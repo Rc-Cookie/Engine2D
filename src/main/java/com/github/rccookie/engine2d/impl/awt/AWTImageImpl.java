@@ -1,15 +1,21 @@
 package com.github.rccookie.engine2d.impl.awt;
 
+import java.awt.AlphaComposite;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
+
 import com.github.rccookie.engine2d.Color;
+import com.github.rccookie.engine2d.Image;
 import com.github.rccookie.engine2d.impl.ImageImpl;
 import com.github.rccookie.engine2d.util.RuntimeIOException;
 import com.github.rccookie.geometry.performance.IVec2;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
+import org.jetbrains.annotations.NotNull;
 
 public class AWTImageImpl implements ImageImpl {
 
@@ -38,6 +44,17 @@ public class AWTImageImpl implements ImageImpl {
         size = new IVec2(image.getWidth(), image.getHeight());
     }
 
+
+    @Override
+    public @NotNull ImageImpl clone() {
+        BufferedImage imageClone = new BufferedImage(size.x, size.y, image.getType());
+        Graphics2D g = imageClone.createGraphics();
+        g.drawImage(image, 0, 0, null);
+        g.dispose();
+        return new AWTImageImpl(imageClone);
+    }
+
+
     @Override
     public void fillRect(IVec2 topLeft, IVec2 size, Color color) {
         Graphics2D g = image.createGraphics();
@@ -55,13 +72,44 @@ public class AWTImageImpl implements ImageImpl {
     }
 
     @Override
+    public void fillOval(IVec2 center, IVec2 size, Color color) {
+        Graphics2D g = image.createGraphics();
+        g.setColor(color.getAwtColor());
+        g.fillOval(center.x - size.x / 2, center.y - size.y / 2, size.x, size.y);
+        g.dispose();
+    }
+
+    @Override
+    public void drawOval(IVec2 center, IVec2 size, Color color) {
+        Graphics2D g = image.createGraphics();
+        g.setColor(color.getAwtColor());
+        g.drawOval(center.x - size.x / 2, center.y - size.y / 2, size.x, size.y);
+        g.dispose();
+    }
+
+    @Override
+    public void drawLine(IVec2 from, IVec2 to, Color color) {
+        Graphics2D g = image.createGraphics();
+        g.setColor(color.getAwtColor());
+        g.drawLine(from.x, from.y, to.x, to.y);
+        g.dispose();
+    }
+
+    @Override
     public void setPixel(IVec2 location, Color color) {
-        fillRect(location, IVec2.ONE, color);
+        image.setRGB(location.x, location.y, color.getRGB());
+    }
+
+    @Override
+    public void clear() {
+        Graphics2D g = image.createGraphics();
+        g.clearRect(0, 0, size.x, size.y);
+        g.dispose();
     }
 
     @Override
     public Color getPixel(IVec2 location) {
-        return new Color(image.getRGB(location.x, location.y));
+        return Color.fromRGB(image.getRGB(location.x, location.y));
     }
 
     @Override
@@ -77,12 +125,17 @@ public class AWTImageImpl implements ImageImpl {
     }
 
     @Override
-    public ImageImpl scaled(IVec2 newSize) {
+    public ImageImpl scaled(IVec2 newSize, Image.AntialiasingMode aaMode) {
         BufferedImage scaled = new BufferedImage(newSize.x, newSize.y, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = scaled.createGraphics();
         g.setComposite(AlphaComposite.Src);
-        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
-        g.drawImage(image, 0, 0, null);
+        if(aaMode == Image.AntialiasingMode.OFF)
+            g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+        else if(aaMode == Image.AntialiasingMode.LOW)
+            g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        else
+            g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+        g.drawImage(image, 0, 0, newSize.x, newSize.y, null);
         g.dispose();
         return new AWTImageImpl(scaled);
     }

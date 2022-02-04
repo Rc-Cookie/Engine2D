@@ -1,17 +1,23 @@
 package com.github.rccookie.engine2d;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import com.github.rccookie.engine2d.core.LocalExecutionManager;
 import com.github.rccookie.engine2d.core.LocalInputManager;
 import com.github.rccookie.engine2d.physics.BoxCollider;
 import com.github.rccookie.engine2d.physics.Convert;
+import com.github.rccookie.engine2d.util.NamedCaughtEvent;
+import com.github.rccookie.event.BiParamEvent;
+import com.github.rccookie.event.CaughtBiParamEvent;
 import com.github.rccookie.event.Event;
 import com.github.rccookie.geometry.performance.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
-
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 public class GameObject {
 
@@ -27,35 +33,31 @@ public class GameObject {
     private final BodyDef bodyData;
 
 
-    public final Event update = new Event() {
+    public final Event update = new NamedCaughtEvent(false, () -> "Gameobject.update on " + this) {
         @Override
-        public void invoke() {
-            for(var c : components.toArray(new Component[0])) c.earlyUpdate.invoke();
+        public boolean invoke() {
+            for(int i=0; i<components.size(); i++)
+                components.get(i).earlyUpdate.invoke();
             super.invoke();
-            for(var c : components.toArray(new Component[0])) c.update.invoke();
+            for(int i=0; i<components.size(); i++)
+                components.get(i).update.invoke();
+            return false;
         }
     };
-    public final Event lateUpdate = new Event() {
+    public final Event lateUpdate = new NamedCaughtEvent(false, () -> "GameObject.lateUpdate on " + this) {
         @Override
-        public void invoke() {
+        public boolean invoke() {
             super.invoke();
-            for(var c : components.toArray(new Component[0])) c.lateUpdate.invoke();
+            for(int i=0; i<components.size(); i++) components.get(i).lateUpdate.invoke();
+            return false;
         }
     };
+    public final BiParamEvent<Map,Map> onMapChange = new CaughtBiParamEvent<>(false);
 
-    public final LocalInputManager input = new LocalInputManager(update) {
-        @Override
-        protected boolean isInputAvailable() {
-            Map map = GameObject.this.map;
-            if(map == null) return false;
-            Camera camera = Camera.getActive();
-            if(camera == null) return false;
-            GameObject cameraObject = camera.getGameObject();
-            return cameraObject != null && cameraObject.map == map;
-        }
-    };
+    public final LocalInputManager input = new LocalInputManager.Impl(update, this::isOnActiveMap);
+    public final LocalExecutionManager execute = new LocalExecutionManager(this::isOnActiveMap);
 
-    final Set<Component> components = new HashSet<>();
+    final List<Component> components = new ArrayList<>();
     final Set<Collider> colliders = new HashSet<>();
 
     private boolean useImageCollider = true;
@@ -69,6 +71,18 @@ public class GameObject {
         bodyData.type = BodyType.KINEMATIC;
         bodyData.linearDamping = 0.2f;
         bodyData.angularDamping = 0.2f;
+        bodyData.fixedRotation = false;
+    }
+
+
+
+    private boolean isOnActiveMap() {
+        Map map = GameObject.this.map;
+        if(map == null) return false;
+        Camera camera = Camera.getActive();
+        if(camera == null) return false;
+        GameObject cameraObject = camera.getGameObject();
+        return cameraObject != null && cameraObject.map == map;
     }
 
 
@@ -85,6 +99,7 @@ public class GameObject {
             this.map.objects.remove(this);
             this.map.paintOrderObjects.remove(this);
         }
+        Map old = this.map;
         this.map = map;
         if(map != null) {
             map.objects.add(this);
@@ -92,10 +107,15 @@ public class GameObject {
             body = map.physicsWorld.createBody(bodyData);
             for(var c : colliders) c.generateFixture(body);
         }
+        onMapChange.invoke(old, map);
     }
 
     public void remove() {
         setMap(null);
+    }
+
+    public Vec2 direction() {
+        return Vec2.angled(angle);
     }
 
 
@@ -131,6 +151,12 @@ public class GameObject {
         boolean out = components.remove(component);
         if(out && component instanceof Collider)
             colliders.remove(component);
+        return out;
+    }
+
+    public <C> C removeComponent(Class<C> type) {
+        C out = getComponent(type);
+        if(out != null) removeComponent((Component) out);
         return out;
     }
 
@@ -174,10 +200,12 @@ public class GameObject {
     }
 
     void preparePhysicsUpdate() {
-        bodyData.position        = location.scaled(Convert.PIXELS_TO_UNITS);
-        bodyData.linearVelocity  = velocity.scaled(Convert.PIXELS_TO_UNITS);
-        bodyData.angle           = angle         * Convert.DEGREES_TO_RADIANS;
-        bodyData.angularVelocity = rotation      * Convert.DEGREES_TO_RADIANS;
+        bodyData.position         = location.scaled(Convert.PIXELS_TO_UNITS);
+        bodyData.linearVelocity   = velocity.scaled(Convert.PIXELS_TO_UNITS);
+        bodyData.angle            = angle         * Convert.DEGREES_TO_RADIANS;
+        bodyData.angularVelocity  = rotation      * Convert.DEGREES_TO_RADIANS;
+//        bodyData.position.y       = -bodyData.position.y;
+//        bodyData.linearVelocity.y = -bodyData.position.y;
 
         assert body != null;
 
@@ -199,6 +227,8 @@ public class GameObject {
         velocity.set(bodyData.linearVelocity).scale(Convert.UNITS_TO_PIXELS);
         angle =      bodyData.angle               * Convert.RADIANS_TO_DEGREES;
         rotation =   bodyData.angularVelocity     * Convert.RADIANS_TO_DEGREES;
+//        location.y = -location.y;
+//        velocity.y = -velocity.y;
     }
 
     protected void update() {

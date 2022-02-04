@@ -1,7 +1,5 @@
 package com.github.rccookie.engine2d.util;
 
-import com.github.rccookie.util.Console;
-
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Deque;
@@ -34,10 +32,8 @@ public class Pool<T> {
 
 
     public T get() {
-        if(objects.isEmpty()) {
-            Console.info("Object pool empty, creating new");
+        if(objects.isEmpty())
             return factory.get();
-        }
         return objects.poll();
     }
 

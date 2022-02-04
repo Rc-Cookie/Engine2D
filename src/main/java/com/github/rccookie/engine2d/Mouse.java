@@ -5,7 +5,7 @@ import com.github.rccookie.geometry.performance.IVec2;
 
 public class Mouse {
 
-    public final IVec2 screenLoc;
+    public final IVec2 pixel;
     public final boolean pressed;
     public final int button;
     public final boolean emulated;
@@ -14,8 +14,8 @@ public class Mouse {
         this(data.screenLoc, data.button, false);
     }
 
-    private Mouse(IVec2 screenLoc, int button, boolean emulated) {
-        this.screenLoc = screenLoc.clone();
+    private Mouse(IVec2 pixel, int button, boolean emulated) {
+        this.pixel = pixel.clone();
         this.button = button;
         this.emulated = emulated;
         this.pressed = button != 0;
@@ -23,12 +23,12 @@ public class Mouse {
 
     public IVec2 mapLoc() {
         // TODO Implement
-        return screenLoc.clone();
+        return pixel.clone();
     }
 
     @Override
     public String toString() {
-        return "Mouse at " + screenLoc + (pressed ? "(pressed: " + button + ")" : "");
+        return "Mouse at " + pixel + (pressed ? "(pressed: " + button + ")" : "");
     }
 
     public static Mouse getEmulated(IVec2 screenLoc, int button) {

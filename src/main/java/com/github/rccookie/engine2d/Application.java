@@ -1,18 +1,19 @@
 package com.github.rccookie.engine2d;
 
+import java.awt.DisplayMode;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+
 import com.github.rccookie.engine2d.core.LoopExecutor;
 import com.github.rccookie.engine2d.core.ParallelLoopExecutor;
 import com.github.rccookie.engine2d.core.SequentialLoopExecutor;
+import com.github.rccookie.engine2d.core.stats.PerformanceStats;
 import com.github.rccookie.engine2d.impl.DisplayController;
 import com.github.rccookie.engine2d.impl.Implementation;
-import com.github.rccookie.engine2d.impl.awt.AWTImplementation;
-import com.github.rccookie.engine2d.physics.BoxCollider;
+import com.github.rccookie.engine2d.util.NamedCaughtEvent;
 import com.github.rccookie.event.Event;
 import com.github.rccookie.geometry.performance.IVec2;
-import com.github.rccookie.geometry.performance.Vec2;
-import com.github.rccookie.util.Console;
-
-import java.awt.*;
+import org.jetbrains.annotations.Blocking;
 
 public enum Application {
 
@@ -37,8 +38,15 @@ public enum Application {
         }
     };
 
-    public static final Event earlyUpdate = new Event();
-    public static final Event update = new Event();
+    /**
+     * Called before all update methods in GameObjects and UIObjects.
+     */
+    public static final Event earlyUpdate = new NamedCaughtEvent(false, "Application.earlyUpdate");
+
+    /**
+     * Called after all update methods in GameObjects and UIObjects.
+     */
+    public static final Event lateUpdate = new NamedCaughtEvent(false, "Application.lateUpdate");
 
     private static LoopExecutor executor = null;
     private static Implementation implementation = null;
@@ -84,6 +92,7 @@ public enum Application {
      * Starts the application on this thread. No further code immediately after
      * the call to this method will execute until the application quits.
      */
+    @Blocking
     public static void start() {
         checkSetup();
         synchronized (Application.class) {
@@ -104,7 +113,7 @@ public enum Application {
             running = true;
         }
         if(implementation.supportsMultithreading())
-            new Thread(Application::runUpdateLoop).start();
+            new Thread(Application::runUpdateLoop, "Application Thread").start();
         else runUpdateLoop();
     }
 
@@ -147,78 +156,24 @@ public enum Application {
         executor.setFps(fps);
     }
 
+    public static PerformanceStats getPerformanceStats() {
+        Camera camera = Camera.getActive();
+        return new PerformanceStats(
+                executor.getFrameDuration() / 1000000000f,
+                camera.renderPrepDuration / 1000000000f,
+                camera.renderDuration / 1000000000f,
+                camera.drawCount,
+                camera.getPoolSize(),
+                camera.updateDuration / 1000000000f,
+                camera.physicsDuration / 1000000000f,
+                camera.uiUpdateDuration / 1000000000f,
+                executor.getBottleneck(),
+                executor.isParallel()
+        );
+    }
+
     static void checkSetup() {
         if(implementation == null)
             throw new IllegalStateException("The application has to be set up using using Application.setup() before any actions can be performed on it");
-    }
-
-
-
-    public static void main(String[] args) {
-
-        Application.setup(new AWTImplementation(), false);
-
-        Map map = new Map();
-        map.setGravity(new Vec2(0, -9.81f));
-        map.setAllowPhysicsSleep(false);
-
-        GameObject cameraObject = new GameObject();
-        cameraObject.setImage(new Image(new IVec2(20, 40), Color.RED));
-        cameraObject.location.x = 250;
-        cameraObject.velocity.x = -100;
-        cameraObject.usePhysics(true);
-        new BoxCollider(cameraObject, Vec2.ONE.scaled(10));
-        cameraObject.setMap(map);
-        cameraObject.rotation = 90;
-
-        GameObject gameObject = new GameObject();
-        gameObject.setImage(new Image(IVec2.ONE.scaled(32), Color.BLUE));
-        gameObject.setImage(Image.text("Hello\nWorld!", 32, Color.BLUE));
-        gameObject.usePhysics(true);
-        gameObject.getComponent(Collider.class).setRestitution(1);
-        gameObject.setMap(map);
-
-//        Settings.maxTranslation = 200f;
-//        Settings.maxTranslationSquared = 200f * 200f;
-
-        UI ui = new UI();
-        UIObject uiObject = new UIObject(ui);
-        uiObject.setImage(new Image(new IVec2(400, 100), Color.DARK_GRAY));
-        uiObject.relativeLoc.y = 1;
-        UIObject uiObject1 = new UIObject(uiObject);
-        uiObject1.setImage(new Image(IVec2.ONE.scaled(16), Color.PINK));
-        uiObject1.relativeLoc.set(-1, -1);
-
-        Camera camera = new Camera(new IVec2(600, 400));
-
-        GameObject cameraManager = new GameObject();
-        cameraManager.setImage(new Image(IVec2.ONE.scaled(4), Color.BLACK));
-        cameraManager.getComponent(Collider.class).setRestitution(0);
-        cameraManager.setMap(map);
-        Input.addKeyListener(() -> camera.setGameObject(cameraObject), "1");
-        Input.addKeyListener(() -> camera.setGameObject(gameObject), "2");
-        cameraManager.input.addKeyListener(() -> Console.map("Velocity", cameraObject.velocity, cameraObject.rotation), "t");
-        cameraManager.input.addKeyPressListener(() -> cameraManager.velocity.y += 300, "s", "down");
-        cameraManager.input.addKeyPressListener(() -> cameraManager.velocity.y -= 300, "w", "up");
-        cameraManager.input.addKeyPressListener(() -> cameraManager.velocity.x += 300, "d", "right");
-        cameraManager.input.addKeyPressListener(() -> cameraManager.velocity.x -= 300, "a", "left");
-        cameraManager.input.addKeyReleaseListener(() -> cameraManager.velocity.y += -300, "s", "down");
-        cameraManager.input.addKeyReleaseListener(() -> cameraManager.velocity.y -= -300, "w", "up");
-        cameraManager.input.addKeyReleaseListener(() -> cameraManager.velocity.x += -300, "d", "right");
-        cameraManager.input.addKeyReleaseListener(() -> cameraManager.velocity.x -= -300, "a", "left");
-        cameraManager.input.addKeyListener(() -> cameraManager.angle += 90 * Time.delta(), "e");
-        cameraManager.input.addKeyListener(() -> cameraManager.angle -= 90 * Time.delta(), "q");
-
-        camera.setGameObject(cameraManager);
-        camera.setUI(ui);
-
-        Application.startAsync();
-
-        Execute.when(() -> uiObject1.update.add(() -> uiObject1.relativeLoc.x = Math.min(1, uiObject1.relativeLoc.x + Time.delta())), () -> Input.getKeyState(" "));
-        Execute.when(cameraObject::remove, () -> Input.getKeyState("r"));
-        Execute.when(() -> camera.setBackgroundColor(Color.DARK_GRAY.setBlue(1f)), () -> Input.getKeyState("c"));
-        Execute.when(() -> camera.setGameObject(null), () -> Input.getKeyState("n"));
-
-        Application.update.add(() -> Console.map("Velocity", cameraManager.velocity));
     }
 }

@@ -1,13 +1,16 @@
 package com.github.rccookie.engine2d.impl.awt;
 
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
+
 import com.github.rccookie.engine2d.Color;
 import com.github.rccookie.engine2d.impl.ImageImpl;
 import com.github.rccookie.engine2d.impl.ImageImplFactory;
 import com.github.rccookie.engine2d.util.RuntimeIOException;
 import com.github.rccookie.geometry.performance.IVec2;
-
-import java.awt.*;
-import java.awt.image.BufferedImage;
 
 public class AWTImageImplFactory implements ImageImplFactory {
     @Override
@@ -30,7 +33,7 @@ public class AWTImageImplFactory implements ImageImplFactory {
         g.setFont(font);
         FontMetrics metrics = g.getFontMetrics();
         int height = metrics.getHeight() * lines.length;
-        int width = 0;
+        int width = 1;
         for(String line : lines) {
             int w = (int) Math.ceil(metrics.getStringBounds(line, g).getWidth());
             if(w > width) width = w;

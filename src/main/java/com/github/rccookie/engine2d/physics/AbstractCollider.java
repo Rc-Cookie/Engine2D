@@ -18,13 +18,19 @@ abstract class AbstractCollider<S extends Shape> extends Collider {
     Fixture fixture;
     final FixtureDef fixtureData;
 
+    private Body delayed = null;
+
     AbstractCollider(GameObject gameObject, S shape) {
         super(gameObject);
         this.shape = Arguments.checkNull(shape);
         fixtureData = new FixtureDef();
         fixtureData.shape = shape;
         fixtureData.friction = 0.5f;
+        fixtureData.density = 1;
+        fixtureData.restitution = 0.2f;
         fixtureData.userData = this;
+        if(delayed != null)
+            generateFixture(delayed);
     }
 
     @Override
@@ -34,6 +40,12 @@ abstract class AbstractCollider<S extends Shape> extends Collider {
 
     @Override
     protected void generateFixture(Body body) {
+        FixtureDef fixtureData = this.fixtureData;
+        if(fixtureData == null) {
+            delayed = body;
+            return;
+        }
+        delayed = null;
         fixture = body.createFixture(fixtureData);
     }
 

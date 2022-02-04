@@ -1,10 +1,15 @@
 package com.github.rccookie.engine2d;
 
 import com.github.rccookie.engine2d.physics.Raycast;
+import com.github.rccookie.event.CaughtParamEvent;
+import com.github.rccookie.event.ParamEvent;
 import com.github.rccookie.geometry.performance.Vec2;
 import org.jbox2d.dynamics.Body;
 
 public abstract class Collider extends Component {
+
+    public final ParamEvent<Collider> onCollisionEnter = new CaughtParamEvent<>();
+    public final ParamEvent<Collider> onCollisionExit = new CaughtParamEvent<>();
 
     public Collider(GameObject gameObject) {
         super(gameObject);

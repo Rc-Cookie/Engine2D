@@ -1,44 +1,50 @@
 package com.github.rccookie.engine2d.impl.awt;
 
+import java.awt.MouseInfo;
+import java.awt.Point;
+import java.awt.PointerInfo;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
+import javax.swing.JFrame;
+
 import com.github.rccookie.engine2d.impl.InputAdapter;
 import com.github.rccookie.engine2d.impl.MouseData;
+import com.github.rccookie.event.action.BiParamAction;
+import com.github.rccookie.event.action.ParamAction;
 import com.github.rccookie.geometry.performance.IVec2;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 public class AWTInputAdapter implements InputAdapter {
 
     @Override
-    public void attachKeyEvent(BiConsumer<String, Boolean> event) {
+    public void attachKeyEvent(BiParamAction<String, Boolean> event) {
         JFrame window = AWTDisplay.INSTANCE.window;
         window.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                event.accept(getKeyString(e), true);
+                event.run(getKeyString(e), true);
             }
 
             @Override
             public void keyReleased(KeyEvent e) {
-                event.accept(getKeyString(e), false);
+                event.run(getKeyString(e), false);
             }
         });
     }
 
     @Override
-    public void attachMouseEvent(Consumer<MouseData> event) {
+    public void attachMouseEvent(ParamAction<MouseData> event) {
         JFrame window = AWTDisplay.INSTANCE.window;
         window.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                Point displayOnScreenPoint = AWTDisplay.INSTANCE.getLocationOnScreen();
-                IVec2 pos = new IVec2(e.getXOnScreen() - displayOnScreenPoint.x,
-                        e.getYOnScreen() - displayOnScreenPoint.y);
-                event.accept(new MouseData(pos, e.getButton()));
-                event.accept(new MouseData(pos, 0));
+//                Point displayOnScreenPoint = AWTDisplay.INSTANCE.getLocationOnScreen();
+//                IVec2 pos = new IVec2(e.getXOnScreen() - displayOnScreenPoint.x,
+//                        e.getYOnScreen() - displayOnScreenPoint.y);
+//                event.accept(new MouseData(pos, e.getButton()));
+//                event.accept(new MouseData(pos, 0));
             }
 
             @Override
@@ -46,7 +52,7 @@ public class AWTInputAdapter implements InputAdapter {
                 Point displayOnScreenPoint = AWTDisplay.INSTANCE.getLocationOnScreen();
                 IVec2 pos = new IVec2(e.getXOnScreen() - displayOnScreenPoint.x,
                         e.getYOnScreen() - displayOnScreenPoint.y);
-                event.accept(new MouseData(pos, e.getButton()));
+                event.run(new MouseData(pos, e.getButton()));
             }
 
             @Override
@@ -54,7 +60,7 @@ public class AWTInputAdapter implements InputAdapter {
                 Point displayOnScreenPoint = AWTDisplay.INSTANCE.getLocationOnScreen();
                 IVec2 pos = new IVec2(e.getXOnScreen() - displayOnScreenPoint.x,
                         e.getYOnScreen() - displayOnScreenPoint.y);
-                event.accept(new MouseData(pos, 0));
+                event.run(new MouseData(pos, 0));
             }
         });
     }

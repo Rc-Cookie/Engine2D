@@ -1,12 +1,13 @@
 package com.github.rccookie.engine2d;
 
-import com.github.rccookie.engine2d.impl.MouseData;
-import com.github.rccookie.event.ParamEvent;
-import com.github.rccookie.geometry.performance.IVec2;
-
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
+
+import com.github.rccookie.engine2d.impl.MouseData;
+import com.github.rccookie.engine2d.util.OrderedParamEvent;
+import com.github.rccookie.event.ParamEvent;
+import com.github.rccookie.geometry.performance.IVec2;
 
 public enum Input {
 
@@ -21,10 +22,10 @@ public enum Input {
      */
     public static boolean REPORT_KEY_REPEAT = false;
 
-    public static final ParamEvent<String> keyPressed = new ParamEvent<>();
-    public static final ParamEvent<String> keyReleased = new ParamEvent<>();
-    public static final ParamEvent<Mouse> mousePressed = new ParamEvent<>();
-    public static final ParamEvent<Mouse> mouseReleased = new ParamEvent<>();
+    public static final ParamEvent<String> keyPressed    = new OrderedParamEvent<>();
+    public static final ParamEvent<String> keyReleased   = new OrderedParamEvent<>();
+    public static final ParamEvent<Mouse>  mousePressed  = new OrderedParamEvent<>();
+    public static final ParamEvent<Mouse>  mouseReleased = new OrderedParamEvent<>();
 
     private static Mouse lastMouse = Mouse.getEmulated(IVec2.ZERO, 0);
     private static final Set<String> pressedKeys = new HashSet<>();
@@ -74,7 +75,7 @@ public enum Input {
 
     public static void addKeyListener(Consumer<String> action, String... keys) {
         if(keys == null || keys.length == 0) return;
-        Application.update.add(() -> {
+        Application.lateUpdate.add(() -> {
             for(String k : keys) {
                 if(getKeyState(k)) {
                     action.accept(k);
@@ -118,7 +119,7 @@ public enum Input {
         String lowerKey = key.toLowerCase();
         boolean wasPressed;
         synchronized (pressedKeys) {
-            wasPressed = pressedKeys.contains(key);
+            wasPressed = pressedKeys.contains(lowerKey);
         }
         if(pressed) {
             if(wasPressed) {

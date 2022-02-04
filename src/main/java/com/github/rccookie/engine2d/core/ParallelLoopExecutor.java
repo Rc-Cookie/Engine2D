@@ -1,27 +1,37 @@
 package com.github.rccookie.engine2d.core;
 
+import java.util.function.Consumer;
+
 import com.github.rccookie.engine2d.Application;
 import com.github.rccookie.engine2d.Camera;
-
-import java.util.function.Consumer;
+import com.github.rccookie.engine2d.core.stats.Bottleneck;
 
 public class ParallelLoopExecutor extends LoopExecutor {
 
     private volatile boolean startLoops = false;
+    private volatile long frameDuration = 0;
+    private volatile long renderDuration1 = 0, renderDuration2 = 0;
 
 
-    LoopThread updateThread = new LoopThread(c -> {
+    LoopThread updateThread = new LoopThread("Update Thread", c -> {
+        long frameStart = System.nanoTime();
         updateTime();
         Application.earlyUpdate.invoke();
         if(c != null) {
             c.update.invoke();
-            Application.update.invoke();
-            c.prepareRender();
+            Application.lateUpdate.invoke();
+            frameDuration = System.nanoTime() - frameStart;
+            renderDuration1 = c.prepareRender();
         }
-        else Application.update.invoke();
+        else {
+            Application.lateUpdate.invoke();
+            frameDuration = System.nanoTime() - frameStart;
+            renderDuration1 = 0;
+        }
     });
-    LoopThread renderThread = new LoopThread(c -> {
-        if(c != null) c.render();
+    LoopThread renderThread = new LoopThread("Render Thread", c -> {
+        if(c != null) renderDuration2 = c.render();
+        else renderDuration2 = 0;
     });
 
 
@@ -30,6 +40,8 @@ public class ParallelLoopExecutor extends LoopExecutor {
         renderThread.start();
     }
 
+
+    // TODO update bottleneck
 
     @Override
     public void runIteration() {
@@ -41,28 +53,31 @@ public class ParallelLoopExecutor extends LoopExecutor {
         long delay = getIterationDelay();
         long remainingDelay = delay - (System.nanoTime() - frameStart);
         if(remainingDelay > 0) {
-            if(Application.getImplementation().supportsSleeping()) {
+            if(Application.getImplementation().supportsSleeping() || Application.FORCE_FPS_CAP) {
                 Application.getImplementation().sleep(remainingDelay / 1000000, (int) (remainingDelay % 1000000));
                 // Parallel execution looses enough time for managing the threads so that an exact waiting is unnecessary
             }
-            else if(Application.FORCE_FPS_CAP) {
-                long targetTime = System.nanoTime() + remainingDelay;
-                //noinspection StatementWithEmptyBody
-                while(System.nanoTime() < targetTime);
-            }
         }
 
+        boolean bottlenecked = updateThread.running || renderThread.running;
+
         while(updateThread.running || renderThread.running) Thread.yield();
+        if(!bottlenecked) setBottleneck(Bottleneck.FPS_CAP);
+        else setBottleneck(frameDuration < renderDuration1 + renderDuration2 ? Bottleneck.RENDERING : Bottleneck.UPDATE);
     }
 
-
+    @Override
+    public long getFrameDuration() {
+        return frameDuration;
+    }
 
     class LoopThread extends Thread {
 
         volatile boolean running = false;
         private final Consumer<Camera> loopAction;
 
-        public LoopThread(Consumer<Camera> loopAction) {
+        public LoopThread(String name, Consumer<Camera> loopAction) {
+            super(name);
             this.loopAction = loopAction;
         }
 
@@ -82,5 +97,10 @@ public class ParallelLoopExecutor extends LoopExecutor {
                 running = false;
             }
         }
+    }
+
+    @Override
+    public boolean isParallel() {
+        return true;
     }
 }

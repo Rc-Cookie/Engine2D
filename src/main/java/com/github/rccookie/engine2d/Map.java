@@ -1,47 +1,85 @@
 package com.github.rccookie.engine2d;
 
-import com.github.rccookie.engine2d.physics.Raycast;
-import com.github.rccookie.engine2d.physics.RaycastFilter;
-import com.github.rccookie.geometry.performance.Vec2;
-import com.github.rccookie.util.Arguments;
-import org.jbox2d.callbacks.RaycastCallback;
-import org.jbox2d.dynamics.Fixture;
-import org.jbox2d.dynamics.World;
-
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.github.rccookie.engine2d.physics.Raycast;
+import com.github.rccookie.engine2d.physics.RaycastFilter;
+import com.github.rccookie.geometry.performance.Vec2;
+import com.github.rccookie.util.Arguments;
+
+import org.jbox2d.callbacks.ContactImpulse;
+import org.jbox2d.callbacks.ContactListener;
+import org.jbox2d.callbacks.RaycastCallback;
+import org.jbox2d.collision.Manifold;
+import org.jbox2d.dynamics.Fixture;
+import org.jbox2d.dynamics.World;
+import org.jbox2d.dynamics.contacts.Contact;
+
 public class Map {
 
-    final Set<GameObject> objects = new HashSet<>();
+    final List<GameObject> objects = new ArrayList<>();
     final List<GameObject> paintOrderObjects = new ArrayList<>();
 
     final World physicsWorld = new World(new Vec2());
 
+    long updateDuration = 0;
+    long physicsDuration = 0;
+
+
     public Map() {
         Application.checkSetup();
         physicsWorld.setAutoClearForces(true);
+        physicsWorld.setContactListener(new ContactListener() {
+            @Override
+            public void beginContact(Contact contact) {
+                Collider a = (Collider) contact.m_fixtureA.m_userData;
+                Collider b = (Collider) contact.m_fixtureB.m_userData;
+                Execute.later(() -> {
+                    a.onCollisionEnter.invoke(b);
+                    b.onCollisionEnter.invoke(a);
+                });
+            }
+
+            @Override
+            public void endContact(Contact contact) {
+                Collider a = (Collider) contact.m_fixtureA.m_userData;
+                Collider b = (Collider) contact.m_fixtureB.m_userData;
+                Execute.later(() -> {
+                    a.onCollisionExit.invoke(b);
+                    b.onCollisionExit.invoke(a);
+                });
+            }
+
+            @Override
+            public void preSolve(Contact contact, Manifold oldManifold) { }
+
+            @Override
+            public void postSolve(Contact contact, ContactImpulse impulse) { }
+        });
     }
 
     public void update() {
-        RuntimeException exception = null;
-        try {
-            for(GameObject o : objects.toArray(new GameObject[0]))
-                o.update.invoke();
-        } catch(RuntimeException e) { exception = e; }
+        long start = System.nanoTime();
+        for(int i=0; i<objects.size(); i++)
+            objects.get(i).update.invoke();
+        long updateDuration = System.nanoTime() - start;
+
+        start = System.nanoTime();
         for(GameObject o : objects) o.preparePhysicsUpdate();
         physicsWorld.step(Time.delta(), 6, 2);
         for(GameObject o : objects) o.processPhysicsUpdate();
-        try {
-            for(GameObject o : objects.toArray(new GameObject[0]))
-                o.lateUpdate.invoke();
-        } catch(RuntimeException e) {
-            if(exception == null) exception = e;
-            else exception.addSuppressed(e);
-        }
-        if(exception != null) throw exception;
+        physicsDuration = System.nanoTime() - start;
+
+        start = System.nanoTime();
+        for(int i=0; i<objects.size(); i++)
+            objects.get(i).lateUpdate.invoke();
+        updateDuration += System.nanoTime() - start;
+        this.updateDuration = updateDuration;
     }
 
 
@@ -60,6 +98,16 @@ public class Map {
 
     public void setAllowPhysicsSleep(boolean flag) {
         physicsWorld.setAllowSleep(flag);
+    }
+
+
+
+    public Collection<GameObject> getObjects() {
+        return Collections.unmodifiableCollection(objects);
+    }
+
+    public int getObjectCount() {
+        return objects.size();
     }
 
 

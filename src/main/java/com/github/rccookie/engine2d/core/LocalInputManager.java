@@ -1,38 +1,36 @@
 package com.github.rccookie.engine2d.core;
 
-import com.github.rccookie.engine2d.Input;
-import com.github.rccookie.engine2d.Mouse;
-import com.github.rccookie.event.Event;
-import com.github.rccookie.event.ParamEvent;
-import com.github.rccookie.util.Arguments;
-
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
+import com.github.rccookie.engine2d.Input;
+import com.github.rccookie.engine2d.Mouse;
+import com.github.rccookie.engine2d.util.OrderedParamEvent;
+import com.github.rccookie.event.Event;
+import com.github.rccookie.event.ParamEvent;
+import com.github.rccookie.util.Arguments;
+import org.jetbrains.annotations.NotNull;
+
 public abstract class LocalInputManager {
 
-    public final ParamEvent<String> keyPressed = new ParamEvent<>();
-    public final ParamEvent<String> keyReleased = new ParamEvent<>();
-    public final ParamEvent<Mouse> mousePressed = new ParamEvent<>();
-    public final ParamEvent<Mouse> mouseReleased = new ParamEvent<>();
+    public final ParamEvent<String> keyPressed    = new SplitParamEvent<>();
+    public final ParamEvent<String> keyReleased   = new SplitParamEvent<>();
+    public final ParamEvent<Mouse>  mousePressed  = new SplitParamEvent<>();
+    public final ParamEvent<Mouse>  mouseReleased = new SplitParamEvent<>();
 
     private final Event update;
 
 
-    public LocalInputManager(Event updateEvent) {
+    public LocalInputManager(@NotNull Event updateEvent) {
         update = Arguments.checkNull(updateEvent);
-        Input.keyPressed.add(k -> {
-            if(isInputAvailable()) keyPressed.invoke(k);
-        });
-        Input.keyReleased.add(k -> {
-            if(isInputAvailable()) keyReleased.invoke(k);
-        });
-        Input.mousePressed.add(k -> {
-            if(isInputAvailable()) mousePressed.invoke(k);
-        });
-        Input.mouseReleased.add(k -> {
-            if(isInputAvailable()) mouseReleased.invoke(k);
-        });
+        Input.keyPressed   .addConsuming(k ->      isInputAvailable() && ((SplitParamEvent<String>) keyPressed)   .invokeConsuming(k));
+        Input.keyReleased  .addConsuming(k ->      isInputAvailable() && ((SplitParamEvent<String>) keyReleased)  .invokeConsuming(k));
+        Input.mousePressed .addConsuming(m ->      isInputAvailable() && ((SplitParamEvent<Mouse>)  mousePressed) .invokeConsuming(m));
+        Input.mouseReleased.addConsuming(m ->      isInputAvailable() && ((SplitParamEvent<Mouse>)  mouseReleased).invokeConsuming(m));
+        Input.keyPressed   .add(k -> { if(isInputAvailable())   ((SplitParamEvent<String>) keyPressed)   .invokeNonConsuming(k); });
+        Input.keyReleased  .add(k -> { if(isInputAvailable())   ((SplitParamEvent<String>) keyReleased)  .invokeNonConsuming(k); });
+        Input.mousePressed .add(k -> { if(isInputAvailable())   ((SplitParamEvent<Mouse>) mousePressed)  .invokeNonConsuming(k); });
+        Input.mouseReleased.add(k -> { if(isInputAvailable())   ((SplitParamEvent<Mouse>) mouseReleased) .invokeNonConsuming(k); });
     }
 
 
@@ -109,6 +107,27 @@ public abstract class LocalInputManager {
         @Override
         protected boolean isInputAvailable() {
             return isInputAvailable.getAsBoolean();
+        }
+    }
+
+
+
+    private static class SplitParamEvent<T> extends OrderedParamEvent<T> {
+
+        @Override
+        public boolean invokeConsuming(T info) {
+            return super.invokeConsuming(info);
+        }
+
+        @Override
+        public void invokeNonConsuming(T info) {
+            super.invokeNonConsuming(info);
+        }
+
+        @Override
+        @Deprecated
+        public boolean invoke(T info) {
+            return super.invoke(info);
         }
     }
 }

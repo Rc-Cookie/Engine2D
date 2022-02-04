@@ -1765,7 +1765,7 @@ public class ParticleSystem {
         newCapacity, deferred);
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "deprecation"})
   <T> T[] requestParticleBuffer(Class<T> klass, T[] buffer) {
     if (buffer == null) {
       buffer = (T[]) Array.newInstance(klass, m_internalAllocatedCapacity);

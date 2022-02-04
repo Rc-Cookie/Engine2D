@@ -1,5 +1,17 @@
 package com.github.rccookie.engine2d.impl.awt;
 
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.WindowConstants;
+
 import com.github.rccookie.engine2d.Application;
 import com.github.rccookie.engine2d.Color;
 import com.github.rccookie.engine2d.Execute;
@@ -8,13 +20,6 @@ import com.github.rccookie.engine2d.impl.Display;
 import com.github.rccookie.engine2d.impl.DisplayController;
 import com.github.rccookie.geometry.performance.IVec2;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.geom.AffineTransform;
-import java.awt.image.BufferedImage;
-
 public class AWTDisplay extends JPanel implements Display {
 
     static DisplayController displayController;
@@ -22,29 +27,69 @@ public class AWTDisplay extends JPanel implements Display {
 
     final JFrame window;
 
-    BufferedImage image;
     private IVec2 resolution;
 
+    private DrawObject[] objects;
+    private Color background;
 
-    public AWTDisplay() {
-        window = new JFrame("Hello");
+
+    public AWTDisplay(String title) {
+        window = new JFrame(title);
         window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         window.getContentPane().add(this);
         window.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
-                Application.getDisplayController().setResolution(new IVec2(window.getWidth() - 8, window.getHeight() - 19));
+                Application.getDisplayController().setResolution(new IVec2(window.getWidth() - 8, window.getHeight() - 39));
             }
         });
 
         setResolution(Display.DEFAULT_RESOLUTION);
+
+//        this.setDoubleBuffered(true);
 
         window.setVisible(true);
     }
 
     @Override
     public void draw(DrawObject[] objects, Color background) {
-        Graphics2D g = image.createGraphics();
+        synchronized (this) {
+            this.objects = objects;
+            this.background = background;
+        }
+        repaint();
+    }
+
+    @Override
+    public void setResolution(IVec2 resolution) {
+        this.resolution = resolution;
+        // Does not seem to have an impact even after a call to window.pack()
+        setMinimumSize(new Dimension(resolution.x, resolution.y));
+        window.setSize(resolution.x + 8, resolution.y + 39);
+    }
+
+    @Override
+    public void allowResizingChanged(boolean allowed) {
+        Execute.nextFrame(() -> window.setResizable(allowed));
+    }
+
+    @Override
+    protected void paintComponent(Graphics g1d) {
+        super.paintComponent(g1d);
+
+        Graphics2D g = (Graphics2D) g1d;
+
+        DrawObject[] objects;
+        Color background;
+        synchronized (this) {
+            objects = this.objects;
+            background = this.background;
+        }
+
+        if(objects == null) return;
+
+        if(background.a != 255)
+            g.clearRect(0, 0, resolution.x, resolution.y);
         g.setColor(background.getAwtColor());
         g.fillRect(0, 0, resolution.x, resolution.y);
 
@@ -63,29 +108,6 @@ public class AWTDisplay extends JPanel implements Display {
 
             if(oldTransform != null) g.setTransform(oldTransform);
         }
-        g.dispose();
-
-        repaint();
-    }
-
-    @Override
-    public void setResolution(IVec2 resolution) {
-        this.resolution = resolution;
-        image = new BufferedImage(resolution.x, resolution.y, BufferedImage.TYPE_INT_ARGB);
-        // Does not seem to have an impact even after a call to window.pack()
-        setMinimumSize(new Dimension(resolution.x, resolution.y));
-        window.setSize(resolution.x + 8, resolution.y + 19);
-    }
-
-    @Override
-    public void allowResizingChanged(boolean allowed) {
-        Execute.nextFrame(() -> window.setResizable(allowed));
-    }
-
-    @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        g.drawImage(image, 0, 0, null);
     }
 
     static void init() { }

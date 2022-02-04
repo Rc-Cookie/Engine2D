@@ -6,11 +6,17 @@ public class AWTImplementation implements Implementation {
 
     private final ImageImplFactory imageFactory = new AWTImageImplFactory();
     private final InputAdapter inputAdapter = new AWTInputAdapter();
+    
+    private final AWTStartupPrefs prefs;
+
+    public AWTImplementation(AWTStartupPrefs prefs) {
+        this.prefs = prefs;
+    }
 
     @Override
     public void setDisplayController(DisplayController displayController) {
         AWTDisplay.displayController = displayController;
-        AWTDisplay.INSTANCE = new AWTDisplay();
+        AWTDisplay.INSTANCE = new AWTDisplay(prefs.applicationName);
     }
 
     @Override

@@ -1,22 +1,24 @@
 package com.github.rccookie.engine2d;
 
-import com.github.rccookie.engine2d.util.Future;
-import com.github.rccookie.engine2d.util.FutureImpl;
-import com.github.rccookie.util.Console;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
-public final class Execute {
+import com.github.rccookie.engine2d.util.Future;
+import com.github.rccookie.engine2d.util.FutureImpl;
+import com.github.rccookie.util.Console;
+
+public enum Execute {
+
+    ;
 
     private static final Collection<ExecutionTask<Object>> TASKS = new ArrayList<>();
     private static final Collection<RepeatingExecutionTask> REPEATING_TASKS = new ArrayList<>();
 
     static {
         Application.earlyUpdate.add(Execute::runTasks);
-        Application.update.add(Execute::runAllTasks);
+        Application.lateUpdate.add(Execute::runAllTasks);
         repeating(() -> Console.custom("FPS", Time.fps()), 1, 1, true);
     }
 
@@ -161,10 +163,6 @@ public final class Execute {
     }
 
 
-
-    private Execute() {
-        throw new UnsupportedOperationException();
-    }
 
     static void init() { }
 

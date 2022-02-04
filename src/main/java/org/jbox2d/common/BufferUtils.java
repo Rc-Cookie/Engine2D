@@ -4,8 +4,9 @@ import java.lang.reflect.Array;
 
 public class BufferUtils {
   /** Reallocate a buffer. */
+  @SuppressWarnings("deprecation")
   public static <T> T[] reallocateBuffer(Class<T> klass, T[] oldBuffer, int oldCapacity,
-      int newCapacity) {
+                                         int newCapacity) {
     assert (newCapacity > oldCapacity);
     @SuppressWarnings("unchecked")
     T[] newBuffer = (T[]) Array.newInstance(klass, newCapacity);

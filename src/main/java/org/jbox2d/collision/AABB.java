@@ -23,9 +23,10 @@
  ******************************************************************************/
 package org.jbox2d.collision;
 
+import com.github.rccookie.geometry.performance.Vec2;
+
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Settings;
-import com.github.rccookie.geometry.performance.Vec2;
 import org.jbox2d.pooling.IWorldPool;
 import org.jbox2d.pooling.normal.DefaultWorldPool;
 
@@ -192,6 +193,7 @@ public class AABB {
    * @param input
    * @return
    */
+  @Deprecated
   public final boolean raycast(final RayCastOutput output, final RayCastInput input) {
     return raycast(output, input, new DefaultWorldPool(4, 4));
   }

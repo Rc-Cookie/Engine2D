@@ -1,9 +1,12 @@
 package com.github.rccookie.engine2d.core;
 
 import com.github.rccookie.engine2d.Time;
-import com.github.rccookie.util.ArgumentOutOfRangeException;
+import com.github.rccookie.engine2d.core.stats.Bottleneck;
+import com.github.rccookie.util.Arguments;
 
 public abstract class LoopExecutor {
+
+    private Bottleneck bottleneck = Bottleneck.FPS_CAP;
 
     private static Runnable timeUpdate;
 
@@ -19,7 +22,7 @@ public abstract class LoopExecutor {
     }
 
     public void setFps(float fps) {
-        if(fps < 0.1) throw new ArgumentOutOfRangeException(fps, 0.1, null);
+        Arguments.checkRange(fps, 0.1f, null);
         iterationDelay = fps > 1000 ? 0 : (long) (1000000000 / fps);
     }
 
@@ -36,6 +39,18 @@ public abstract class LoopExecutor {
         if(timeUpdate == null) Time.time();
         timeUpdate.run();
     }
+
+    protected void setBottleneck(Bottleneck bottleneck) {
+        this.bottleneck = Arguments.checkNull(bottleneck);
+    }
+
+    public Bottleneck getBottleneck() {
+        return bottleneck;
+    }
+
+    public abstract long getFrameDuration();
+
+    public abstract boolean isParallel();
 
     public static void setTimeUpdate(Runnable update) {
         if(timeUpdate != null) throw new IllegalStateException();

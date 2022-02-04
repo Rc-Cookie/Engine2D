@@ -1,16 +1,14 @@
 package com.github.rccookie.engine2d;
 
-import com.github.rccookie.engine2d.core.LoopExecutor;
-import com.github.rccookie.util.ArgumentOutOfRangeException;
-
 import java.util.ArrayDeque;
 import java.util.Deque;
 
-public final class Time {
+import com.github.rccookie.engine2d.core.LoopExecutor;
+import com.github.rccookie.util.Arguments;
 
-    private Time() {
-        throw new UnsupportedOperationException();
-    }
+public enum Time {
+
+    ;
 
     static {
         LoopExecutor.setTimeUpdate(Time::update);
@@ -89,8 +87,7 @@ public final class Time {
     }
 
     public static void setMaxDelta(float maxDelta) {
-        if(maxDelta <= 0)
-            throw new ArgumentOutOfRangeException(maxDelta, 0.00000000001, null);
+        Arguments.checkExclusive(maxDelta, 0d, null);
         Time.maxDelta = maxDelta;
     }
 

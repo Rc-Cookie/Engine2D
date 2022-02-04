@@ -1,8 +1,14 @@
 package com.github.rccookie.engine2d;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
 import com.github.rccookie.engine2d.core.DrawObject;
+import com.github.rccookie.engine2d.core.LocalExecutionManager;
 import com.github.rccookie.engine2d.core.LocalInputManager;
 import com.github.rccookie.engine2d.impl.Display;
+import com.github.rccookie.engine2d.util.NamedCaughtEvent;
 import com.github.rccookie.engine2d.util.Pool;
 import com.github.rccookie.event.Event;
 import com.github.rccookie.geometry.performance.IVec2;
@@ -10,10 +16,6 @@ import com.github.rccookie.geometry.performance.Vec2;
 import com.github.rccookie.util.ArgumentOutOfRangeException;
 import com.github.rccookie.util.Arguments;
 import com.github.rccookie.util.Console;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 public class Camera {
 
@@ -37,11 +39,16 @@ public class Camera {
     private Color backgroundColor = Color.WHITE;
 
     private final Pool<DrawObject> drawObjectPool = new Pool<>(DrawObject::new);
-    private final List<DrawObject> drawObjects = new ArrayList<>();
+    final List<DrawObject> drawObjects = new ArrayList<>();
+    long updateDuration = 0, physicsDuration = 0, uiUpdateDuration = 0;
+    long renderPrepDuration = 0;
+    long renderDuration = 0;
+    int drawCount = 0;
 
-    public final Event update = new Event();
+    public final Event update = new NamedCaughtEvent(false, () -> "Camera.update on " + this);
 
-    public final LocalInputManager input = new LocalInputManager.Impl(update, () -> Camera.active == this);
+    public final LocalInputManager input = new LocalInputManager.Impl(update, this::isActive);
+    public final LocalExecutionManager execute = new LocalExecutionManager(this::isActive);
 
 
 
@@ -49,6 +56,10 @@ public class Camera {
         Application.checkSetup();
 
         update.add(this::update);
+
+        // To prevent a [0|0] default value for the first frame
+        this.resolution.set(resolution);
+        this.halfResolution.set(resolution.scaled(0.5f));
 
         setResolution(resolution);
 
@@ -102,8 +113,24 @@ public class Camera {
         return gameObject;
     }
 
+    public Map getMap() {
+        return gameObject != null ? gameObject.map : null;
+    }
+
     public void setGameObject(GameObject gameObject) {
         this.gameObject = gameObject;
+    }
+
+    public IVec2 pointToPixel(Vec2 location) {
+        if(gameObject == null || gameObject.map == null)
+            throw new IllegalStateException();
+        return location.added(halfResolution).subtracted(gameObject.location).rotateAround(halfResolution, -gameObject.angle).toI();
+    }
+
+    public Vec2 pixelToPoint(IVec2 pixel) {
+        if(gameObject == null || gameObject.map == null)
+            throw new IllegalStateException();
+        return pixel.toF().rotateAround(halfResolution, gameObject.angle).add(gameObject.location).subtract(halfResolution);
     }
 
     public UI getUI() {
@@ -118,55 +145,65 @@ public class Camera {
     }
 
     protected void update() {
-        if(gameObject != null && gameObject.map != null)
+        if(gameObject != null && gameObject.map != null) {
             gameObject.map.update();
-        if(ui != null)
+            updateDuration = gameObject.map.updateDuration;
+            physicsDuration = gameObject.map.physicsDuration;
+        }
+        if(ui != null) {
+            long start = System.nanoTime();
             ui.update.invoke();
+            uiUpdateDuration = System.nanoTime() - start;
+        }
+        else uiUpdateDuration = 0;
     }
 
     /**
      * Should be called only from the update thread.
      */
-    public void prepareRender() {
+    public long prepareRender() {
+
+        long start = System.nanoTime();
 
         GameObject[] gameObjects = new GameObject[0];
 
         if(gameObject != null && gameObject.map != null) {
             // Filter out objects with images that may be on the screen
-            float sqrScreenRadius = (halfResolution.x * halfResolution.x) + (halfResolution.y * halfResolution.y);
             Vec2 loc = gameObject.location;
-             gameObjects = gameObject.map.paintOrderObjects.stream()
-                            .filter(o -> {
-                                Image image = o.getImage();
-                                if(image == null) return false;
-                                if(o == gameObject) return true;
+            gameObjects = gameObject.map.paintOrderObjects.stream()
+                    .filter(o -> {
+                        Image image = o.getImage();
+                        if(image == null || image.definitelyBlank) return false;
+                        if(o == gameObject) return true;
 
-                                // Simple circle collision detection
-                                float sqrRadius = (image.size.x * image.size.x + image.size.y * image.size.y) * 0.25f;
-                                float sqrDistance = Vec2.sqrDist(loc, o.location);
-                                return sqrDistance < sqrRadius + sqrScreenRadius;
-                            }).toArray(GameObject[]::new);
+                        // Simple circle collision detection
+                        float w = image.size.x / 2f + halfResolution.x, h = image.size.y / 2f + halfResolution.y;
+                        float maxSqrDistance = w * w + h * h;
+                        float sqrDistance = Vec2.sqrDist(loc, o.location);
+
+                        return sqrDistance < maxSqrDistance;
+                    }).toArray(GameObject[]::new);
         }
 
         List<UIObject> uiObjects = new ArrayList<>();
         if(ui != null)
             ui.addAllRelevantInPaintOrder(uiObjects);
 
-        int errorMessage = gameObject == null || gameObject.map == null ? 1 : 0;
-        int totalDrawCount = gameObjects.length + uiObjects.size() + errorMessage;
+        int errorMessage = gameObject != null && gameObject.map == null ? 1 : 0;
+        drawCount = gameObjects.length + uiObjects.size() + errorMessage;
 
-//            Console.map("Objects to draw", totalDrawCount);
+//            Console.map("Objects to draw", drawCount);
 
         // Don't read drawObjects for rendering while it's being edited
         synchronized (drawObjects) {
 
             // Match the number of draw objects and the number of gameobjects to draw
-            if(totalDrawCount < drawObjects.size()) {
-                List<DrawObject> additionalObjects = drawObjects.subList(0, drawObjects.size() - totalDrawCount);
+            if(drawCount < drawObjects.size()) {
+                List<DrawObject> additionalObjects = drawObjects.subList(0, drawObjects.size() - drawCount);
                 drawObjectPool.returnObjects(additionalObjects);
                 additionalObjects.clear();
             }
-            else while(totalDrawCount > drawObjects.size())
+            else while(drawCount > drawObjects.size())
                     drawObjects.add(drawObjectPool.get());
 
             if(gameObject != null && gameObject.map != null) {
@@ -183,11 +220,13 @@ public class Camera {
                     drawObject.screenLocation.set(g.location.added(screenOffset).rotateAround(halfResolution, -gameObject.angle).toI());
                 }
             }
-            else {
+            else if(gameObject != null) {
                 DrawObject drawObject = drawObjects.get(0);
+
                 drawObject.image = Application.getImplementation().getImageFactory()
-                        .createText(gameObject != null ? "The gameobject is not on a map" : "The camera is not attached to a gameobject",
-                                20, backgroundColor.getContrast().setAlpha(1f));
+                    .createText("The gameobject is not on a map",
+                            20, backgroundColor.getContrast().setAlpha(1f));
+
                 drawObject.rotation = 0;
                 drawObject.screenLocation.set(halfResolution.toI());
             }
@@ -205,6 +244,8 @@ public class Camera {
         // Reset the cache immediately after using it to use less resources rather than
         // having it stored unused until the next rendering
         if(ui != null) ui.resetCache();
+
+        return renderPrepDuration = System.nanoTime() - start;
     }
 
     /**
@@ -212,7 +253,9 @@ public class Camera {
      * be prepared previously using {@link #prepareRender()}. May be called from
      * any thread at any time.
      */
-    public void render() {
+    public long render() {
+
+        long start = System.nanoTime();
 
         DrawObject[] drawObjects;
 
@@ -226,10 +269,37 @@ public class Camera {
 
         // Don't return drawObjects here, the whole list will be reused as much as
         // possible and excess will be returned during the next prepareRender() call
+
+        return renderDuration = System.nanoTime() - start;
     }
 
 
 
+    public int getDrawCount() {
+        synchronized (drawObjects) {
+            return drawObjects.size();
+        }
+    }
+
+    int getPoolSize() {
+        synchronized (drawObjects) {
+            return drawObjectPool.size();
+        }
+    }
+
+
+
+    public boolean isActive() {
+        return this == Camera.active;
+    }
+
+    /**
+     * Returns the camera that is currently being shown. This is never
+     * {@code null}, a suitable replacement will be used if no camera
+     * has been set yet, or it has been removed.
+     *
+     * @return The currently shown camera
+     */
     public static Camera getActive() {
         return active;
     }
