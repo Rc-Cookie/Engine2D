@@ -32,7 +32,7 @@ import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.collision.shapes.ShapeType;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Transform;
-import com.github.rccookie.geometry.performance.Vec2;
+import com.github.rccookie.geometry.performance.float2;
 import org.jbox2d.dynamics.contacts.Contact;
 import org.jbox2d.dynamics.contacts.ContactEdge;
 
@@ -227,7 +227,7 @@ public class Fixture {
    * @param p a point in world coordinates.
    * @return
    */
-  public boolean testPoint(final Vec2 p) {
+  public boolean testPoint(final float2 p) {
     return m_shape.testPoint(m_body.m_xf, p);
   }
 
@@ -307,7 +307,7 @@ public class Fixture {
    * @param p a point in world coordinates.
    * @return distance
    */
-  public float computeDistance(Vec2 p, int childIndex, Vec2 normalOut) {
+  public float computeDistance(float2 p, int childIndex, float2 normalOut) {
     return m_shape.computeDistanceToOut(m_body.getTransform(), p, childIndex, normalOut);
   }
 
@@ -405,7 +405,7 @@ public class Fixture {
 
   private final AABB pool1 = new AABB();
   private final AABB pool2 = new AABB();
-  private final Vec2 displacement = new Vec2();
+  private final float2 displacement = new float2();
 
   /**
    * Internal method

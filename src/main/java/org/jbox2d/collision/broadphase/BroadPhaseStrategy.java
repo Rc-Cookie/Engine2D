@@ -1,11 +1,12 @@
 package org.jbox2d.collision.broadphase;
 
+import com.github.rccookie.geometry.performance.float2;
+
 import org.jbox2d.callbacks.DebugDraw;
 import org.jbox2d.callbacks.TreeCallback;
 import org.jbox2d.callbacks.TreeRayCastCallback;
 import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.RayCastInput;
-import com.github.rccookie.geometry.performance.Vec2;
 
 public interface BroadPhaseStrategy {
 
@@ -31,7 +32,7 @@ public interface BroadPhaseStrategy {
    * 
    * @return true if the proxy was re-inserted.
    */
-  boolean moveProxy(int proxyId, AABB aabb, Vec2 displacement);
+  boolean moveProxy(int proxyId, AABB aabb, float2 displacement);
   
   Object getUserData(int proxyId);
 

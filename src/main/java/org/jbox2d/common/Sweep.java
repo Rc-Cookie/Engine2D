@@ -23,7 +23,7 @@
  ******************************************************************************/
 package org.jbox2d.common;
 
-import com.github.rccookie.geometry.performance.Vec2;
+import com.github.rccookie.geometry.performance.float2;
 
 import java.io.Serializable;
 
@@ -36,9 +36,9 @@ public class Sweep implements Serializable {
   private static final long serialVersionUID = 1L;
 
   /** Local center of mass position */
-  public final Vec2 localCenter;
+  public final float2 localCenter;
   /** Center world positions */
-  public final Vec2 c0, c;
+  public final float2 c0, c;
   /** World angles */
   public float a0, a;
 
@@ -54,9 +54,9 @@ public class Sweep implements Serializable {
   }
 
   public Sweep() {
-    localCenter = new Vec2();
-    c0 = new Vec2();
-    c = new Vec2();
+    localCenter = new float2();
+    c0 = new float2();
+    c = new float2();
   }
 
   public final void normalize() {

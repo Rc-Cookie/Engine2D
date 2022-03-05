@@ -25,11 +25,11 @@ package org.jbox2d.dynamics.contacts;
 
 import org.jbox2d.common.Mat22;
 import org.jbox2d.common.Settings;
-import com.github.rccookie.geometry.performance.Vec2;
+import com.github.rccookie.geometry.performance.float2;
 
 public class ContactVelocityConstraint {
   public VelocityConstraintPoint[] points = new VelocityConstraintPoint[Settings.maxManifoldPoints];
-  public final Vec2 normal = new Vec2();
+  public final float2 normal = new float2();
   public final Mat22 normalMass = new Mat22();
   public final Mat22 K = new Mat22();
   public int indexA;
@@ -49,8 +49,8 @@ public class ContactVelocityConstraint {
   }
 
   public static class VelocityConstraintPoint {
-    public final Vec2 rA = new Vec2();
-    public final Vec2 rB = new Vec2();
+    public final float2 rA = new float2();
+    public final float2 rB = new float2();
     public float normalImpulse;
     public float tangentImpulse;
     public float normalMass;

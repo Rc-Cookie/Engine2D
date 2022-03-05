@@ -6,7 +6,7 @@ import org.jbox2d.callbacks.TreeCallback;
 import org.jbox2d.callbacks.TreeRayCastCallback;
 import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.RayCastInput;
-import com.github.rccookie.geometry.performance.Vec2;
+import com.github.rccookie.geometry.performance.float2;
 
 
 public interface BroadPhase {
@@ -33,7 +33,7 @@ public interface BroadPhase {
    * Call MoveProxy as many times as you like, then when you are done call UpdatePairs to finalized
    * the proxy pairs (for your time step).
    */
-  void moveProxy(int proxyId, AABB aabb, Vec2 displacement);
+  void moveProxy(int proxyId, AABB aabb, float2 displacement);
 
   void touchProxy(int proxyId);
 

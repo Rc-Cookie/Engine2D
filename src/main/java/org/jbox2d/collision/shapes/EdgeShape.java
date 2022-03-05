@@ -30,7 +30,7 @@ import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Rot;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Transform;
-import com.github.rccookie.geometry.performance.Vec2;
+import com.github.rccookie.geometry.performance.float2;
 
 /**
  * A line segment (edge) shape. These can be connected in chains or loops to other edge shapes. The
@@ -43,20 +43,20 @@ public class EdgeShape extends Shape {
   /**
    * edge vertex 1
    */
-  public final Vec2 m_vertex1 = new Vec2();
+  public final float2 m_vertex1 = new float2();
   /**
    * edge vertex 2
    */
-  public final Vec2 m_vertex2 = new Vec2();
+  public final float2 m_vertex2 = new float2();
 
   /**
    * optional adjacent vertex 1. Used for smooth collision
    */
-  public final Vec2 m_vertex0 = new Vec2();
+  public final float2 m_vertex0 = new float2();
   /**
    * optional adjacent vertex 2. Used for smooth collision
    */
-  public final Vec2 m_vertex3 = new Vec2();
+  public final float2 m_vertex3 = new float2();
   public boolean m_hasVertex0 = false, m_hasVertex3 = false;
 
 
@@ -70,22 +70,22 @@ public class EdgeShape extends Shape {
     return 1;
   }
 
-  public void set(Vec2 v1, Vec2 v2) {
+  public void set(float2 v1, float2 v2) {
     m_vertex1.set(v1);
     m_vertex2.set(v2);
     m_hasVertex0 = m_hasVertex3 = false;
   }
 
   @Override
-  public boolean testPoint(Transform xf, Vec2 p) {
+  public boolean testPoint(Transform xf, float2 p) {
     return false;
   }
 
   // for pooling
-  private final Vec2 normal = new Vec2();
+  private final float2 normal = new float2();
 
   @Override
-  public float computeDistanceToOut(Transform xf, Vec2 p, int childIndex, Vec2 normalOut) {
+  public float computeDistanceToOut(Transform xf, float2 p, int childIndex, float2 normalOut) {
     float xfqc = xf.q.c;
     float xfqs = xf.q.s;
     float xfpx = xf.p.x;
@@ -130,10 +130,10 @@ public class EdgeShape extends Shape {
   public boolean raycast(RayCastOutput output, RayCastInput input, Transform xf, int childIndex) {
 
     float tempx, tempy;
-    final Vec2 v1 = m_vertex1;
-    final Vec2 v2 = m_vertex2;
+    final float2 v1 = m_vertex1;
+    final float2 v2 = m_vertex2;
     final Rot xfq = xf.q;
-    final Vec2 xfp = xf.p;
+    final float2 xfp = xf.p;
 
     // Put the ray into the edge's frame of reference.
     // b2Vec2 p1 = b2MulT(xf.q, input.p1 - xf.p);
@@ -212,8 +212,8 @@ public class EdgeShape extends Shape {
 
   @Override
   public void computeAABB(AABB aabb, Transform xf, int childIndex) {
-    final Vec2 lowerBound = aabb.lowerBound;
-    final Vec2 upperBound = aabb.upperBound;
+    final float2 lowerBound = aabb.lowerBound;
+    final float2 upperBound = aabb.upperBound;
     final Rot xfq = xf.q;
 
     final float v1x = (xfq.c * m_vertex1.x - xfq.s * m_vertex1.y) + xf.p.x;

@@ -26,7 +26,7 @@
  */
 package org.jbox2d.dynamics.joints;
 
-import com.github.rccookie.geometry.performance.Vec2;
+import com.github.rccookie.geometry.performance.float2;
 import org.jbox2d.dynamics.Body;
 
 /**
@@ -40,12 +40,12 @@ public class FrictionJointDef extends JointDef {
   /**
    * The local anchor point relative to bodyA's origin.
    */
-  public final Vec2 localAnchorA;
+  public final float2 localAnchorA;
 
   /**
    * The local anchor point relative to bodyB's origin.
    */
-  public final Vec2 localAnchorB;
+  public final float2 localAnchorB;
 
   /**
    * The maximum friction force in N.
@@ -59,8 +59,8 @@ public class FrictionJointDef extends JointDef {
 
   public FrictionJointDef() {
     super(JointType.FRICTION);
-    localAnchorA = new Vec2();
-    localAnchorB = new Vec2();
+    localAnchorA = new float2();
+    localAnchorB = new float2();
     maxForce = 0f;
     maxTorque = 0f;
   }
@@ -69,7 +69,7 @@ public class FrictionJointDef extends JointDef {
    * Initialize the bodies, anchors, axis, and reference angle using the world anchor and world
    * axis.
    */
-  public void initialize(Body bA, Body bB, Vec2 anchor) {
+  public void initialize(Body bA, Body bB, float2 anchor) {
     bodyA = bA;
     bodyB = bB;
     bA.getLocalPointToOut(anchor, localAnchorA);

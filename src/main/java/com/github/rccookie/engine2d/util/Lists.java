@@ -2,14 +2,29 @@ package com.github.rccookie.engine2d.util;
 
 import java.util.*;
 
+/**
+ * Utility class to work with lists.
+ */
 public enum Lists {
     ;
 
+    /**
+     * Creates an immutable list view of the given array.
+     *
+     * @param elements The array to wrap
+     * @param <E> The array content type
+     * @return A list view of the elements
+     */
     @SafeVarargs
     public static <E> List<E> of(E... elements) {
         return new ImmutableArrayReferenceList<>(elements);
     }
 
+    /**
+     * List view of array.
+     *
+     * @param <E> Array type
+     */
     private static class ImmutableArrayReferenceList<E> implements List<E> {
 
         private final E[] array;

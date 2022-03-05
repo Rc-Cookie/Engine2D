@@ -1,11 +1,11 @@
 package com.github.rccookie.engine2d.core;
 
 import com.github.rccookie.engine2d.impl.ImageImpl;
-import com.github.rccookie.geometry.performance.IVec2;
+import com.github.rccookie.geometry.performance.int2;
 
 public class DrawObject {
 
-    public final IVec2 screenLocation = IVec2.ZERO.clone();
+    public final int2 screenLocation = int2.ZERO.clone();
     public float rotation;
     public ImageImpl image;
 

@@ -36,8 +36,8 @@ import org.jbox2d.common.Mat22;
 import org.jbox2d.common.Mat33;
 import org.jbox2d.common.Rot;
 import org.jbox2d.common.Settings;
-import com.github.rccookie.geometry.performance.Vec2;
-import com.github.rccookie.geometry.performance.Vec3;
+import com.github.rccookie.geometry.performance.float2;
+import com.github.rccookie.geometry.performance.float3;
 import org.jbox2d.dynamics.contacts.ChainAndCircleContact;
 import org.jbox2d.dynamics.contacts.ChainAndPolygonContact;
 import org.jbox2d.dynamics.contacts.CircleContact;
@@ -57,8 +57,8 @@ import org.jbox2d.pooling.IWorldPool;
  */
 public class DefaultWorldPool implements IWorldPool {
 
-  private final OrderedStack<Vec2> vecs;
-  private final OrderedStack<Vec3> vec3s;
+  private final OrderedStack<float2> vecs;
+  private final OrderedStack<float3> vec3s;
   private final OrderedStack<Mat22> mats;
   private final OrderedStack<Mat33> mat33s;
   private final OrderedStack<AABB> aabbs;
@@ -66,7 +66,7 @@ public class DefaultWorldPool implements IWorldPool {
 
   private final HashMap<Integer, float[]> afloats = new HashMap<Integer, float[]>();
   private final HashMap<Integer, int[]> aints = new HashMap<Integer, int[]>();
-  private final HashMap<Integer, Vec2[]> avecs = new HashMap<Integer, Vec2[]>();
+  private final HashMap<Integer, float2[]> avecs = new HashMap<Integer, float2[]>();
 
   private final IWorldPool world = this;
 
@@ -117,11 +117,11 @@ public class DefaultWorldPool implements IWorldPool {
   private final Distance dist;
 
   public DefaultWorldPool(int argSize, int argContainerSize) {
-    vecs = new OrderedStack<Vec2>(argSize, argContainerSize) {
-      protected Vec2 newInstance() { return new Vec2(); }
+    vecs = new OrderedStack<float2>(argSize, argContainerSize) {
+      protected float2 newInstance() { return new float2(); }
     };
-    vec3s = new OrderedStack<Vec3>(argSize, argContainerSize) {
-      protected Vec3 newInstance() { return new Vec3(); }
+    vec3s = new OrderedStack<float3>(argSize, argContainerSize) {
+      protected float3 newInstance() { return new float3(); }
     };
     mats = new OrderedStack<Mat22>(argSize, argContainerSize) {
       protected Mat22 newInstance() { return new Mat22(); }
@@ -173,11 +173,11 @@ public class DefaultWorldPool implements IWorldPool {
     return chpstack;
   }
 
-  public final Vec2 popVec2() {
+  public final float2 popVec2() {
     return vecs.pop();
   }
 
-  public final Vec2[] popVec2(int argNum) {
+  public final float2[] popVec2(int argNum) {
     return vecs.pop(argNum);
   }
 
@@ -185,11 +185,11 @@ public class DefaultWorldPool implements IWorldPool {
     vecs.push(argNum);
   }
 
-  public final Vec3 popVec3() {
+  public final float3 popVec3() {
     return vec3s.pop();
   }
 
-  public final Vec3[] popVec3(int argNum) {
+  public final float3[] popVec3(int argNum) {
     return vec3s.pop(argNum);
   }
 
@@ -267,11 +267,11 @@ public class DefaultWorldPool implements IWorldPool {
     return aints.get(argLength);
   }
 
-  public final Vec2[] getVec2Array(int argLength) {
+  public final float2[] getVec2Array(int argLength) {
     if (!avecs.containsKey(argLength)) {
-      Vec2[] ray = new Vec2[argLength];
+      float2[] ray = new float2[argLength];
       for (int i = 0; i < argLength; i++) {
-        ray[i] = new Vec2();
+        ray[i] = new float2();
       }
       avecs.put(argLength, ray);
     }

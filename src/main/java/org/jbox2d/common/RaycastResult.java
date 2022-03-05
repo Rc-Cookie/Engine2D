@@ -25,11 +25,11 @@ package org.jbox2d.common;
 
 // updated to rev 100
 
-import com.github.rccookie.geometry.performance.Vec2;
+import com.github.rccookie.geometry.performance.float2;
 
 public class RaycastResult {
 	public float lambda = 0.0f;
-	public final Vec2 normal = new Vec2();
+	public final float2 normal = new float2();
 	
 	public RaycastResult set(RaycastResult argOther){
 		lambda = argOther.lambda;

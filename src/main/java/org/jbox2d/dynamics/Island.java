@@ -29,7 +29,7 @@ import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Sweep;
 import org.jbox2d.common.Timer;
-import com.github.rccookie.geometry.performance.Vec2;
+import com.github.rccookie.geometry.performance.float2;
 import org.jbox2d.dynamics.contacts.Contact;
 import org.jbox2d.dynamics.contacts.ContactSolver;
 import org.jbox2d.dynamics.contacts.ContactSolver.ContactSolverDef;
@@ -238,7 +238,7 @@ public class Island {
   private final SolverData solverData = new SolverData();
   private final ContactSolverDef solverDef = new ContactSolverDef();
 
-  public void solve(Profile profile, TimeStep step, Vec2 gravity, boolean allowSleep) {
+  public void solve(Profile profile, TimeStep step, float2 gravity, boolean allowSleep) {
 
     // System.out.println("Solving Island");
     float h = step.dt;
@@ -247,9 +247,9 @@ public class Island {
     for (int i = 0; i < m_bodyCount; ++i) {
       final Body b = m_bodies[i];
       final Sweep bm_sweep = b.m_sweep;
-      final Vec2 c = bm_sweep.c;
+      final float2 c = bm_sweep.c;
       float a = bm_sweep.a;
-      final Vec2 v = b.m_linearVelocity;
+      final float2 v = b.m_linearVelocity;
       float w = b.m_angularVelocity;
 
       // Store positions for continuous collision.
@@ -330,9 +330,9 @@ public class Island {
 
     // Integrate positions
     for (int i = 0; i < m_bodyCount; ++i) {
-      final Vec2 c = m_positions[i].c;
+      final float2 c = m_positions[i].c;
       float a = m_positions[i].a;
-      final Vec2 v = m_velocities[i].v;
+      final float2 v = m_velocities[i].v;
       float w = m_velocities[i].w;
 
       // Check for large velocities
@@ -410,7 +410,7 @@ public class Island {
 
         if ((b.m_flags & Body.e_autoSleepFlag) == 0
             || b.m_angularVelocity * b.m_angularVelocity > angTolSqr
-            || Vec2.dot(b.m_linearVelocity, b.m_linearVelocity) > linTolSqr) {
+            || float2.dot(b.m_linearVelocity, b.m_linearVelocity) > linTolSqr) {
           b.m_sleepTime = 0.0f;
           minSleepTime = 0.0f;
         } else {
@@ -515,9 +515,9 @@ public class Island {
 
     // Integrate positions
     for (int i = 0; i < m_bodyCount; ++i) {
-      Vec2 c = m_positions[i].c;
+      float2 c = m_positions[i].c;
       float a = m_positions[i].a;
-      Vec2 v = m_velocities[i].v;
+      float2 v = m_velocities[i].v;
       float w = m_velocities[i].w;
 
       // Check for large velocities

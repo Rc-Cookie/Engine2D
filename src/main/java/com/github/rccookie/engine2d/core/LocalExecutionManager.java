@@ -5,6 +5,8 @@ import java.util.function.Supplier;
 
 import com.github.rccookie.engine2d.Execute;
 import com.github.rccookie.engine2d.Time;
+import com.github.rccookie.engine2d.coroutine.Coroutine;
+import com.github.rccookie.engine2d.coroutine.Wait;
 import com.github.rccookie.engine2d.util.Future;
 
 public class LocalExecutionManager {
@@ -70,6 +72,17 @@ public class LocalExecutionManager {
             task.run();
             return null;
         }, requirement);
+    }
+
+
+    public static <T> Future<T> coroutine(Coroutine<T> coroutine) {
+        runCoroutine(coroutine, coroutine.runNextChunk());
+        return coroutine.getResult();
+    }
+
+    private static void runCoroutine(Coroutine<?> coroutine, Wait wait) {
+        if(wait == null) return;
+        Execute.when(() -> runCoroutine(coroutine, coroutine.runNextChunk()), wait::isDone);
     }
 
 

@@ -3,7 +3,7 @@ package org.jbox2d.dynamics.joints;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Rot;
 import org.jbox2d.common.Settings;
-import com.github.rccookie.geometry.performance.Vec2;
+import com.github.rccookie.geometry.performance.float2;
 import org.jbox2d.dynamics.SolverData;
 import org.jbox2d.pooling.IWorldPool;
 
@@ -18,8 +18,8 @@ import org.jbox2d.pooling.IWorldPool;
  */
 public class RopeJoint extends Joint {
   // Solver shared
-  private final Vec2 m_localAnchorA = new Vec2();
-  private final Vec2 m_localAnchorB = new Vec2();
+  private final float2 m_localAnchorA = new float2();
+  private final float2 m_localAnchorB = new float2();
   private float m_maxLength;
   private float m_length;
   private float m_impulse;
@@ -27,11 +27,11 @@ public class RopeJoint extends Joint {
   // Solver temp
   private int m_indexA;
   private int m_indexB;
-  private final Vec2 m_u = new Vec2();
-  private final Vec2 m_rA = new Vec2();
-  private final Vec2 m_rB = new Vec2();
-  private final Vec2 m_localCenterA = new Vec2();
-  private final Vec2 m_localCenterB = new Vec2();
+  private final float2 m_u = new float2();
+  private final float2 m_rA = new float2();
+  private final float2 m_rB = new float2();
+  private final float2 m_localCenterA = new float2();
+  private final float2 m_localCenterB = new float2();
   private float m_invMassA;
   private float m_invMassB;
   private float m_invIA;
@@ -63,28 +63,28 @@ public class RopeJoint extends Joint {
     m_invIA = m_bodyA.m_invI;
     m_invIB = m_bodyB.m_invI;
 
-    Vec2 cA = data.positions[m_indexA].c;
+    float2 cA = data.positions[m_indexA].c;
     float aA = data.positions[m_indexA].a;
-    Vec2 vA = data.velocities[m_indexA].v;
+    float2 vA = data.velocities[m_indexA].v;
     float wA = data.velocities[m_indexA].w;
 
-    Vec2 cB = data.positions[m_indexB].c;
+    float2 cB = data.positions[m_indexB].c;
     float aB = data.positions[m_indexB].a;
-    Vec2 vB = data.velocities[m_indexB].v;
+    float2 vB = data.velocities[m_indexB].v;
     float wB = data.velocities[m_indexB].w;
 
     final Rot qA = pool.popRot();
     final Rot qB = pool.popRot();
-    final Vec2 temp = pool.popVec2();
+    final float2 temp = pool.popVec2();
 
     qA.set(aA);
     qB.set(aB);
 
     // Compute the effective masses.
-    Rot.mulToOutUnsafe(qA, temp.set(m_localAnchorA).subtract(m_localCenterA), m_rA);
-    Rot.mulToOutUnsafe(qB, temp.set(m_localAnchorB).subtract(m_localCenterB), m_rB);
+    Rot.mulToOutUnsafe(qA, temp.set(m_localAnchorA).sub(m_localCenterA), m_rA);
+    Rot.mulToOutUnsafe(qB, temp.set(m_localAnchorB).sub(m_localCenterB), m_rB);
 
-    m_u.set(cB).add(m_rB).subtract(cA).subtract(m_rA);
+    m_u.set(cB).add(m_rB).sub(cA).sub(m_rA);
 
     m_length = m_u.abs();
 
@@ -107,8 +107,8 @@ public class RopeJoint extends Joint {
     }
 
     // Compute effective mass.
-    float crA = Vec2.cross(m_rA, m_u);
-    float crB = Vec2.cross(m_rB, m_u);
+    float crA = float2.cross(m_rA, m_u);
+    float crB = float2.cross(m_rB, m_u);
     float invMass = m_invMassA + m_invIA * crA * crA + m_invMassB + m_invIB * crB * crB;
 
     m_mass = invMass != 0.0f ? 1.0f / invMass : 0.0f;
@@ -141,23 +141,23 @@ public class RopeJoint extends Joint {
 
   @Override
   public void solveVelocityConstraints(final SolverData data) {
-    Vec2 vA = data.velocities[m_indexA].v;
+    float2 vA = data.velocities[m_indexA].v;
     float wA = data.velocities[m_indexA].w;
-    Vec2 vB = data.velocities[m_indexB].v;
+    float2 vB = data.velocities[m_indexB].v;
     float wB = data.velocities[m_indexB].w;
 
     // Cdot = dot(u, v + cross(w, r))
-    Vec2 vpA = pool.popVec2();
-    Vec2 vpB = pool.popVec2();
-    Vec2 temp = pool.popVec2();
+    float2 vpA = pool.popVec2();
+    float2 vpB = pool.popVec2();
+    float2 temp = pool.popVec2();
 
-    Vec2.cross(wA, m_rA, vpA);
+    float2.cross(wA, m_rA, vpA);
     vpA.add(vA);
-    Vec2.cross(wB, m_rB, vpB);
+    float2.cross(wB, m_rB, vpB);
     vpB.add(vB);
 
     float C = m_length - m_maxLength;
-    float Cdot = Vec2.dot(m_u, temp.set(vpB).subtract(vpA));
+    float Cdot = float2.dot(m_u, temp.set(vpB).sub(vpA));
 
     // Predictive constraint.
     if (C < 0.0f) {
@@ -188,28 +188,28 @@ public class RopeJoint extends Joint {
 
   @Override
   public boolean solvePositionConstraints(final SolverData data) {
-    Vec2 cA = data.positions[m_indexA].c;
+    float2 cA = data.positions[m_indexA].c;
     float aA = data.positions[m_indexA].a;
-    Vec2 cB = data.positions[m_indexB].c;
+    float2 cB = data.positions[m_indexB].c;
     float aB = data.positions[m_indexB].a;
 
     final Rot qA = pool.popRot();
     final Rot qB = pool.popRot();
-    final Vec2 u = pool.popVec2();
-    final Vec2 rA = pool.popVec2();
-    final Vec2 rB = pool.popVec2();
-    final Vec2 temp = pool.popVec2();
+    final float2 u = pool.popVec2();
+    final float2 rA = pool.popVec2();
+    final float2 rB = pool.popVec2();
+    final float2 temp = pool.popVec2();
 
     qA.set(aA);
     qB.set(aB);
 
     // Compute the effective masses.
-    Rot.mulToOutUnsafe(qA, temp.set(m_localAnchorA).subtract(m_localCenterA), rA);
-    Rot.mulToOutUnsafe(qB, temp.set(m_localAnchorB).subtract(m_localCenterB), rB);
-    u.set(cB).add(rB).subtract(cA).subtract(rA);
+    Rot.mulToOutUnsafe(qA, temp.set(m_localAnchorA).sub(m_localCenterA), rA);
+    Rot.mulToOutUnsafe(qB, temp.set(m_localAnchorB).sub(m_localCenterB), rB);
+    u.set(cB).add(rB).sub(cA).sub(rA);
 
     float length = u.abs();
-    u.divide(length);
+    u.div(length);
     float C = length - m_maxLength;
 
     C = MathUtils.clamp(C, 0.0f, Settings.maxLinearCorrection);
@@ -237,17 +237,17 @@ public class RopeJoint extends Joint {
   }
 
   @Override
-  public void getAnchorA(Vec2 argOut) {
+  public void getAnchorA(float2 argOut) {
     m_bodyA.getWorldPointToOut(m_localAnchorA, argOut);
   }
 
   @Override
-  public void getAnchorB(Vec2 argOut) {
+  public void getAnchorB(float2 argOut) {
     m_bodyB.getWorldPointToOut(m_localAnchorB, argOut);
   }
 
   @Override
-  public void getReactionForce(float inv_dt, Vec2 argOut) {
+  public void getReactionForce(float inv_dt, float2 argOut) {
     argOut.set(m_u).scale(inv_dt).scale(m_impulse);
   }
 
@@ -256,11 +256,11 @@ public class RopeJoint extends Joint {
     return 0f;
   }
 
-  public Vec2 getLocalAnchorA() {
+  public float2 getLocalAnchorA() {
     return m_localAnchorA;
   }
 
-  public Vec2 getLocalAnchorB() {
+  public float2 getLocalAnchorB() {
     return m_localAnchorB;
   }
 

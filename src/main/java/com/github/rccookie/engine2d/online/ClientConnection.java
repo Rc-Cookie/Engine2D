@@ -83,8 +83,10 @@ public class ClientConnection implements Closeable {
         inputThread.start();
     }
 
+    /**
+     * Executed before connecting. Used by {@link HostClientConnection}.
+     */
     void beforeConnect() {
-
     }
 
     @Blocking

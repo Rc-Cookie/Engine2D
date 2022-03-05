@@ -10,18 +10,29 @@ import com.github.rccookie.engine2d.core.SequentialLoopExecutor;
 import com.github.rccookie.engine2d.core.stats.PerformanceStats;
 import com.github.rccookie.engine2d.impl.DisplayController;
 import com.github.rccookie.engine2d.impl.Implementation;
+import com.github.rccookie.engine2d.util.Coroutine;
+import com.github.rccookie.engine2d.util.Future;
 import com.github.rccookie.engine2d.util.NamedCaughtEvent;
+import com.github.rccookie.engine2d.util.VoidCoroutine;
 import com.github.rccookie.event.Event;
-import com.github.rccookie.geometry.performance.IVec2;
+import com.github.rccookie.geometry.performance.int2;
+
 import org.jetbrains.annotations.Blocking;
 
+/**
+ * The main control class and entry point of the application. Also serves as
+ * connection between the impl API and the actual implementation.
+ */
 public enum Application {
 
     ; // No enum instance
 
+    /**
+     * Global display controller.
+     */
     private static final DisplayController displayController = new DisplayController() {
         @Override
-        public boolean setResolution(IVec2 resolution) {
+        public boolean setResolution(int2 resolution) {
             if(!Camera.allowsExternalResizing) return false;
             Camera.getActive().setResolution(resolution);
             return true;
@@ -48,8 +59,20 @@ public enum Application {
      */
     public static final Event lateUpdate = new NamedCaughtEvent(false, "Application.lateUpdate");
 
+    /**
+     * Executes the update and render threads. May not be used if the implementation
+     * has an internal update loop. Gets set from the setup method.
+     */
     private static LoopExecutor executor = null;
+
+    /**
+     * The "native" implementation of this application.
+     */
     private static Implementation implementation = null;
+
+    /**
+     * Has the application been started?
+     */
     private static boolean running = false;
 
     /**
@@ -60,10 +83,30 @@ public enum Application {
      */
     public static boolean FORCE_FPS_CAP = false;
 
+    /**
+     * Set up the application to use the specified "native" implementation.
+     * This method must be called before any of the classes can be used,
+     * and can only be used once. Otherwise, an {@link IllegalStateException}
+     * will be thrown.
+     * <p>This method will use multithreading if available.</p>
+     *
+     * @param implementation The implementation to use
+     */
     public static void setup(Implementation implementation) {
         setup(implementation, implementation.supportsMultithreading());
     }
 
+    /**
+     * Set up the application to use the specified "native" implementation.
+     * This method must be called before any of the classes can be used,
+     * and can only be used once. Otherwise, an {@link IllegalStateException}
+     * will be thrown.
+     *
+     * @param implementation The implementation to use
+     * @param parallel Whether to allow parallel execution. If the implementation
+     *                 does not support multithreading this option will be
+     *                 ignored
+     */
     public static void setup(Implementation implementation, boolean parallel) {
         if(Application.implementation != null)
             throw new IllegalStateException();
@@ -132,30 +175,93 @@ public enum Application {
         executor.runIteration();
     }
 
+    /**
+     * Starts the given coroutine.
+     *
+     * @param coroutine The coroutine to start
+     * @param <T> The type of result
+     * @return A future for the result of the coroutine
+     */
+    @Deprecated
+    public static <T> Future<T> startCoroutine(Coroutine<T> coroutine) {
+        checkSetup();
+        return implementation.startCoroutine(coroutine);
+    }
+
+    /**
+     * Starts the given coroutine which has no result.
+     *
+     * @param coroutine The coroutine to start
+     */
+    @Deprecated
+    public static void startCoroutine(VoidCoroutine coroutine) {
+        startCoroutine((Coroutine<Object>) coroutine);
+    }
+
+//    public static void yield() {
+//        checkSetup();
+//        implementation.yield();
+//    }
+
+    /**
+     * Determines whether this application has been set up using
+     * {@link #setup(Implementation)} or {@link #setup(Implementation, boolean)}.
+     *
+     * @return Whether this application has been set up
+     */
     public static boolean isSetup() {
         return implementation != null;
     }
 
+    /**
+     * Returns the "native" implementation underlying this application. Interacting
+     * with the implementation is usually only for internal purposes.
+     *
+     * @return The underlying implementation
+     */
     public static Implementation getImplementation() {
         checkSetup();
         return implementation;
     }
 
+    /**
+     * Returns the display controller controlling the display of this application.
+     *
+     * @return The display controller of this application
+     */
     public static DisplayController getDisplayController() {
         checkSetup();
         return displayController;
     }
 
+    /**
+     * Returns the current fps cap.
+     *
+     * @return The current maximum fps
+     */
     public static float getMaxFps() {
         checkSetup();
         return executor.getFps();
     }
 
+    /**
+     * Sets the fps cap for the application. Values above 1000 will be threatened as
+     * no limit, although it is very unlikely that these targets will be hit.
+     * <p>The fps cap defaults to the maximum refresh rate of the monitor, if
+     * this information is available. Otherwise it will limit to 60 fps by default.</p>
+     *
+     * @param fps The new fps cap
+     */
     public static void setMaxFps(float fps) {
         checkSetup();
         executor.setFps(fps);
     }
 
+    /**
+     * Collects current performance stats.
+     *
+     * @return The current performance stats
+     */
     public static PerformanceStats getPerformanceStats() {
         Camera camera = Camera.getActive();
         return new PerformanceStats(

@@ -46,7 +46,7 @@
 
 package org.jbox2d.collision;
 
-import com.github.rccookie.geometry.performance.Vec2;
+import com.github.rccookie.geometry.performance.float2;
 
 // updated to rev 100
 /**
@@ -63,7 +63,7 @@ import com.github.rccookie.geometry.performance.Vec2;
  */
 public class ManifoldPoint {
 	/** usage depends on manifold type */
-	public final Vec2 localPoint;
+	public final float2 localPoint;
 	/** the non-penetration impulse */
 	public float normalImpulse;
 	/** the friction impulse */
@@ -75,7 +75,7 @@ public class ManifoldPoint {
 	 * Blank manifold point with everything zeroed out.
 	 */
 	public ManifoldPoint() {
-		localPoint = new Vec2();
+		localPoint = new float2();
 		normalImpulse = tangentImpulse = 0f;
 		id = new ContactID();
 	}

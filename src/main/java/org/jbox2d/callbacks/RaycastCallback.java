@@ -26,13 +26,13 @@
  */
 package org.jbox2d.callbacks;
 
-import com.github.rccookie.geometry.performance.Vec2;
+import com.github.rccookie.geometry.performance.float2;
 import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.World;
 
 /**
  * Callback class for ray casts.
- * See {@link World#raycast(RaycastCallback, Vec2, Vec2)}
+ * See {@link World#raycast(RaycastCallback, float2, float2)}
  * @author Daniel Murphy
  */
 public interface RaycastCallback {
@@ -52,5 +52,5 @@ public interface RaycastCallback {
 	 * closest hit, 1 to continue
 	 * @param fraction
 	 */
-	public float reportFixture(Fixture fixture, Vec2 point, Vec2 normal, float fraction);
+	public float reportFixture(Fixture fixture, float2 point, float2 normal, float fraction);
 }

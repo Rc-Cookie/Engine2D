@@ -1,5 +1,13 @@
 package com.github.rccookie.engine2d.util;
 
+import java.util.function.Consumer;
+
+/**
+ * Describes a value that will be computed at some time in the
+ * future.
+ *
+ * @param <V> The content type
+ */
 public interface Future<V> {
 
     /**
@@ -46,4 +54,33 @@ public interface Future<V> {
      *                               has been canceled
      */
     V get() throws IllegalStateException;
+
+    /**
+     * Sets the action to be executed when the result is received.
+     *
+     * @param action The action to perform
+     * @return This future itself
+     * @throws IllegalStateException If the method is called multiple times
+     */
+    Future<V> then(Consumer<? super V> action);
+
+    /**
+     * Sets the action to be executed when the result is received.
+     *
+     * @param action The action to perform
+     * @return This future itself
+     * @throws IllegalStateException If the method is called multiple times
+     */
+    default Future<V> then(Runnable action) {
+        return then($ -> action.run());
+    }
+
+    /**
+     * Sets the action to be executed when the result gets cancelled.
+     *
+     * @param handler The action to perform
+     * @return This future
+     * @throws IllegalStateException If the method is called multiple times
+     */
+    Future<V> onCancel(Runnable handler);
 }

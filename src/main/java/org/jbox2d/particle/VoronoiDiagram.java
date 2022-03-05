@@ -1,12 +1,12 @@
 package org.jbox2d.particle;
 
 import org.jbox2d.common.MathUtils;
-import com.github.rccookie.geometry.performance.Vec2;
+import com.github.rccookie.geometry.performance.float2;
 import org.jbox2d.pooling.normal.MutableStack;
 
 public class VoronoiDiagram {
   public static class Generator {
-    final Vec2 center = new Vec2();
+    final float2 center = new float2();
     int tag;
   }
   public static class VoronoiDiagramTask {
@@ -72,15 +72,15 @@ public class VoronoiDiagram {
     }
   }
 
-  public void addGenerator(Vec2 center, int tag) {
+  public void addGenerator(float2 center, int tag) {
     Generator g = m_generatorBuffer[m_generatorCount++];
     g.center.x = center.x;
     g.center.y = center.y;
     g.tag = tag;
   }
 
-  private final Vec2 lower = new Vec2();
-  private final Vec2 upper = new Vec2();
+  private final float2 lower = new float2();
+  private final float2 upper = new float2();
   private MutableStack<VoronoiDiagramTask> taskPool =
       new MutableStack<VoronoiDiagramTask>(50) {
         @Override
@@ -104,8 +104,8 @@ public class VoronoiDiagram {
     upper.y = -Float.MAX_VALUE;
     for (int k = 0; k < m_generatorCount; k++) {
       Generator g = m_generatorBuffer[k];
-      Vec2.min(lower, g.center, lower);
-      Vec2.max(upper, g.center, upper);
+      float2.min(lower, g.center, lower);
+      float2.max(upper, g.center, upper);
     }
     m_countX = 1 + (int) (inverseRadius * (upper.x - lower.x));
     m_countY = 1 + (int) (inverseRadius * (upper.y - lower.y));

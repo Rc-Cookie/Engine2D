@@ -23,7 +23,7 @@
  ******************************************************************************/
 package org.jbox2d.dynamics.joints;
 
-import com.github.rccookie.geometry.performance.Vec2;
+import com.github.rccookie.geometry.performance.float2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.SolverData;
 import org.jbox2d.dynamics.World;
@@ -154,14 +154,14 @@ public abstract class Joint {
    * 
    * @return
    */
-  public abstract void getAnchorA(Vec2 out);
+  public abstract void getAnchorA(float2 out);
 
   /**
    * get the anchor point on bodyB in world coordinates.
    * 
    * @return
    */
-  public abstract void getAnchorB(Vec2 out);
+  public abstract void getAnchorB(float2 out);
 
   /**
    * get the reaction force on body2 at the joint anchor in Newtons.
@@ -169,7 +169,7 @@ public abstract class Joint {
    * @param inv_dt
    * @return
    */
-  public abstract void getReactionForce(float inv_dt, Vec2 out);
+  public abstract void getReactionForce(float inv_dt, float2 out);
 
   /**
    * get the reaction torque on body2 in N*m.

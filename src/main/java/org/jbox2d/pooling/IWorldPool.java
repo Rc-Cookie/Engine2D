@@ -30,8 +30,8 @@ import org.jbox2d.collision.TimeOfImpact;
 import org.jbox2d.common.Mat22;
 import org.jbox2d.common.Mat33;
 import org.jbox2d.common.Rot;
-import com.github.rccookie.geometry.performance.Vec2;
-import com.github.rccookie.geometry.performance.Vec3;
+import com.github.rccookie.geometry.performance.float2;
+import com.github.rccookie.geometry.performance.float3;
 import org.jbox2d.dynamics.contacts.Contact;
 
 /**
@@ -55,15 +55,15 @@ public interface IWorldPool {
     
     public IDynamicStack<Contact> getChainPolyContactStack();
     
-	public Vec2 popVec2();
+	public float2 popVec2();
 
-	public Vec2[] popVec2(int num);
+	public float2[] popVec2(int num);
 
 	public void pushVec2(int num);
 
-	public Vec3 popVec3();
+	public float3 popVec3();
 
-	public Vec3[] popVec3(int num);
+	public float3[] popVec3(int num);
 
 	public void pushVec3(int num);
 
@@ -97,5 +97,5 @@ public interface IWorldPool {
 
 	public int[] getIntArray(int argLength);
 
-	public Vec2[] getVec2Array(int argLength);
+	public float2[] getVec2Array(int argLength);
 }

@@ -11,8 +11,15 @@ import com.github.rccookie.json.JsonArray;
 import com.github.rccookie.json.JsonObject;
 import com.github.rccookie.util.Console;
 
+/**
+ * Class to interact with the storage of a specific Greenfoot scenario
+ * (<a href="https://www.greenfoot.org/scenarios/29116">scenario</a>).
+ */
 class ServerStorage {
 
+    /**
+     * The default values of the stored data.
+     */
     private static final JsonObject DEFAULT = new JsonObject(
             "score", 0,
             "num", new JsonArray(0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
@@ -22,8 +29,15 @@ class ServerStorage {
             "imageUrl", "/photo_attachments/0002/6442/8B16AF38-EF5D-47B2-A318-65163E99D90C_thumb.jpeg"
     );
 
+    /**
+     * Reads the scenario's data.
+     *
+     * @return The currently saved data
+     * @throws Exception If an exception occurres
+     */
     @SuppressWarnings("SpellCheckingInspection")
     public static JsonObject read() throws Exception {
+        // TODO: Use HTTPRequest
         HttpsURLConnection connection = (HttpsURLConnection) new URL(
                 "https://www.greenfoot.org/scenarios/29116/userinfo/all_user_data.json?user_id=52320&passcode=0C17E040CAB9BBF9").openConnection();
         connection.setRequestMethod("GET");
@@ -33,8 +47,15 @@ class ServerStorage {
         return Json.parse(connection.getInputStream()).get(0).or(DEFAULT);
     }
 
+    /**
+     * Writes the specified data to the server.
+     *
+     * @param data The data to write
+     * @throws Exception If an exception occurres
+     */
     @SuppressWarnings("SpellCheckingInspection")
     public static void write(JsonObject data) throws Exception {
+        // TODO: User HTTPRequest
         data = data.clone();
         System.out.println(data);
         data.combine(read());
@@ -68,6 +89,12 @@ class ServerStorage {
         Console.map("Response code", connection.getResponseCode());
     }
 
+    /**
+     * Replaces invalid characters with the appropriate URL code for them.
+     *
+     * @param str The string to encode
+     * @return The valid string
+     */
     private static String toValidString(String str) {
         return URLEncoder.encode(str.length() > 50 ? str.substring(0, 50) : str, StandardCharsets.UTF_8);
     }

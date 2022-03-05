@@ -5,11 +5,25 @@ import java.util.Objects;
 import com.github.rccookie.engine2d.Color;
 import com.github.rccookie.util.Arguments;
 
+import org.jetbrains.annotations.NotNull;
+
+/**
+ * Theme color that has a constant result value.
+ */
 class ConstThemeColor implements ThemeColor {
 
-    final Color color;
+    /**
+     * The constant result.
+     */
+    private final Color color;
 
-    ConstThemeColor(Color color) {
+
+    /**
+     * Creates a new constant theme color.
+     *
+     * @param color The color to use
+     */
+    ConstThemeColor(@NotNull Color color) {
         this.color = Arguments.checkNull(color);
     }
 

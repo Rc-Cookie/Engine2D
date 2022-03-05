@@ -46,7 +46,7 @@
 
 package org.jbox2d.collision.shapes;
 
-import com.github.rccookie.geometry.performance.Vec2;
+import com.github.rccookie.geometry.performance.float2;
 
 // Updated to rev 100
 
@@ -55,7 +55,7 @@ public class MassData {
 	/** The mass of the shape, usually in kilograms. */
 	public float mass;
 	/** The position of the shape's centroid relative to the shape's origin. */
-	public final Vec2 center;
+	public final float2 center;
 	/** The rotational inertia of the shape about the local origin. */
 	public float I;
 	
@@ -64,7 +64,7 @@ public class MassData {
 	 */
 	public MassData() {
 		mass = I = 0f;
-		center = new Vec2();
+		center = new float2();
 	}
 	
 	/**

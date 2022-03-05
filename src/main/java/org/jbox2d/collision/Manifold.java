@@ -24,7 +24,7 @@
 package org.jbox2d.collision;
 
 import org.jbox2d.common.Settings;
-import com.github.rccookie.geometry.performance.Vec2;
+import com.github.rccookie.geometry.performance.float2;
 
 /**
  * A manifold for two touching convex shapes. Box2D supports multiple types of contact:
@@ -58,10 +58,10 @@ public class Manifold {
   public final ManifoldPoint[] points;
 
   /** not use for Type::e_points */
-  public final Vec2 localNormal;
+  public final float2 localNormal;
 
   /** usage depends on manifold type */
-  public final Vec2 localPoint;
+  public final float2 localPoint;
 
   public ManifoldType type;
 
@@ -76,8 +76,8 @@ public class Manifold {
     for (int i = 0; i < Settings.maxManifoldPoints; i++) {
       points[i] = new ManifoldPoint();
     }
-    localNormal = new Vec2();
-    localPoint = new Vec2();
+    localNormal = new float2();
+    localPoint = new float2();
     pointCount = 0;
   }
 

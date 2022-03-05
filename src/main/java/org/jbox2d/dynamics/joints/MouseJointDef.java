@@ -23,7 +23,7 @@
  ******************************************************************************/
 package org.jbox2d.dynamics.joints;
 
-import com.github.rccookie.geometry.performance.Vec2;
+import com.github.rccookie.geometry.performance.float2;
 
 /**
  * Mouse joint definition. This requires a world target point, tuning parameters, and the time step.
@@ -34,7 +34,7 @@ public class MouseJointDef extends JointDef {
   /**
    * The initial world target point. This is assumed to coincide with the body anchor initially.
    */
-  public final Vec2 target = new Vec2();
+  public final float2 target = new float2();
 
   /**
    * The maximum constraint force that can be exerted to move the candidate body. Usually you will

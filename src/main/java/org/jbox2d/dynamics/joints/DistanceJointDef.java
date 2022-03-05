@@ -46,7 +46,7 @@
 
 package org.jbox2d.dynamics.joints;
 
-import com.github.rccookie.geometry.performance.Vec2;
+import com.github.rccookie.geometry.performance.float2;
 import org.jbox2d.dynamics.Body;
 
 //Updated to rev 56->130->142 of b2DistanceJoint.cpp/.h
@@ -60,10 +60,10 @@ import org.jbox2d.dynamics.Body;
  */
 public class DistanceJointDef extends JointDef {
   /** The local anchor point relative to body1's origin. */
-  public final Vec2 localAnchorA;
+  public final float2 localAnchorA;
 
   /** The local anchor point relative to body2's origin. */
-  public final Vec2 localAnchorB;
+  public final float2 localAnchorB;
 
   /** The equilibrium length between the anchor points. */
   public float length;
@@ -80,8 +80,8 @@ public class DistanceJointDef extends JointDef {
 
   public DistanceJointDef() {
     super(JointType.DISTANCE);
-    localAnchorA = new Vec2(0.0f, 0.0f);
-    localAnchorB = new Vec2(0.0f, 0.0f);
+    localAnchorA = new float2(0.0f, 0.0f);
+    localAnchorB = new float2(0.0f, 0.0f);
     length = 1.0f;
     frequencyHz = 0.0f;
     dampingRatio = 0.0f;
@@ -95,12 +95,12 @@ public class DistanceJointDef extends JointDef {
    * @param anchor1 World anchor on first body
    * @param anchor2 World anchor on second body
    */
-  public void initialize(final Body b1, final Body b2, final Vec2 anchor1, final Vec2 anchor2) {
+  public void initialize(final Body b1, final Body b2, final float2 anchor1, final float2 anchor2) {
     bodyA = b1;
     bodyB = b2;
     localAnchorA.set(bodyA.getLocalPoint(anchor1));
     localAnchorB.set(bodyB.getLocalPoint(anchor2));
-    Vec2 d = anchor2.subtracted(anchor1);
+    float2 d = anchor2.subed(anchor1);
     length = d.abs();
   }
 }

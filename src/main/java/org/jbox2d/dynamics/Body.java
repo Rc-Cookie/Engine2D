@@ -30,7 +30,7 @@ import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Rot;
 import org.jbox2d.common.Sweep;
 import org.jbox2d.common.Transform;
-import com.github.rccookie.geometry.performance.Vec2;
+import com.github.rccookie.geometry.performance.float2;
 import org.jbox2d.dynamics.contacts.Contact;
 import org.jbox2d.dynamics.contacts.ContactEdge;
 import org.jbox2d.dynamics.joints.JointEdge;
@@ -69,10 +69,10 @@ public class Body {
    */
   public final Sweep m_sweep = new Sweep();
 
-  public final Vec2 m_linearVelocity = new Vec2();
+  public final float2 m_linearVelocity = new float2();
   public float m_angularVelocity = 0;
 
-  public final Vec2 m_force = new Vec2();
+  public final float2 m_force = new float2();
   public float m_torque = 0;
 
   public World m_world;
@@ -314,7 +314,7 @@ public class Body {
    * @param position the world position of the body's local origin.
    * @param angle the world rotation in radians.
    */
-  public final void setTransform(Vec2 position, float angle) {
+  public final void setTransform(float2 position, float angle) {
     assert (!m_world.isLocked());
     if (m_world.isLocked()) {
       return;
@@ -350,7 +350,7 @@ public class Body {
    * 
    * @return the world position of the body's origin.
    */
-  public final Vec2 getPosition() {
+  public final float2 getPosition() {
     return m_xf.p;
   }
 
@@ -366,14 +366,14 @@ public class Body {
   /**
    * Get the world position of the center of mass. Do not modify.
    */
-  public final Vec2 getWorldCenter() {
+  public final float2 getWorldCenter() {
     return m_sweep.c;
   }
 
   /**
    * Get the local position of the center of mass. Do not modify.
    */
-  public final Vec2 getLocalCenter() {
+  public final float2 getLocalCenter() {
     return m_sweep.localCenter;
   }
 
@@ -382,7 +382,7 @@ public class Body {
    * 
    * @param v the new linear velocity of the center of mass.
    */
-  public final void setLinearVelocity(Vec2 v) {
+  public final void setLinearVelocity(float2 v) {
     if (m_type == BodyType.STATIC) {
       return;
     }
@@ -396,11 +396,11 @@ public class Body {
 
   /**
    * Get the linear velocity of the center of mass. Do not modify, instead use
-   * {@link #setLinearVelocity(Vec2)}.
+   * {@link #setLinearVelocity(float2)}.
    * 
    * @return the linear velocity of the center of mass.
    */
-  public final Vec2 getLinearVelocity() {
+  public final float2 getLinearVelocity() {
     return m_linearVelocity;
   }
 
@@ -455,7 +455,7 @@ public class Body {
    * @param force the world force vector, usually in Newtons (N).
    * @param point the world position of the point of application.
    */
-  public final void applyForce(Vec2 force, Vec2 point) {
+  public final void applyForce(float2 force, float2 point) {
     if (m_type != BodyType.DYNAMIC) {
       return;
     }
@@ -480,7 +480,7 @@ public class Body {
    * 
    * @param force the world force vector, usually in Newtons (N).
    */
-  public final void applyForceToCenter(Vec2 force) {
+  public final void applyForceToCenter(float2 force) {
     if (m_type != BodyType.DYNAMIC) {
       return;
     }
@@ -521,7 +521,7 @@ public class Body {
    * @param point the world position of the point of application.
    * @param wake also wake up the body
    */
-  public final void applyLinearImpulse(Vec2 impulse, Vec2 point, boolean wake) {
+  public final void applyLinearImpulse(float2 impulse, float2 point, boolean wake) {
     if (m_type != BodyType.DYNAMIC) {
       return;
     }
@@ -628,12 +628,12 @@ public class Body {
     m_invMass = 1.0f / m_mass;
 
     if (massData.I > 0.0f && (m_flags & e_fixedRotationFlag) == 0) {
-      m_I = massData.I - m_mass * Vec2.dot(massData.center, massData.center);
+      m_I = massData.I - m_mass * float2.dot(massData.center, massData.center);
       assert (m_I > 0.0f);
       m_invI = 1.0f / m_I;
     }
 
-    final Vec2 oldCenter = m_world.getPool().popVec2();
+    final float2 oldCenter = m_world.getPool().popVec2();
     // Move center of mass.
     oldCenter.set(m_sweep.c);
     m_sweep.localCenter.set(massData.center);
@@ -643,9 +643,9 @@ public class Body {
 
     // Update center of mass velocity.
     // m_linearVelocity += Cross(m_angularVelocity, m_sweep.c - oldCenter);
-    final Vec2 temp = m_world.getPool().popVec2();
-    temp.set(m_sweep.c).subtract(oldCenter);
-    Vec2.cross(m_angularVelocity, temp, temp);
+    final float2 temp = m_world.getPool().popVec2();
+    temp.set(m_sweep.c).sub(oldCenter);
+    float2.cross(m_angularVelocity, temp, temp);
     m_linearVelocity.add(temp);
 
     m_world.getPool().pushVec2(2);
@@ -678,9 +678,9 @@ public class Body {
     assert (m_type == BodyType.DYNAMIC);
 
     // Accumulate mass over all fixtures.
-    final Vec2 localCenter = m_world.getPool().popVec2();
+    final float2 localCenter = m_world.getPool().popVec2();
     localCenter.setZero();
-    final Vec2 temp = m_world.getPool().popVec2();
+    final float2 temp = m_world.getPool().popVec2();
     final MassData massData = pmd;
     for (Fixture f = m_fixtureList; f != null; f = f.m_next) {
       if (f.m_density == 0.0f) {
@@ -706,7 +706,7 @@ public class Body {
 
     if (m_I > 0.0f && (m_flags & e_fixedRotationFlag) == 0) {
       // Center the inertia about the center of mass.
-      m_I -= m_mass * Vec2.dot(localCenter, localCenter);
+      m_I -= m_mass * float2.dot(localCenter, localCenter);
       assert (m_I > 0.0f);
       m_invI = 1.0f / m_I;
     } else {
@@ -714,7 +714,7 @@ public class Body {
       m_invI = 0.0f;
     }
 
-    Vec2 oldCenter = m_world.getPool().popVec2();
+    float2 oldCenter = m_world.getPool().popVec2();
     // Move center of mass.
     oldCenter.set(m_sweep.c);
     m_sweep.localCenter.set(localCenter);
@@ -724,10 +724,10 @@ public class Body {
 
     // Update center of mass velocity.
     // m_linearVelocity += Cross(m_angularVelocity, m_sweep.c - oldCenter);
-    temp.set(m_sweep.c).subtract(oldCenter);
+    temp.set(m_sweep.c).sub(oldCenter);
 
-    final Vec2 temp2 = oldCenter;
-    Vec2.cross(m_angularVelocity, temp, temp2);
+    final float2 temp2 = oldCenter;
+    float2.cross(m_angularVelocity, temp, temp2);
     m_linearVelocity.add(temp2);
 
     m_world.getPool().pushVec2(3);
@@ -739,13 +739,13 @@ public class Body {
    * @param localPoint a point on the body measured relative the the body's origin.
    * @return the same point expressed in world coordinates.
    */
-  public final Vec2 getWorldPoint(Vec2 localPoint) {
-    Vec2 v = new Vec2();
+  public final float2 getWorldPoint(float2 localPoint) {
+    float2 v = new float2();
     getWorldPointToOut(localPoint, v);
     return v;
   }
 
-  public final void getWorldPointToOut(Vec2 localPoint, Vec2 out) {
+  public final void getWorldPointToOut(float2 localPoint, float2 out) {
     Transform.mulToOut(m_xf, localPoint, out);
   }
 
@@ -755,17 +755,17 @@ public class Body {
    * @param localVector a vector fixed in the body.
    * @return the same vector expressed in world coordinates.
    */
-  public final Vec2 getWorldVector(Vec2 localVector) {
-    Vec2 out = new Vec2();
+  public final float2 getWorldVector(float2 localVector) {
+    float2 out = new float2();
     getWorldVectorToOut(localVector, out);
     return out;
   }
 
-  public final void getWorldVectorToOut(Vec2 localVector, Vec2 out) {
+  public final void getWorldVectorToOut(float2 localVector, float2 out) {
     Rot.mulToOut(m_xf.q, localVector, out);
   }
 
-  public final void getWorldVectorToOutUnsafe(Vec2 localVector, Vec2 out) {
+  public final void getWorldVectorToOutUnsafe(float2 localVector, float2 out) {
     Rot.mulToOutUnsafe(m_xf.q, localVector, out);
   }
 
@@ -775,13 +775,13 @@ public class Body {
    * @param a point in world coordinates.
    * @return the corresponding local point relative to the body's origin.
    */
-  public final Vec2 getLocalPoint(Vec2 worldPoint) {
-    Vec2 out = new Vec2();
+  public final float2 getLocalPoint(float2 worldPoint) {
+    float2 out = new float2();
     getLocalPointToOut(worldPoint, out);
     return out;
   }
 
-  public final void getLocalPointToOut(Vec2 worldPoint, Vec2 out) {
+  public final void getLocalPointToOut(float2 worldPoint, float2 out) {
     Transform.mulTransToOut(m_xf, worldPoint, out);
   }
 
@@ -791,17 +791,17 @@ public class Body {
    * @param a vector in world coordinates.
    * @return the corresponding local vector.
    */
-  public final Vec2 getLocalVector(Vec2 worldVector) {
-    Vec2 out = new Vec2();
+  public final float2 getLocalVector(float2 worldVector) {
+    float2 out = new float2();
     getLocalVectorToOut(worldVector, out);
     return out;
   }
 
-  public final void getLocalVectorToOut(Vec2 worldVector, Vec2 out) {
+  public final void getLocalVectorToOut(float2 worldVector, float2 out) {
     Rot.mulTrans(m_xf.q, worldVector, out);
   }
 
-  public final void getLocalVectorToOutUnsafe(Vec2 worldVector, Vec2 out) {
+  public final void getLocalVectorToOutUnsafe(float2 worldVector, float2 out) {
     Rot.mulTransUnsafe(m_xf.q, worldVector, out);
   }
 
@@ -811,13 +811,13 @@ public class Body {
    * @param a point in world coordinates.
    * @return the world velocity of a point.
    */
-  public final Vec2 getLinearVelocityFromWorldPoint(Vec2 worldPoint) {
-    Vec2 out = new Vec2();
+  public final float2 getLinearVelocityFromWorldPoint(float2 worldPoint) {
+    float2 out = new float2();
     getLinearVelocityFromWorldPointToOut(worldPoint, out);
     return out;
   }
 
-  public final void getLinearVelocityFromWorldPointToOut(Vec2 worldPoint, Vec2 out) {
+  public final void getLinearVelocityFromWorldPointToOut(float2 worldPoint, float2 out) {
     final float tempX = worldPoint.x - m_sweep.c.x;
     final float tempY = worldPoint.y - m_sweep.c.y;
     out.x = -m_angularVelocity * tempY + m_linearVelocity.x;
@@ -830,13 +830,13 @@ public class Body {
    * @param a point in local coordinates.
    * @return the world velocity of a point.
    */
-  public final Vec2 getLinearVelocityFromLocalPoint(Vec2 localPoint) {
-    Vec2 out = new Vec2();
+  public final float2 getLinearVelocityFromLocalPoint(float2 localPoint) {
+    float2 out = new float2();
     getLinearVelocityFromLocalPointToOut(localPoint, out);
     return out;
   }
 
-  public final void getLinearVelocityFromLocalPointToOut(Vec2 localPoint, Vec2 out) {
+  public final void getLinearVelocityFromLocalPointToOut(float2 localPoint, float2 out) {
     getWorldPointToOut(localPoint, out);
     getLinearVelocityFromWorldPointToOut(out, out);
   }
@@ -1142,7 +1142,7 @@ public class Body {
     m_xf.q.s = MathUtils.sin(m_sweep.a);
     m_xf.q.c = MathUtils.cos(m_sweep.a);
     Rot q = m_xf.q;
-    Vec2 v = m_sweep.localCenter;
+    float2 v = m_sweep.localCenter;
     m_xf.p.x = m_sweep.c.x - q.c * v.x + q.s * v.y;
     m_xf.p.y = m_sweep.c.y - q.s * v.x - q.c * v.y;
   }

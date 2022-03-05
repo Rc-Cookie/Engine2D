@@ -49,7 +49,7 @@ package org.jbox2d.dynamics.joints;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Rot;
 import org.jbox2d.common.Settings;
-import com.github.rccookie.geometry.performance.Vec2;
+import com.github.rccookie.geometry.performance.float2;
 import org.jbox2d.dynamics.SolverData;
 import org.jbox2d.pooling.IWorldPool;
 
@@ -71,8 +71,8 @@ public class DistanceJoint extends Joint {
   private float m_bias;
 
   // Solver shared
-  private final Vec2 m_localAnchorA;
-  private final Vec2 m_localAnchorB;
+  private final float2 m_localAnchorA;
+  private final float2 m_localAnchorB;
   private float m_gamma;
   private float m_impulse;
   private float m_length;
@@ -80,11 +80,11 @@ public class DistanceJoint extends Joint {
   // Solver temp
   private int m_indexA;
   private int m_indexB;
-  private final Vec2 m_u = new Vec2();
-  private final Vec2 m_rA = new Vec2();
-  private final Vec2 m_rB = new Vec2();
-  private final Vec2 m_localCenterA = new Vec2();
-  private final Vec2 m_localCenterB = new Vec2();
+  private final float2 m_u = new float2();
+  private final float2 m_rA = new float2();
+  private final float2 m_rB = new float2();
+  private final float2 m_localCenterA = new float2();
+  private final float2 m_localCenterB = new float2();
   private float m_invMassA;
   private float m_invMassB;
   private float m_invIA;
@@ -128,20 +128,20 @@ public class DistanceJoint extends Joint {
   }
 
   @Override
-  public void getAnchorA(Vec2 argOut) {
+  public void getAnchorA(float2 argOut) {
     m_bodyA.getWorldPointToOut(m_localAnchorA, argOut);
   }
 
   @Override
-  public void getAnchorB(Vec2 argOut) {
+  public void getAnchorB(float2 argOut) {
     m_bodyB.getWorldPointToOut(m_localAnchorB, argOut);
   }
 
-  public Vec2 getLocalAnchorA() {
+  public float2 getLocalAnchorA() {
     return m_localAnchorA;
   }
 
-  public Vec2 getLocalAnchorB() {
+  public float2 getLocalAnchorB() {
     return m_localAnchorB;
   }
 
@@ -149,7 +149,7 @@ public class DistanceJoint extends Joint {
    * Get the reaction force given the inverse time step. Unit is N.
    */
   @Override
-  public void getReactionForce(float inv_dt, Vec2 argOut) {
+  public void getReactionForce(float inv_dt, float2 argOut) {
     argOut.x = m_impulse * m_u.x * inv_dt;
     argOut.y = m_impulse * m_u.y * inv_dt;
   }
@@ -175,14 +175,14 @@ public class DistanceJoint extends Joint {
     m_invIA = m_bodyA.m_invI;
     m_invIB = m_bodyB.m_invI;
 
-    Vec2 cA = data.positions[m_indexA].c;
+    float2 cA = data.positions[m_indexA].c;
     float aA = data.positions[m_indexA].a;
-    Vec2 vA = data.velocities[m_indexA].v;
+    float2 vA = data.velocities[m_indexA].v;
     float wA = data.velocities[m_indexA].w;
 
-    Vec2 cB = data.positions[m_indexB].c;
+    float2 cB = data.positions[m_indexB].c;
     float aB = data.positions[m_indexB].a;
-    Vec2 vB = data.velocities[m_indexB].v;
+    float2 vB = data.velocities[m_indexB].v;
     float wB = data.velocities[m_indexB].w;
 
     final Rot qA = pool.popRot();
@@ -192,9 +192,9 @@ public class DistanceJoint extends Joint {
     qB.set(aB);
 
     // use m_u as temporary variable
-    Rot.mulToOutUnsafe(qA, m_u.set(m_localAnchorA).subtract(m_localCenterA), m_rA);
-    Rot.mulToOutUnsafe(qB, m_u.set(m_localAnchorB).subtract(m_localCenterB), m_rB);
-    m_u.set(cB).add(m_rB).subtract(cA).subtract(m_rA);
+    Rot.mulToOutUnsafe(qA, m_u.set(m_localAnchorA).sub(m_localCenterA), m_rA);
+    Rot.mulToOutUnsafe(qB, m_u.set(m_localAnchorB).sub(m_localCenterB), m_rB);
+    m_u.set(cB).add(m_rB).sub(cA).sub(m_rA);
 
     pool.pushRot(2);
 
@@ -208,8 +208,8 @@ public class DistanceJoint extends Joint {
     }
 
 
-    float crAu = Vec2.cross(m_rA, m_u);
-    float crBu = Vec2.cross(m_rB, m_u);
+    float crAu = float2.cross(m_rA, m_u);
+    float crBu = float2.cross(m_rB, m_u);
     float invMass = m_invMassA + m_invIA * crAu * crAu + m_invMassB + m_invIB * crBu * crBu;
 
     // Compute the effective mass matrix.
@@ -244,16 +244,16 @@ public class DistanceJoint extends Joint {
       // Scale the impulse to support a variable time step.
       m_impulse *= data.step.dtRatio;
 
-      Vec2 P = pool.popVec2();
+      float2 P = pool.popVec2();
       P.set(m_u).scale(m_impulse);
 
       vA.x -= m_invMassA * P.x;
       vA.y -= m_invMassA * P.y;
-      wA -= m_invIA * Vec2.cross(m_rA, P);
+      wA -= m_invIA * float2.cross(m_rA, P);
 
       vB.x += m_invMassB * P.x;
       vB.y += m_invMassB * P.y;
-      wB += m_invIB * Vec2.cross(m_rB, P);
+      wB += m_invIB * float2.cross(m_rB, P);
 
       pool.pushVec2(1);
     } else {
@@ -267,20 +267,20 @@ public class DistanceJoint extends Joint {
 
   @Override
   public void solveVelocityConstraints(final SolverData data) {
-    Vec2 vA = data.velocities[m_indexA].v;
+    float2 vA = data.velocities[m_indexA].v;
     float wA = data.velocities[m_indexA].w;
-    Vec2 vB = data.velocities[m_indexB].v;
+    float2 vB = data.velocities[m_indexB].v;
     float wB = data.velocities[m_indexB].w;
 
-    final Vec2 vpA = pool.popVec2();
-    final Vec2 vpB = pool.popVec2();
+    final float2 vpA = pool.popVec2();
+    final float2 vpB = pool.popVec2();
 
     // Cdot = dot(u, v + cross(w, r))
-    Vec2.cross(wA, m_rA, vpA);
+    float2.cross(wA, m_rA, vpA);
     vpA.add(vA);
-    Vec2.cross(wB, m_rB, vpB);
+    float2.cross(wB, m_rB, vpB);
     vpB.add(vB);
-    float Cdot = Vec2.dot(m_u, vpB.subtract(vpA));
+    float Cdot = float2.dot(m_u, vpB.sub(vpA));
 
     float impulse = -m_mass * (Cdot + m_bias + m_gamma * m_impulse);
     m_impulse += impulse;
@@ -311,25 +311,25 @@ public class DistanceJoint extends Joint {
     }
     final Rot qA = pool.popRot();
     final Rot qB = pool.popRot();
-    final Vec2 rA = pool.popVec2();
-    final Vec2 rB = pool.popVec2();
-    final Vec2 u = pool.popVec2();
+    final float2 rA = pool.popVec2();
+    final float2 rB = pool.popVec2();
+    final float2 u = pool.popVec2();
 
-    Vec2 cA = data.positions[m_indexA].c;
+    float2 cA = data.positions[m_indexA].c;
     float aA = data.positions[m_indexA].a;
-    Vec2 cB = data.positions[m_indexB].c;
+    float2 cB = data.positions[m_indexB].c;
     float aB = data.positions[m_indexB].a;
 
     qA.set(aA);
     qB.set(aB);
 
-    Rot.mulToOutUnsafe(qA, u.set(m_localAnchorA).subtract(m_localCenterA), rA);
-    Rot.mulToOutUnsafe(qB, u.set(m_localAnchorB).subtract(m_localCenterB), rB);
-    u.set(cB).add(rB).subtract(cA).subtract(rA);
+    Rot.mulToOutUnsafe(qA, u.set(m_localAnchorA).sub(m_localCenterA), rA);
+    Rot.mulToOutUnsafe(qB, u.set(m_localAnchorB).sub(m_localCenterB), rB);
+    u.set(cB).add(rB).sub(cA).sub(rA);
 
 
     float length = u.abs();
-    u.divide(length);
+    u.div(length);
     float C = length - m_length;
     C = MathUtils.clamp(C, -Settings.maxLinearCorrection, Settings.maxLinearCorrection);
 

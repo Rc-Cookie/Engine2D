@@ -23,7 +23,7 @@
  ******************************************************************************/
 package org.jbox2d.common;
 
-import com.github.rccookie.geometry.performance.Vec2;
+import com.github.rccookie.geometry.performance.float2;
 
 /**
  * This is the viewport transform used from drawing. Use yFlip if you are drawing from the top-left
@@ -47,13 +47,13 @@ public interface IViewportTransform {
    * This is the half-width and half-height. This should be the actual half-width and half-height,
    * not anything transformed or scaled. Not a copy.
    */
-  Vec2 getExtents();
+  float2 getExtents();
 
   /**
    * This sets the half-width and half-height. This should be the actual half-width and half-height,
    * not anything transformed or scaled.
    */
-  void setExtents(Vec2 extents);
+  void setExtents(float2 extents);
 
   /**
    * This sets the half-width and half-height of the viewport. This should be the actual half-width
@@ -64,12 +64,12 @@ public interface IViewportTransform {
   /**
    * center of the viewport. Not a copy.
    */
-  Vec2 getCenter();
+  float2 getCenter();
 
   /**
    * sets the center of the viewport.
    */
-  void setCenter(Vec2 pos);
+  void setCenter(float2 pos);
 
   /**
    * sets the center of the viewport.
@@ -84,13 +84,13 @@ public interface IViewportTransform {
   /**
    * Transforms the given directional vector by the viewport transform (not positional)
    */
-  void getWorldVectorToScreen(Vec2 world, Vec2 screen);
+  void getWorldVectorToScreen(float2 world, float2 screen);
 
 
   /**
    * Transforms the given directional screen vector back to the world direction.
    */
-  void getScreenVectorToWorld(Vec2 screen, Vec2 world);
+  void getScreenVectorToWorld(float2 screen, float2 world);
   
   Mat22 getMat22Representation();
 
@@ -99,14 +99,14 @@ public interface IViewportTransform {
    * takes the world coordinate (world) puts the corresponding screen coordinate in screen. It
    * should be safe to give the same object as both parameters.
    */
-  void getWorldToScreen(Vec2 world, Vec2 screen);
+  void getWorldToScreen(float2 world, float2 screen);
 
 
   /**
    * takes the screen coordinates (screen) and puts the corresponding world coordinates in world. It
    * should be safe to give the same object as both parameters.
    */
-  void getScreenToWorld(Vec2 screen, Vec2 world);
+  void getScreenToWorld(float2 screen, float2 world);
 
   /**
    * Multiplies the viewport transform by the given Mat22

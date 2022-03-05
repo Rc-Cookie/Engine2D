@@ -2,32 +2,100 @@ package com.github.rccookie.engine2d;
 
 import java.util.Objects;
 
+import com.github.rccookie.engine2d.impl.Implementation;
 import com.github.rccookie.util.Arguments;
 
+import org.jetbrains.annotations.Range;
+
+/**
+ * Represents a color in RGBA space.
+ */
 @SuppressWarnings("StaticInitializerReferencesSubClass")
 public class Color {
 
-    private static final float FACTOR = 0.7f;
+    /**
+     * Constant for calculating a brighter or darker color.
+     */
+    private static final float DARKTER_FACTOR = 0.7f;
 
+    /**
+     * The color black with an alpha value of 0.
+     */
     public static final Color CLEAR      = new ConstColor(0,   0,   0,   0);
+    /**
+     * The color white.
+     */
     public static final Color WHITE      = new ConstColor(255, 255, 255, 255);
+    /**
+     * A light gray.
+     */
     public static final Color LIGHT_GRAY = new ConstColor(192, 192, 192, 255);
+    /**
+     * A gray.
+     */
     public static final Color GRAY       = new ConstColor(128, 128, 128, 255);
+    /**
+     * A dark gray.
+     */
     public static final Color DARK_GRAY  = new ConstColor(64,  64,  64 , 255);
+    /**
+     * The color black.
+     */
     public static final Color BLACK      = new ConstColor(0,   0,   0  , 255);
+    /**
+     * The color red.
+     */
     public static final Color RED        = new ConstColor(255, 0,   0  , 255);
+    /**
+     * An orange.
+     */
     public static final Color ORANGE     = new ConstColor(255, 200, 0  , 255);
+    /**
+     * The color yellow.
+     */
     public static final Color YELLOW     = new ConstColor(255, 255, 0  , 255);
+    /**
+     * The color green.
+     */
     public static final Color GREEN      = new ConstColor(0,   255, 0  , 255);
+    /**
+     * The color cyan.
+     */
     public static final Color CYAN       = new ConstColor(0,   255, 255, 255);
+    /**
+     * The color blue.
+     */
     public static final Color BLUE       = new ConstColor(0,   0,   255, 255);
+    /**
+     * The color magenta.
+     */
     public static final Color MAGENTA    = new ConstColor(255, 0,   255, 255);
+    /**
+     * A pink.
+     */
     public static final Color PINK       = new ConstColor(255, 175, 175, 255);
 
+    /**
+     * RGBA value between 0 and 255.
+     */
+    @Range(from = 0, to = 255)
     public final short r, g, b, a;
+    /**
+     * RGBA float value between 0 and 1. Equivalent to respectable int
+     * value when multiplied by 255.
+     */
+    @Range(from = 0, to = 1)
     public final float fr, fg, fb, fa;
 
-    public Color(int r, int g, int b, int a) {
+    /**
+     * Creates a new color with the given RGBA values.
+     *
+     * @param r Red
+     * @param g Green
+     * @param b Blue
+     * @param a Alpha
+     */
+    public Color(@Range(from = 0, to = 255) int r, @Range(from = 0, to = 255) int g, @Range(from = 0, to = 255) int b, @Range(from = 0, to = 255) int a) {
         Arguments.checkRange(r, 0, 256);
         Arguments.checkRange(g, 0, 256);
         Arguments.checkRange(b, 0, 256);
@@ -42,11 +110,26 @@ public class Color {
         fa = a / 255f;
     }
 
-    public Color(int r, int g, int b) {
+    /**
+     * Creates a new color with the given RGBA values.
+     *
+     * @param r Red
+     * @param g Green
+     * @param b Blue
+     */
+    public Color(@Range(from = 0, to = 255) int r, @Range(from = 0, to = 255) int g, @Range(from = 0, to = 255) int b) {
         this(r, g, b, 255);
     }
 
-    public Color(float fr, float fg, float fb, float fa) {
+    /**
+     * Creates a new color with the given RGBA values.
+     *
+     * @param fr Red in float space between 0 and 1
+     * @param fg Green in float space between 0 and 1
+     * @param fb Blue in float space between 0 and 1
+     * @param fa Alpha in float space between 0 and 1
+     */
+    public Color(@Range(from = 0, to = 1) float fr, @Range(from = 0, to = 1) float fg, @Range(from = 0, to = 1) float fb, @Range(from = 0, to = 1) float fa) {
         Arguments.checkInclusive(fr, 0f, 1f);
         Arguments.checkInclusive(fg, 0f, 1f);
         Arguments.checkInclusive(fb, 0f, 1f);
@@ -61,89 +144,230 @@ public class Color {
         a = (short) (fa * 255 + 0.5f);
     }
 
-    public Color(float fr, float fg, float fb) {
+    /**
+     * Creates a new color with the given RGBA values.
+     *
+     * @param fr Red in float space between 0 and 1
+     * @param fg Green in float space between 0 and 1
+     * @param fb Blue in float space between 0 and 1
+     */
+    public Color(@Range(from = 0, to = 1) float fr, @Range(from = 0, to = 1) float fg, @Range(from = 0, to = 1) float fb) {
         this(fr, fg, fb, 1f);
     }
 
-    public Color(int brightness, int a) {
+    /**
+     * Creates a new color with all RGB values set to the same value.
+     *
+     * @param brightness The value for r,g and b
+     * @param a Alpha
+     */
+    public Color(@Range(from = 0, to = 255) int brightness, @Range(from = 0, to = 255) int a) {
         this(brightness, brightness, brightness, a);
     }
 
-    public Color(float fBrightness, float fa) {
+    /**
+     * Creates a new color with all RGB values set to the same value.
+     *
+     * @param fBrightness The value for r,g and b in float space between 0 and 1
+     * @param fa Alpha in float space between 0 and 1
+     */
+    public Color(@Range(from = 0, to = 1) float fBrightness, @Range(from = 0, to = 1) float fa) {
         this(fBrightness, fBrightness, fBrightness, fa);
     }
 
-    public Color(int brightness) {
-        this(brightness, 255);
-    }
-
-    public Color(float fBrightness) {
+    /**
+     * Creates a new color with all RGB values set to the same value.
+     *
+     * @param fBrightness The value for r,g and b in float space between 0 and 1
+     */
+    public Color(@Range(from = 0, to = 1) float fBrightness) {
         this(fBrightness, 1f);
     }
 
+    /**
+     * Creates a new color from the given RGB value. Aplha will be ignored and set to 255.
+     * <p>The main purpose of this method is to be used with hexadecimal notation
+     * (0x00000000) to input a hex color value directly.</p>
+     *
+     * @param rgb RGB value to set
+     */
+    public Color(int rgb) {
+        this(rgb, false);
+    }
+
+    /**
+     * Creates a new color from the given RGBA value. If set aplha will be ignored and
+     * set to 255.
+     * <p>The main purpose of this method is to be used with hexadecimal notation
+     * (0x00000000) to input a hex color value directly.</p>
+     *
+     * @param rgb The RGB or ARGB to set
+     * @param a Whether alpha should be used or set to 255
+     */
+    public Color(int rgb, boolean a) {
+        this((rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, rgb & 0xFF, a ? (rgb >> 24) & 0xFF : 0xFF);
+    }
+
+    /**
+     * Creates a new color from the given hex string. The hex string may include a
+     * leading '#' or not, but must not have any whitespaces or other characters.
+     *
+     * @param hex The hex string
+     */
+    public Color(String hex) {
+        this(getRGB(hex), true);
+    }
+
+    /**
+     * Calculates a ARGB value from the given hex string.
+     *
+     * @param hex The string to parse
+     * @return The ARGB value
+     */
+    private static int getRGB(String hex) {
+        if(hex.startsWith("#"))
+            hex = hex.substring(1);
+        int rgb = Integer.parseInt(hex, 16);
+        if(hex.length() <= 6)
+            rgb |= 0xFF000000;
+        return rgb;
+    }
 
 
-    public Color setRed(int r) {
+
+
+
+    /**
+     * Returns a new color with the given red value.
+     *
+     * @param r Red
+     * @return A copy of this color with the specified red value
+     */
+    public Color setRed(@Range(from = 0, to = 255) int r) {
         return new Color(r, g, b, a);
     }
 
-    public Color setGreen(int g) {
+    /**
+     * Returns a new color with the given green value.
+     *
+     * @param g Green
+     * @return A copy of this color with the specified green value
+     */
+    public Color setGreen(@Range(from = 0, to = 255) int g) {
         return new Color(r, g, b, a);
     }
 
-    public Color setBlue(int b) {
+    /**
+     * Returns a new color with the given blue value.
+     *
+     * @param b Blue
+     * @return A copy of this color with the specified blue value
+     */
+    public Color setBlue(@Range(from = 0, to = 255) int b) {
         return new Color(r, g, b, a);
     }
 
-    public Color setAlpha(int a) {
+    /**
+     * Returns a new color with the given alpha value.
+     *
+     * @param a Alpha
+     * @return A copy of this color with the specified alpha value
+     */
+    public Color setAlpha(@Range(from = 0, to = 255) int a) {
         return new Color(r, g, b, a);
     }
 
-    public Color setRed(float fr) {
+    /**
+     * Returns a new color with the given red value.
+     *
+     * @param fr Red in float space between 0 and 1
+     * @return A copy of this color with the specified red value
+     */
+    public Color setRed(@Range(from = 0, to = 1) float fr) {
         return new Color(fr, fg, fb, fa);
     }
 
-    public Color setGreen(float fg) {
+    /**
+     * Returns a new color with the given green value.
+     *
+     * @param fg Green in float space between 0 and 1
+     * @return A copy of this color with the specified green value
+     */
+    public Color setGreen(@Range(from = 0, to = 1) float fg) {
         return new Color(fr, fg, fb, fa);
     }
 
-    public Color setBlue(float fb) {
+    /**
+     * Returns a new color with the given blue value.
+     *
+     * @param fb Blue in float space between 0 and 1
+     * @return A copy of this color with the specified blue value
+     */
+    public Color setBlue(@Range(from = 0, to = 1) float fb) {
         return new Color(fr, fg, fb, fa);
     }
 
-    public Color setAlpha(float fa) {
+    /**
+     * Returns a new color with the given alpha value.
+     *
+     * @param fa Alpha in float space between 0 and 1
+     * @return A copy of this color with the specified alpha value
+     */
+    public Color setAlpha(@Range(from = 0, to = 1) float fa) {
         return new Color(fr, fg, fb, fa);
     }
 
 
-
+    /**
+     * Returns a new color that is brighter than this color, if possible.
+     * Note that darker may not be an exact reverse of this operation.
+     *
+     * @return A color brighter than this color
+     */
     public Color brighter() {
 
         // From java.awt.Color
 
-        int i = (int) (1/(1-FACTOR));
+        int i = (int) (1/(1- DARKTER_FACTOR));
         if(r == 0 && g == 0 && b == 0)
             return new Color(i, i, i, a);
 
-        return new Color(Math.min((int) (Math.max(r, i)/FACTOR), 255),
-                Math.min((int) (Math.max(g, i)/FACTOR), 255),
-                Math.min((int) (Math.max(b, i)/FACTOR), 255),
+        return new Color(Math.min((int) (Math.max(r, i)/ DARKTER_FACTOR), 255),
+                Math.min((int) (Math.max(g, i)/ DARKTER_FACTOR), 255),
+                Math.min((int) (Math.max(b, i)/ DARKTER_FACTOR), 255),
                 a);
     }
 
+    /**
+     * Returns a new color that is darker than this color, if possible.
+     * Note that brighter may not be an exact reverse of this operation.
+     *
+     * @return A color darker than this color
+     */
     public Color darker() {
-        return new Color(Math.max((int) (r * FACTOR), 0),
-                Math.max((int) (g * FACTOR), 0),
-                Math.max((int) (b * FACTOR), 0),
+        return new Color(Math.max((int) (r * DARKTER_FACTOR), 0),
+                Math.max((int) (g * DARKTER_FACTOR), 0),
+                Math.max((int) (b * DARKTER_FACTOR), 0),
                 a);
     }
 
 
-
+    /**
+     * Returns the RGB complement of this color, i.e. every component (except alhpa)
+     * gets inverted.
+     *
+     * @return This color's complement
+     */
     public Color getComplement() {
         return new Color(255 - r, 255 - g, 255 - b, a);
     }
 
+    /**
+     * Returns the color with the most contrast (the biggest possible component-wise
+     * difference).
+     *
+     * @return A contrast color to this color
+     */
     public Color getContrast() {
         return new Color(
                 r > 127 ? 0 : 255,
@@ -153,7 +377,11 @@ public class Color {
         );
     }
 
-
+    /**
+     * Returns the ARGB of this color.
+     *
+     * @return The ARGB of this color
+     */
     public int getRGB() {
         return  ((r & 0xFF) << 16) |
                 ((g & 0xFF) << 8)  |
@@ -162,6 +390,13 @@ public class Color {
     }
 
 
+    /**
+     * Returns a new {@link java.awt.Color} with the same RGBA values as this
+     * color. Note that this operation may not be supported on all implementations.
+     * Test {@link Implementation#supportsAWT()} first.
+     *
+     * @return A equivalent java.awt.Color
+     */
     public java.awt.Color getAwtColor() {
         return new java.awt.Color(r, g, b, a);
     }
@@ -179,6 +414,12 @@ public class Color {
         return Objects.hash(r, g, b, a);
     }
 
+    /**
+     * Returns this color as hex value with a leading '#'. If alpha is 255
+     * it will not be included.
+     *
+     * @return A string representation of this color
+     */
     @Override
     public String toString() {
         String rgb = Integer.toHexString(
@@ -188,12 +429,9 @@ public class Color {
     }
 
 
-    public static Color fromRGB(int rgb) {
-        return new Color((rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, rgb & 0xFF, (rgb >> 24) & 0xFF);
-    }
-
-
-
+    /**
+     * Class for frequently used color constants with cached values.
+     */
     private static class ConstColor extends Color {
 
         private final String toString;

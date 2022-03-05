@@ -13,20 +13,41 @@ import com.github.rccookie.engine2d.Color;
 import com.github.rccookie.engine2d.Image;
 import com.github.rccookie.engine2d.impl.ImageImpl;
 import com.github.rccookie.engine2d.util.RuntimeIOException;
-import com.github.rccookie.geometry.performance.IVec2;
+import com.github.rccookie.geometry.performance.int2;
 
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * AWT implementation of {@link ImageImpl} using {@link BufferedImage}.
+ */
 public class AWTImageImpl implements ImageImpl {
 
+    /**
+     * The internal image backing this image implementation.
+     */
     final BufferedImage image;
-    final IVec2 size;
+    /**
+     * The image size, cached.
+     */
+    final int2 size;
 
-    public AWTImageImpl(IVec2 size) {
+
+    /**
+     * Creates a new AWTImageImpl.
+     *
+     * @param size The size of the image
+     */
+    public AWTImageImpl(int2 size) {
         image = new BufferedImage(size.x, size.y, BufferedImage.TYPE_INT_ARGB);
         this.size = size.clone();
     }
 
+    /**
+     * Creates a new AWTImageImpl by loading from the specified file.
+     *
+     * @param file The path to the file to load
+     * @throws RuntimeIOException If an exception occurs reading the file
+     */
     public AWTImageImpl(String file) throws RuntimeIOException {
         BufferedImage loaded;
         try {
@@ -36,12 +57,17 @@ public class AWTImageImpl implements ImageImpl {
         image = new BufferedImage(loaded.getWidth(), loaded.getHeight(), BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = image.createGraphics();
         g.drawImage(loaded, 0, 0, null);
-        size = new IVec2(image.getWidth(), image.getHeight());
+        size = new int2(image.getWidth(), image.getHeight());
     }
 
+    /**
+     * Creates a new AWTImageImpl backed with the given BufferedImage.
+     *
+     * @param image The BufferedImage used to back this image
+     */
     AWTImageImpl(BufferedImage image) {
         this.image = image;
-        size = new IVec2(image.getWidth(), image.getHeight());
+        size = new int2(image.getWidth(), image.getHeight());
     }
 
 
@@ -56,7 +82,7 @@ public class AWTImageImpl implements ImageImpl {
 
 
     @Override
-    public void fillRect(IVec2 topLeft, IVec2 size, Color color) {
+    public void fillRect(int2 topLeft, int2 size, Color color) {
         Graphics2D g = image.createGraphics();
         g.setColor(color.getAwtColor());
         g.fillRect(topLeft.x, topLeft.y, size.x, size.y);
@@ -64,7 +90,7 @@ public class AWTImageImpl implements ImageImpl {
     }
 
     @Override
-    public void drawRect(IVec2 topLeft, IVec2 size, Color color) {
+    public void drawRect(int2 topLeft, int2 size, Color color) {
         Graphics2D g = image.createGraphics();
         g.setColor(color.getAwtColor());
         g.drawRect(topLeft.x, topLeft.y, size.x - 1, size.y - 1);
@@ -72,7 +98,7 @@ public class AWTImageImpl implements ImageImpl {
     }
 
     @Override
-    public void fillOval(IVec2 center, IVec2 size, Color color) {
+    public void fillOval(int2 center, int2 size, Color color) {
         Graphics2D g = image.createGraphics();
         g.setColor(color.getAwtColor());
         g.fillOval(center.x - size.x / 2, center.y - size.y / 2, size.x, size.y);
@@ -80,7 +106,7 @@ public class AWTImageImpl implements ImageImpl {
     }
 
     @Override
-    public void drawOval(IVec2 center, IVec2 size, Color color) {
+    public void drawOval(int2 center, int2 size, Color color) {
         Graphics2D g = image.createGraphics();
         g.setColor(color.getAwtColor());
         g.drawOval(center.x - size.x / 2, center.y - size.y / 2, size.x, size.y);
@@ -88,7 +114,7 @@ public class AWTImageImpl implements ImageImpl {
     }
 
     @Override
-    public void drawLine(IVec2 from, IVec2 to, Color color) {
+    public void drawLine(int2 from, int2 to, Color color) {
         Graphics2D g = image.createGraphics();
         g.setColor(color.getAwtColor());
         g.drawLine(from.x, from.y, to.x, to.y);
@@ -96,7 +122,7 @@ public class AWTImageImpl implements ImageImpl {
     }
 
     @Override
-    public void setPixel(IVec2 location, Color color) {
+    public void setPixel(int2 location, Color color) {
         image.setRGB(location.x, location.y, color.getRGB());
     }
 
@@ -108,24 +134,24 @@ public class AWTImageImpl implements ImageImpl {
     }
 
     @Override
-    public Color getPixel(IVec2 location) {
-        return Color.fromRGB(image.getRGB(location.x, location.y));
+    public Color getPixel(int2 location) {
+        return new Color(image.getRGB(location.x, location.y), true);
     }
 
     @Override
-    public void drawImage(ImageImpl image, IVec2 topLeft) {
+    public void drawImage(ImageImpl image, int2 topLeft) {
         Graphics2D g = this.image.createGraphics();
         g.drawImage(((AWTImageImpl) image).image, topLeft.x, topLeft.y, null);
         g.dispose();
     }
 
     @Override
-    public IVec2 getSize() {
+    public int2 getSize() {
         return size;
     }
 
     @Override
-    public ImageImpl scaled(IVec2 newSize, Image.AntialiasingMode aaMode) {
+    public ImageImpl scaled(int2 newSize, Image.AntialiasingMode aaMode) {
         BufferedImage scaled = new BufferedImage(newSize.x, newSize.y, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = scaled.createGraphics();
         g.setComposite(AlphaComposite.Src);

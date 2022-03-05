@@ -29,7 +29,7 @@ package org.jbox2d.dynamics.joints;
 import org.jbox2d.common.Mat22;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Rot;
-import com.github.rccookie.geometry.performance.Vec2;
+import com.github.rccookie.geometry.performance.float2;
 import org.jbox2d.dynamics.SolverData;
 import org.jbox2d.pooling.IWorldPool;
 
@@ -38,11 +38,11 @@ import org.jbox2d.pooling.IWorldPool;
  */
 public class FrictionJoint extends Joint {
 
-  private final Vec2 m_localAnchorA;
-  private final Vec2 m_localAnchorB;
+  private final float2 m_localAnchorA;
+  private final float2 m_localAnchorB;
 
   // Solver shared
-  private final Vec2 m_linearImpulse;
+  private final float2 m_linearImpulse;
   private float m_angularImpulse;
   private float m_maxForce;
   private float m_maxTorque;
@@ -50,10 +50,10 @@ public class FrictionJoint extends Joint {
   // Solver temp
   private int m_indexA;
   private int m_indexB;
-  private final Vec2 m_rA = new Vec2();
-  private final Vec2 m_rB = new Vec2();
-  private final Vec2 m_localCenterA = new Vec2();
-  private final Vec2 m_localCenterB = new Vec2();
+  private final float2 m_rA = new float2();
+  private final float2 m_rB = new float2();
+  private final float2 m_localCenterA = new float2();
+  private final float2 m_localCenterB = new float2();
   private float m_invMassA;
   private float m_invMassB;
   private float m_invIA;
@@ -63,36 +63,36 @@ public class FrictionJoint extends Joint {
 
   protected FrictionJoint(IWorldPool argWorldPool, FrictionJointDef def) {
     super(argWorldPool, def);
-    m_localAnchorA = new Vec2(def.localAnchorA);
-    m_localAnchorB = new Vec2(def.localAnchorB);
+    m_localAnchorA = new float2(def.localAnchorA);
+    m_localAnchorB = new float2(def.localAnchorB);
 
-    m_linearImpulse = new Vec2();
+    m_linearImpulse = new float2();
     m_angularImpulse = 0.0f;
 
     m_maxForce = def.maxForce;
     m_maxTorque = def.maxTorque;
   }
 
-  public Vec2 getLocalAnchorA() {
+  public float2 getLocalAnchorA() {
     return m_localAnchorA;
   }
 
-  public Vec2 getLocalAnchorB() {
+  public float2 getLocalAnchorB() {
     return m_localAnchorB;
   }
 
   @Override
-  public void getAnchorA(Vec2 argOut) {
+  public void getAnchorA(float2 argOut) {
     m_bodyA.getWorldPointToOut(m_localAnchorA, argOut);
   }
 
   @Override
-  public void getAnchorB(Vec2 argOut) {
+  public void getAnchorB(float2 argOut) {
     m_bodyB.getWorldPointToOut(m_localAnchorB, argOut);
   }
 
   @Override
-  public void getReactionForce(float inv_dt, Vec2 argOut) {
+  public void getReactionForce(float inv_dt, float2 argOut) {
     argOut.set(m_linearImpulse).scale(inv_dt);
   }
 
@@ -134,15 +134,15 @@ public class FrictionJoint extends Joint {
     m_invIB = m_bodyB.m_invI;
 
     float aA = data.positions[m_indexA].a;
-    Vec2 vA = data.velocities[m_indexA].v;
+    float2 vA = data.velocities[m_indexA].v;
     float wA = data.velocities[m_indexA].w;
 
     float aB = data.positions[m_indexB].a;
-    Vec2 vB = data.velocities[m_indexB].v;
+    float2 vB = data.velocities[m_indexB].v;
     float wB = data.velocities[m_indexB].w;
 
 
-    final Vec2 temp = pool.popVec2();
+    final float2 temp = pool.popVec2();
     final Rot qA = pool.popRot();
     final Rot qB = pool.popRot();
 
@@ -150,8 +150,8 @@ public class FrictionJoint extends Joint {
     qB.set(aB);
 
     // Compute the effective mass matrix.
-    Rot.mulToOutUnsafe(qA, temp.set(m_localAnchorA).subtract(m_localCenterA), m_rA);
-    Rot.mulToOutUnsafe(qB, temp.set(m_localAnchorB).subtract(m_localCenterB), m_rB);
+    Rot.mulToOutUnsafe(qA, temp.set(m_localAnchorA).sub(m_localCenterA), m_rA);
+    Rot.mulToOutUnsafe(qB, temp.set(m_localAnchorB).sub(m_localCenterB), m_rB);
 
     // J = [-I -r1_skew I r2_skew]
     // [ 0 -1 0 1]
@@ -183,16 +183,16 @@ public class FrictionJoint extends Joint {
       m_linearImpulse.scale(data.step.dtRatio);
       m_angularImpulse *= data.step.dtRatio;
 
-      final Vec2 P = pool.popVec2();
+      final float2 P = pool.popVec2();
       P.set(m_linearImpulse);
 
       temp.set(P).scale(mA);
-      vA.subtract(temp);
-      wA -= iA * (Vec2.cross(m_rA, P) + m_angularImpulse);
+      vA.sub(temp);
+      wA -= iA * (float2.cross(m_rA, P) + m_angularImpulse);
 
       temp.set(P).scale(mB);
       vB.add(temp);
-      wB += iB * (Vec2.cross(m_rB, P) + m_angularImpulse);
+      wB += iB * (float2.cross(m_rB, P) + m_angularImpulse);
 
       pool.pushVec2(1);
     } else {
@@ -214,9 +214,9 @@ public class FrictionJoint extends Joint {
 
   @Override
   public void solveVelocityConstraints(final SolverData data) {
-    Vec2 vA = data.velocities[m_indexA].v;
+    float2 vA = data.velocities[m_indexA].v;
     float wA = data.velocities[m_indexA].w;
-    Vec2 vB = data.velocities[m_indexB].v;
+    float2 vB = data.velocities[m_indexB].v;
     float wB = data.velocities[m_indexB].w;
 
     float mA = m_invMassA, mB = m_invMassB;
@@ -240,19 +240,19 @@ public class FrictionJoint extends Joint {
 
     // Solve linear friction
     {
-      final Vec2 Cdot = pool.popVec2();
-      final Vec2 temp = pool.popVec2();
+      final float2 Cdot = pool.popVec2();
+      final float2 temp = pool.popVec2();
 
-      Vec2.cross(wA, m_rA, temp);
-      Vec2.cross(wB, m_rB, Cdot);
-      Cdot.add(vB).subtract(vA).subtract(temp);
+      float2.cross(wA, m_rA, temp);
+      float2.cross(wB, m_rB, Cdot);
+      Cdot.add(vB).sub(vA).sub(temp);
 
-      final Vec2 impulse = pool.popVec2();
+      final float2 impulse = pool.popVec2();
       Mat22.mulToOutUnsafe(m_linearMass, Cdot, impulse);
       impulse.negate();
 
 
-      final Vec2 oldImpulse = pool.popVec2();
+      final float2 oldImpulse = pool.popVec2();
       oldImpulse.set(m_linearImpulse);
       m_linearImpulse.add(impulse);
 
@@ -263,15 +263,15 @@ public class FrictionJoint extends Joint {
         m_linearImpulse.scale(maxImpulse);
       }
 
-      impulse.set(m_linearImpulse).subtract(oldImpulse);
+      impulse.set(m_linearImpulse).sub(oldImpulse);
 
       temp.set(impulse).scale(mA);
-      vA.subtract(temp);
-      wA -= iA * Vec2.cross(m_rA, impulse);
+      vA.sub(temp);
+      wA -= iA * float2.cross(m_rA, impulse);
 
       temp.set(impulse).scale(mB);
       vB.add(temp);
-      wB += iB * Vec2.cross(m_rB, impulse);
+      wB += iB * float2.cross(m_rB, impulse);
       
     }
 

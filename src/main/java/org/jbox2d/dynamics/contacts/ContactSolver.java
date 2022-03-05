@@ -32,7 +32,7 @@ import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Rot;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Transform;
-import com.github.rccookie.geometry.performance.Vec2;
+import com.github.rccookie.geometry.performance.float2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.TimeStep;
@@ -187,12 +187,12 @@ public class ContactSolver {
       float iB = vc.invIB;
       int pointCount = vc.pointCount;
 
-      Vec2 vA = m_velocities[indexA].v;
+      float2 vA = m_velocities[indexA].v;
       float wA = m_velocities[indexA].w;
-      Vec2 vB = m_velocities[indexB].v;
+      float2 vB = m_velocities[indexB].v;
       float wB = m_velocities[indexB].w;
 
-      Vec2 normal = vc.normal;
+      float2 normal = vc.normal;
       float tangentx = 1.0f * normal.y;
       float tangenty = -1.0f * normal.x;
 
@@ -236,17 +236,17 @@ public class ContactSolver {
       float mB = vc.invMassB;
       float iA = vc.invIA;
       float iB = vc.invIB;
-      Vec2 localCenterA = pc.localCenterA;
-      Vec2 localCenterB = pc.localCenterB;
+      float2 localCenterA = pc.localCenterA;
+      float2 localCenterB = pc.localCenterB;
 
-      Vec2 cA = m_positions[indexA].c;
+      float2 cA = m_positions[indexA].c;
       float aA = m_positions[indexA].a;
-      Vec2 vA = m_velocities[indexA].v;
+      float2 vA = m_velocities[indexA].v;
       float wA = m_velocities[indexA].w;
 
-      Vec2 cB = m_positions[indexB].c;
+      float2 cB = m_positions[indexB].c;
       float aB = m_positions[indexB].a;
-      Vec2 vB = m_velocities[indexB].v;
+      float2 vB = m_velocities[indexB].v;
       float wB = m_velocities[indexB].w;
 
       assert (manifold.pointCount > 0);
@@ -262,16 +262,16 @@ public class ContactSolver {
 
       worldManifold.initialize(manifold, xfA, radiusA, xfB, radiusB);
 
-      final Vec2 vcnormal = vc.normal;
+      final float2 vcnormal = vc.normal;
       vcnormal.x = worldManifold.normal.x;
       vcnormal.y = worldManifold.normal.y;
 
       int pointCount = vc.pointCount;
       for (int j = 0; j < pointCount; ++j) {
         VelocityConstraintPoint vcp = vc.points[j];
-        Vec2 wmPj = worldManifold.points[j];
-        final Vec2 vcprA = vcp.rA;
-        final Vec2 vcprB = vcp.rB;
+        float2 wmPj = worldManifold.points[j];
+        final float2 vcprA = vcp.rA;
+        final float2 vcprB = vcp.rB;
         vcprA.x = wmPj.x - cA.x;
         vcprA.y = wmPj.y - cA.y;
         vcprB.x = wmPj.x - cB.x;
@@ -346,12 +346,12 @@ public class ContactSolver {
       float iB = vc.invIB;
       int pointCount = vc.pointCount;
 
-      Vec2 vA = m_velocities[indexA].v;
+      float2 vA = m_velocities[indexA].v;
       float wA = m_velocities[indexA].w;
-      Vec2 vB = m_velocities[indexB].v;
+      float2 vB = m_velocities[indexB].v;
       float wB = m_velocities[indexB].w;
 
-      Vec2 normal = vc.normal;
+      float2 normal = vc.normal;
       final float normalx = normal.x;
       final float normaly = normal.y;
       float tangentx = 1.0f * vc.normal.y;
@@ -363,7 +363,7 @@ public class ContactSolver {
       // Solve tangent constraints
       for (int j = 0; j < pointCount; ++j) {
         final VelocityConstraintPoint vcp = vc.points[j];
-        final Vec2 a = vcp.rA;
+        final float2 a = vcp.rA;
         float dvx = -wB * vcp.rB.y + vB.x - vA.x + wA * a.y;
         float dvy = wB * vcp.rB.x + vB.y - vA.y - wA * a.x;
 
@@ -470,10 +470,10 @@ public class ContactSolver {
 
         final VelocityConstraintPoint cp1 = vc.points[0];
         final VelocityConstraintPoint cp2 = vc.points[1];
-        final Vec2 cp1rA = cp1.rA;
-        final Vec2 cp1rB = cp1.rB;
-        final Vec2 cp2rA = cp2.rA;
-        final Vec2 cp2rB = cp2.rB;
+        final float2 cp1rA = cp1.rA;
+        final float2 cp1rB = cp1.rB;
+        final float2 cp2rA = cp2.rA;
+        final float2 cp2rB = cp2.rB;
         float ax = cp1.normalImpulse;
         float ay = cp2.normalImpulse;
 
@@ -561,11 +561,11 @@ public class ContactSolver {
              */
             if (DEBUG_SOLVER) {
               // Postconditions
-              Vec2 dv1 = vB.added(Vec2.cross(wB, cp1rB).subtract(vA).subtract(Vec2.cross(wA, cp1rA)));
-              Vec2 dv2 = vB.added(Vec2.cross(wB, cp2rB).subtract(vA).subtract(Vec2.cross(wA, cp2rA)));
+              float2 dv1 = vB.added(float2.cross(wB, cp1rB).sub(vA).sub(float2.cross(wA, cp1rA)));
+              float2 dv2 = vB.added(float2.cross(wB, cp2rB).sub(vA).sub(float2.cross(wA, cp2rA)));
               // Compute normal velocity
-              vn1 = Vec2.dot(dv1, normal);
-              vn2 = Vec2.dot(dv2, normal);
+              vn1 = float2.dot(dv1, normal);
+              vn2 = float2.dot(dv2, normal);
 
               assert (MathUtils.abs(vn1 - cp1.velocityBias) < k_errorTol);
               assert (MathUtils.abs(vn2 - cp2.velocityBias) < k_errorTol);
@@ -626,9 +626,9 @@ public class ContactSolver {
              */
             if (DEBUG_SOLVER) {
               // Postconditions
-              Vec2 dv1 = vB.added(Vec2.cross(wB, cp1rB).subtract(vA).subtract(Vec2.cross(wA, cp1rA)));
+              float2 dv1 = vB.added(float2.cross(wB, cp1rB).sub(vA).sub(float2.cross(wA, cp1rA)));
               // Compute normal velocity
-              vn1 = Vec2.dot(dv1, normal);
+              vn1 = float2.dot(dv1, normal);
 
               assert (MathUtils.abs(vn1 - cp1.velocityBias) < k_errorTol);
             }
@@ -686,9 +686,9 @@ public class ContactSolver {
              */
             if (DEBUG_SOLVER) {
               // Postconditions
-              Vec2 dv2 = vB.added(Vec2.cross(wB, cp2rB).subtract(vA).subtract(Vec2.cross(wA, cp2rA)));
+              float2 dv2 = vB.added(float2.cross(wB, cp2rB).sub(vA).sub(float2.cross(wA, cp2rA)));
               // Compute normal velocity
-              vn2 = Vec2.dot(dv2, normal);
+              vn2 = float2.dot(dv2, normal);
 
               assert (MathUtils.abs(vn2 - cp2.velocityBias) < k_errorTol);
             }
@@ -818,19 +818,19 @@ public class ContactSolver {
 
       float mA = pc.invMassA;
       float iA = pc.invIA;
-      Vec2 localCenterA = pc.localCenterA;
+      float2 localCenterA = pc.localCenterA;
       final float localCenterAx = localCenterA.x;
       final float localCenterAy = localCenterA.y;
       float mB = pc.invMassB;
       float iB = pc.invIB;
-      Vec2 localCenterB = pc.localCenterB;
+      float2 localCenterB = pc.localCenterB;
       final float localCenterBx = localCenterB.x;
       final float localCenterBy = localCenterB.y;
       int pointCount = pc.pointCount;
 
-      Vec2 cA = m_positions[indexA].c;
+      float2 cA = m_positions[indexA].c;
       float aA = m_positions[indexA].a;
-      Vec2 cB = m_positions[indexB].c;
+      float2 cB = m_positions[indexB].c;
       float aB = m_positions[indexB].a;
 
       // Solve normal constraints
@@ -846,8 +846,8 @@ public class ContactSolver {
 
         final PositionSolverManifold psm = psolver;
         psm.initialize(pc, xfA, xfB, j);
-        final Vec2 normal = psm.normal;
-        final Vec2 point = psm.point;
+        final float2 normal = psm.normal;
+        final float2 point = psm.point;
         final float separation = psm.separation;
 
         float rAx = point.x - cA.x;
@@ -904,8 +904,8 @@ public class ContactSolver {
 
       int indexA = pc.indexA;
       int indexB = pc.indexB;
-      Vec2 localCenterA = pc.localCenterA;
-      Vec2 localCenterB = pc.localCenterB;
+      float2 localCenterA = pc.localCenterA;
+      float2 localCenterB = pc.localCenterB;
       final float localCenterAx = localCenterA.x;
       final float localCenterAy = localCenterA.y;
       final float localCenterBx = localCenterB.x;
@@ -926,10 +926,10 @@ public class ContactSolver {
         iB = pc.invIB;
       }
 
-      Vec2 cA = m_positions[indexA].c;
+      float2 cA = m_positions[indexA].c;
       float aA = m_positions[indexA].a;
 
-      Vec2 cB = m_positions[indexB].c;
+      float2 cB = m_positions[indexB].c;
       float aB = m_positions[indexB].a;
 
       // Solve normal constraints
@@ -945,9 +945,9 @@ public class ContactSolver {
 
         final PositionSolverManifold psm = psolver;
         psm.initialize(pc, xfA, xfB, j);
-        Vec2 normal = psm.normal;
+        float2 normal = psm.normal;
 
-        Vec2 point = psm.point;
+        float2 point = psm.point;
         float separation = psm.separation;
 
         float rAx = point.x - cA.x;
@@ -1007,8 +1007,8 @@ public class ContactSolver {
 
 class PositionSolverManifold {
 
-  public final Vec2 normal = new Vec2();
-  public final Vec2 point = new Vec2();
+  public final float2 normal = new float2();
+  public final float2 point = new float2();
   public float separation;
 
   public void initialize(ContactPositionConstraint pc, Transform xfA, Transform xfB, int index) {
@@ -1016,7 +1016,7 @@ class PositionSolverManifold {
 
     final Rot xfAq = xfA.q;
     final Rot xfBq = xfB.q;
-    final Vec2 pcLocalPointsI = pc.localPoints[index];
+    final float2 pcLocalPointsI = pc.localPoints[index];
     switch (pc.type) {
       case CIRCLES: {
         // Transform.mulToOutUnsafe(xfA, pc.localPoint, pointA);
@@ -1027,8 +1027,8 @@ class PositionSolverManifold {
         // point.set(pointA).addLocal(pointB).mulLocal(.5f);
         // temp.set(pointB).subLocal(pointA);
         // separation = Vec2.dot(temp, normal) - pc.radiusA - pc.radiusB;
-        final Vec2 plocalPoint = pc.localPoint;
-        final Vec2 pLocalPoints0 = pc.localPoints[0];
+        final float2 plocalPoint = pc.localPoint;
+        final float2 pLocalPoints0 = pc.localPoints[0];
         final float pointAx = (xfAq.c * plocalPoint.x - xfAq.s * plocalPoint.y) + xfA.p.x;
         final float pointAy = (xfAq.s * plocalPoint.x + xfAq.c * plocalPoint.y) + xfA.p.y;
         final float pointBx = (xfBq.c * pLocalPoints0.x - xfBq.s * pLocalPoints0.y) + xfB.p.x;
@@ -1053,8 +1053,8 @@ class PositionSolverManifold {
         // temp.set(clipPoint).subLocal(planePoint);
         // separation = Vec2.dot(temp, normal) - pc.radiusA - pc.radiusB;
         // point.set(clipPoint);
-        final Vec2 pcLocalNormal = pc.localNormal;
-        final Vec2 pcLocalPoint = pc.localPoint;
+        final float2 pcLocalNormal = pc.localNormal;
+        final float2 pcLocalPoint = pc.localPoint;
         normal.x = xfAq.c * pcLocalNormal.x - xfAq.s * pcLocalNormal.y;
         normal.y = xfAq.s * pcLocalNormal.x + xfAq.c * pcLocalNormal.y;
         final float planePointx = (xfAq.c * pcLocalPoint.x - xfAq.s * pcLocalPoint.y) + xfA.p.x;
@@ -1081,8 +1081,8 @@ class PositionSolverManifold {
         //
         // // Ensure normal points from A to B
         // normal.negateLocal();
-        final Vec2 pcLocalNormal = pc.localNormal;
-        final Vec2 pcLocalPoint = pc.localPoint;
+        final float2 pcLocalNormal = pc.localNormal;
+        final float2 pcLocalPoint = pc.localPoint;
         normal.x = xfBq.c * pcLocalNormal.x - xfBq.s * pcLocalNormal.y;
         normal.y = xfBq.s * pcLocalNormal.x + xfBq.c * pcLocalNormal.y;
         final float planePointx = (xfBq.c * pcLocalPoint.x - xfBq.s * pcLocalPoint.y) + xfB.p.x;

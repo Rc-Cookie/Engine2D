@@ -5,17 +5,48 @@ import com.github.rccookie.engine2d.UIObject;
 import com.github.rccookie.event.CaughtParamEvent;
 import com.github.rccookie.event.ParamEvent;
 
+import org.jetbrains.annotations.NotNull;
+
+/**
+ * A button that has a distinct on and off state and switches
+ * between them when clicked.
+ */
 public abstract class Toggle extends Button {
 
+    /**
+     * Cached images for the off state.
+     */
     private Image plainImageOff, hoveredImageOff, pressedImageOff, disabledImageOff;
+    /**
+     * Cached images for the on state.
+     */
     private Image plainImageOn, hoveredImageOn, pressedImageOn, disabledImageOn;
+    /**
+     * Indicates whether the respective cached off-state image is ready or needs to be generated first.
+     */
     private boolean plainReadyOff = false, hoveredReadyOff = false, pressedReadyOff = false, disabledReadyOff = false;
+    /**
+     * Indicates whether the respective cached on-state image is ready or needs to be generated first.
+     */
     private boolean plainReadyOn = false, hoveredReadyOn = false, pressedReadyOn = false, disabledReadyOn = false;
 
+
+    /**
+     * Is the toggle on?
+     */
     boolean on = false;
 
+    /**
+     * Invoked whenever the toggle state changes, with the new state as parameter.
+     */
     public final ParamEvent<Boolean> onToggle = new CaughtParamEvent<>(false);
 
+
+    /**
+     * Creates a new toggle.
+     *
+     * @param parent The parent for the toggle
+     */
     public Toggle(UIObject parent) {
         super(parent);
         onToggle.add(this::onToggle);
@@ -23,7 +54,7 @@ public abstract class Toggle extends Button {
     }
 
     @Override
-    protected void modified() {
+    public void modified() {
         plainImageOff = hoveredImageOff = pressedImageOff = disabledImageOff = null;
         plainImageOn = hoveredImageOn = pressedImageOn = disabledImageOn = null;
         plainReadyOff = hoveredReadyOff = pressedReadyOff = disabledReadyOff = false;
@@ -31,23 +62,46 @@ public abstract class Toggle extends Button {
         super.modified();
     }
 
+    /**
+     * Returns whether the toggle is currently on.
+     *
+     * @return Whether the toggle is on
+     */
     public boolean isOn() {
         return on;
     }
 
+    /**
+     * Sets the toggle to be on or off.
+     *
+     * @param on Whether the toggle should be on or not
+     */
     public void setOn(boolean on) {
         if(this.on == on) return;
         onToggle.invoke(on);
     }
 
+    /**
+     * Sets the toggle to be on or off, but without firing the {@link #onToggle} event.
+     *
+     * @param on Whether the toggle should be on or not
+     */
     public void silentSetOn(boolean on) {
         onToggle(on);
     }
 
+    /**
+     * Toggles the toggle.
+     */
     public void toggle() {
-        setOn(!on);
+        onToggle.invoke(!on);
     }
 
+    /**
+     * Changes the toggle state internally.
+     *
+     * @param on New toggle state
+     */
     private void onToggle(boolean on) {
         if(this.on == on) return;
         this.on = on;
@@ -127,20 +181,50 @@ public abstract class Toggle extends Button {
     }
 
     @Override
-    protected Image generatePlainImage() {
+    protected @NotNull Image generatePlainImage() {
         return generatePlainImage(on);
     }
 
+    /**
+     * Generates the toggles plain image, for the specified toggle state.
+     *
+     * @param on Whether the image should represent the on or off state
+     * @return The generated image
+     */
     protected abstract Image generatePlainImage(boolean on);
 
+    /**
+     * Generates the toggles hovered image from the plain image, for the
+     * specified toggle state.
+     *
+     * @param plain The plain image for the same state as {@code on}
+     * @param on Whether the image should represent the on or off state
+     * @return The generated image
+     */
     protected Image generateHoveredImage(Image plain, boolean on) {
         return generateHoveredImage(plain);
     }
 
+    /**
+     * Generates the toggles pressed image from the plain image, for the
+     * specified toggle state.
+     *
+     * @param plain The plain image for the same state as {@code on}
+     * @param on Whether the image should represent the on or off state
+     * @return The generated image
+     */
     protected Image generatePressedImage(Image plain, boolean on) {
         return generatePressedImage(plain);
     }
 
+    /**
+     * Generates the toggles disabled image from the plain image, for the
+     * specified toggle state.
+     *
+     * @param plain The plain image for the same state as {@code on}
+     * @param on Whether the image should represent the on or off state
+     * @return The generated image
+     */
     protected Image generateDisabledImage(Image plain, boolean on) {
         return generateDisabledImage(plain);
     }

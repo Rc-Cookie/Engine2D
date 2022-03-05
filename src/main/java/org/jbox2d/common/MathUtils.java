@@ -46,7 +46,7 @@
 
 package org.jbox2d.common;
 
-import com.github.rccookie.geometry.performance.Vec2;
+import com.github.rccookie.geometry.performance.float2;
 
 import java.util.Random;
 
@@ -223,8 +223,8 @@ public class MathUtils extends PlatformMathUtils {
     return max(low, min(a, high));
   }
 
-  public final static Vec2 clamp(final Vec2 a, final Vec2 low, final Vec2 high) {
-    final Vec2 min = new Vec2();
+  public final static float2 clamp(final float2 a, final float2 low, final float2 high) {
+    final float2 min = new float2();
     min.x = a.x < high.x ? a.x : high.x;
     min.y = a.y < high.y ? a.y : high.y;
     min.x = low.x > min.x ? low.x : min.x;
@@ -232,7 +232,7 @@ public class MathUtils extends PlatformMathUtils {
     return min;
   }
 
-  public final static void clampToOut(final Vec2 a, final Vec2 low, final Vec2 high, final Vec2 dest) {
+  public final static void clampToOut(final float2 a, final float2 low, final float2 high, final float2 dest) {
     dest.x = a.x < high.x ? a.x : high.x;
     dest.y = a.y < high.y ? a.y : high.y;
     dest.x = low.x > dest.x ? low.x : dest.x;
@@ -318,13 +318,13 @@ public class MathUtils extends PlatformMathUtils {
     return (float) StrictMath.sqrt(x);
   }
 
-  public final static float distanceSquared(Vec2 v1, Vec2 v2) {
+  public final static float distanceSquared(float2 v1, float2 v2) {
     float dx = (v1.x - v2.x);
     float dy = (v1.y - v2.y);
     return dx * dx + dy * dy;
   }
 
-  public final static float distance(Vec2 v1, Vec2 v2) {
+  public final static float distance(float2 v1, float2 v2) {
     return sqrt(distanceSquared(v1, v2));
   }
 }

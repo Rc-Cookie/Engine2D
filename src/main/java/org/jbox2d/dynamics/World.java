@@ -23,7 +23,7 @@
  ******************************************************************************/
 package org.jbox2d.dynamics;
 
-import com.github.rccookie.geometry.performance.Vec2;
+import com.github.rccookie.geometry.performance.float2;
 
 import org.jbox2d.callbacks.ContactFilter;
 import org.jbox2d.callbacks.ContactListener;
@@ -106,7 +106,7 @@ public class World {
   private int m_bodyCount;
   private int m_jointCount;
 
-  private final Vec2 m_gravity = new Vec2();
+  private final float2 m_gravity = new float2();
   private boolean m_allowSleep;
 
   // private Body m_groundBody;
@@ -142,7 +142,7 @@ public class World {
    * 
    * @param gravity the world gravity vector.
    */
-  public World(Vec2 gravity) {
+  public World(float2 gravity) {
     this(gravity, new DefaultWorldPool(WORLD_POOL_SIZE, WORLD_POOL_CONTAINER_SIZE));
   }
 
@@ -151,15 +151,15 @@ public class World {
    * 
    * @param gravity the world gravity vector.
    */
-  public World(Vec2 gravity, IWorldPool pool) {
+  public World(float2 gravity, IWorldPool pool) {
     this(gravity, pool, new DynamicTree());
   }
 
-  public World(Vec2 gravity, IWorldPool pool, BroadPhaseStrategy strategy) {
+  public World(float2 gravity, IWorldPool pool, BroadPhaseStrategy strategy) {
     this(gravity, pool, new DefaultBroadPhaseBuffer(strategy));
   }
 
-  public World(Vec2 gravity, IWorldPool pool, BroadPhase broadPhase) {
+  public World(float2 gravity, IWorldPool pool, BroadPhase broadPhase) {
     this.pool = pool;
     m_destructionListener = null;
     m_debugDraw = null;
@@ -674,8 +674,8 @@ public class World {
 
   private final Color3f color = new Color3f();
   private final Transform xf = new Transform();
-  private final Vec2 cA = new Vec2();
-  private final Vec2 cB = new Vec2();
+  private final float2 cA = new float2();
+  private final float2 cB = new float2();
   private final Vec2Array avs = new Vec2Array();
 
   /**
@@ -745,7 +745,7 @@ public class World {
             FixtureProxy proxy = f.m_proxies[i];
             AABB aabb = m_contactManager.m_broadPhase.getFatAABB(proxy.proxyId);
             if (aabb != null) {
-              Vec2[] vs = avs.get(4);
+              float2[] vs = avs.get(4);
               vs[0].set(aabb.lowerBound.x, aabb.lowerBound.y);
               vs[1].set(aabb.upperBound.x, aabb.lowerBound.y);
               vs[2].set(aabb.upperBound.x, aabb.upperBound.y);
@@ -822,7 +822,7 @@ public class World {
    * @param point1 the ray starting point
    * @param point2 the ray ending point
    */
-  public void raycast(RaycastCallback callback, Vec2 point1, Vec2 point2) {
+  public void raycast(RaycastCallback callback, float2 point1, float2 point2) {
     wrcwrapper.broadPhase = m_contactManager.m_broadPhase;
     wrcwrapper.callback = callback;
     input.maxFraction = 1.0f;
@@ -842,7 +842,7 @@ public class World {
    * @param point2 the ray ending point
    */
   public void raycast(RaycastCallback callback, ParticleRaycastCallback particleCallback,
-                      Vec2 point1, Vec2 point2) {
+                      float2 point1, float2 point2) {
     wrcwrapper.broadPhase = m_contactManager.m_broadPhase;
     wrcwrapper.callback = callback;
     input.maxFraction = 1.0f;
@@ -860,7 +860,7 @@ public class World {
    * @param point1 the ray starting point
    * @param point2 the ray ending point
    */
-  public void raycast(ParticleRaycastCallback particleCallback, Vec2 point1, Vec2 point2) {
+  public void raycast(ParticleRaycastCallback particleCallback, float2 point1, float2 point2) {
     m_particleSystem.raycast(particleCallback, point1, point2);
   }
 
@@ -1000,7 +1000,7 @@ public class World {
    * 
    * @param gravity
    */
-  public void setGravity(Vec2 gravity) {
+  public void setGravity(float2 gravity) {
     m_gravity.set(gravity);
   }
 
@@ -1009,7 +1009,7 @@ public class World {
    * 
    * @return
    */
-  public Vec2 getGravity() {
+  public float2 getGravity() {
     return m_gravity;
   }
 
@@ -1518,10 +1518,10 @@ public class World {
     Body bodyB = joint.getBodyB();
     Transform xf1 = bodyA.getTransform();
     Transform xf2 = bodyB.getTransform();
-    Vec2 x1 = xf1.p;
-    Vec2 x2 = xf2.p;
-    Vec2 p1 = pool.popVec2();
-    Vec2 p2 = pool.popVec2();
+    float2 x1 = xf1.p;
+    float2 x2 = xf2.p;
+    float2 p1 = pool.popVec2();
+    float2 p2 = pool.popVec2();
     joint.getAnchorA(p1);
     joint.getAnchorB(p2);
 
@@ -1535,8 +1535,8 @@ public class World {
 
       case PULLEY: {
         PulleyJoint pulley = (PulleyJoint) joint;
-        Vec2 s1 = pulley.getGroundAnchorA();
-        Vec2 s2 = pulley.getGroundAnchorB();
+        float2 s1 = pulley.getGroundAnchorA();
+        float2 s2 = pulley.getGroundAnchorB();
         m_debugDraw.drawSegment(s1, p1, color);
         m_debugDraw.drawSegment(s2, p2, color);
         m_debugDraw.drawSegment(s1, s2, color);
@@ -1559,14 +1559,14 @@ public class World {
   private static final Integer LIQUID_INT = 1234598372;
   private static final float liquidLength = .12f;
   private float averageLinearVel = -1;
-  private final Vec2 liquidOffset = new Vec2();
-  private final Vec2 circCenterMoved = new Vec2();
+  private final float2 liquidOffset = new float2();
+  private final float2 circCenterMoved = new float2();
   private final Color3f liquidColor = new Color3f(.4f, .4f, 1f);
 
-  private final Vec2 center = new Vec2();
-  private final Vec2 axis = new Vec2();
-  private final Vec2 v1 = new Vec2();
-  private final Vec2 v2 = new Vec2();
+  private final float2 center = new float2();
+  private final float2 axis = new float2();
+  private final float2 v1 = new float2();
+  private final float2 v2 = new float2();
   private final Vec2Array tlvertices = new Vec2Array();
 
   private void drawShape(Fixture fixture, Transform xf, Color3f color, boolean wireframe) {
@@ -1590,7 +1590,7 @@ public class World {
           }
           liquidOffset.scale(liquidLength / averageLinearVel / 2);
           circCenterMoved.set(center).add(liquidOffset);
-          center.subtract(liquidOffset);
+          center.sub(liquidOffset);
           m_debugDraw.drawSegment(center, circCenterMoved, liquidColor);
           return;
         }
@@ -1606,7 +1606,7 @@ public class World {
         PolygonShape poly = (PolygonShape) fixture.getShape();
         int vertexCount = poly.m_count;
         assert (vertexCount <= Settings.maxPolygonVertices);
-        Vec2[] vertices = tlvertices.get(Settings.maxPolygonVertices);
+        float2[] vertices = tlvertices.get(Settings.maxPolygonVertices);
 
         for (int i = 0; i < vertexCount; ++i) {
           // vertices[i] = Mul(xf, poly.m_vertices[i]);
@@ -1629,7 +1629,7 @@ public class World {
       case CHAIN: {
         ChainShape chain = (ChainShape) fixture.getShape();
         int count = chain.m_count;
-        Vec2[] vertices = chain.m_vertices;
+        float2[] vertices = chain.m_vertices;
 
         Transform.mulToOutUnsafe(xf, vertices[0], v1);
         for (int i = 1; i < count; ++i) {
@@ -1650,7 +1650,7 @@ public class World {
     int particleCount = system.getParticleCount();
     if (particleCount != 0) {
       float particleRadius = system.getParticleRadius();
-      Vec2[] positionBuffer = system.getParticlePositionBuffer();
+      float2[] positionBuffer = system.getParticlePositionBuffer();
       ParticleColor[] colorBuffer = null;
       if (system.m_colorBuffer.data != null) {
         colorBuffer = system.getParticleColorBuffer();
@@ -1922,11 +1922,11 @@ public class World {
     return m_particleSystem.getParticleFlagsBuffer();
   }
 
-  public Vec2[] getParticlePositionBuffer() {
+  public float2[] getParticlePositionBuffer() {
     return m_particleSystem.getParticlePositionBuffer();
   }
 
-  public Vec2[] getParticleVelocityBuffer() {
+  public float2[] getParticleVelocityBuffer() {
     return m_particleSystem.getParticleVelocityBuffer();
   }
 
@@ -1952,12 +1952,12 @@ public class World {
     m_particleSystem.setParticleFlagsBuffer(buffer, capacity);
   }
 
-  public void setParticlePositionBuffer(Vec2[] buffer, int capacity) {
+  public void setParticlePositionBuffer(float2[] buffer, int capacity) {
     m_particleSystem.setParticlePositionBuffer(buffer, capacity);
 
   }
 
-  public void setParticleVelocityBuffer(Vec2[] buffer, int capacity) {
+  public void setParticleVelocityBuffer(float2[] buffer, int capacity) {
     m_particleSystem.setParticleVelocityBuffer(buffer, capacity);
 
   }
@@ -2023,8 +2023,8 @@ class WorldRayCastWrapper implements TreeRayCastCallback {
 
   // djm pooling
   private final RayCastOutput output = new RayCastOutput();
-  private final Vec2 temp = new Vec2();
-  private final Vec2 point = new Vec2();
+  private final float2 temp = new float2();
+  private final float2 point = new float2();
 
   public float raycastCallback(RayCastInput input, int nodeId) {
     Object userData = broadPhase.getUserData(nodeId);

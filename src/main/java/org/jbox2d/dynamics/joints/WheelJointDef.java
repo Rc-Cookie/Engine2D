@@ -26,7 +26,7 @@
  */
 package org.jbox2d.dynamics.joints;
 
-import com.github.rccookie.geometry.performance.Vec2;
+import com.github.rccookie.geometry.performance.float2;
 import org.jbox2d.dynamics.Body;
 
 /**
@@ -43,17 +43,17 @@ public class WheelJointDef extends JointDef {
   /**
    * The local anchor point relative to body1's origin.
    */
-  public final Vec2 localAnchorA = new Vec2();
+  public final float2 localAnchorA = new float2();
 
   /**
    * The local anchor point relative to body2's origin.
    */
-  public final Vec2 localAnchorB = new Vec2();
+  public final float2 localAnchorB = new float2();
 
   /**
    * The local translation axis in body1.
    */
-  public final Vec2 localAxisA = new Vec2();
+  public final float2 localAxisA = new float2();
 
   /**
    * Enable/disable the joint motor.
@@ -88,7 +88,7 @@ public class WheelJointDef extends JointDef {
     motorSpeed = 0f;
   }
 
-  public void initialize(Body b1, Body b2, Vec2 anchor, Vec2 axis) {
+  public void initialize(Body b1, Body b2, float2 anchor, float2 axis) {
     bodyA = b1;
     bodyB = b2;
     b1.getLocalPointToOut(anchor, localAnchorA);

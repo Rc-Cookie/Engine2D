@@ -1,7 +1,7 @@
 package org.jbox2d.particle;
 
 import org.jbox2d.collision.shapes.Shape;
-import com.github.rccookie.geometry.performance.Vec2;
+import com.github.rccookie.geometry.performance.float2;
 
 /**
  * A particle group definition holds all the data needed to construct a particle group. You can
@@ -19,7 +19,7 @@ public class ParticleGroupDef {
    * The world position of the group. Moves the group's shape a distance equal to the value of
    * position.
    */
-  public final Vec2 position = new Vec2();
+  public final float2 position = new float2();
 
   /**
    * The world angle of the group in radians. Rotates the shape by an angle equal to the value of
@@ -28,7 +28,7 @@ public class ParticleGroupDef {
   public float angle;
 
   /** The linear velocity of the group's origin in world co-ordinates. */
-  public final Vec2 linearVelocity = new Vec2();
+  public final float2 linearVelocity = new float2();
 
   /** The angular velocity of the group. */
   public float angularVelocity;

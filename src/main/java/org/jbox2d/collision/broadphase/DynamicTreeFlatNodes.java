@@ -32,7 +32,7 @@ import org.jbox2d.common.BufferUtils;
 import org.jbox2d.common.Color3f;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Settings;
-import com.github.rccookie.geometry.performance.Vec2;
+import com.github.rccookie.geometry.performance.float2;
 
 public class DynamicTreeFlatNodes implements BroadPhaseStrategy {
   public static final int MAX_STACK_SIZE = 64;
@@ -52,7 +52,7 @@ public class DynamicTreeFlatNodes implements BroadPhaseStrategy {
 
   private int m_freeList;
 
-  private final Vec2[] drawVecs = new Vec2[4];
+  private final float2[] drawVecs = new float2[4];
 
   public DynamicTreeFlatNodes() {
     m_root = NULL_NODE;
@@ -61,7 +61,7 @@ public class DynamicTreeFlatNodes implements BroadPhaseStrategy {
     expandBuffers(0, m_nodeCapacity);
 
     for (int i = 0; i < drawVecs.length; i++) {
-      drawVecs[i] = new Vec2();
+      drawVecs[i] = new float2();
     }
   }
 
@@ -110,7 +110,7 @@ public class DynamicTreeFlatNodes implements BroadPhaseStrategy {
   }
 
   @Override
-  public final boolean moveProxy(int proxyId, final AABB aabb, Vec2 displacement) {
+  public final boolean moveProxy(int proxyId, final AABB aabb, float2 displacement) {
     assert (0 <= proxyId && proxyId < m_nodeCapacity);
     final int node = proxyId;
     assert (m_child1[node] == NULL_NODE);
@@ -125,8 +125,8 @@ public class DynamicTreeFlatNodes implements BroadPhaseStrategy {
     removeLeaf(node);
 
     // Extend AABB
-    final Vec2 lowerBound = nodeAABB.lowerBound;
-    final Vec2 upperBound = nodeAABB.upperBound;
+    final float2 lowerBound = nodeAABB.lowerBound;
+    final float2 upperBound = nodeAABB.upperBound;
     lowerBound.x = aabb.lowerBound.x - Settings.aabbExtension;
     lowerBound.y = aabb.lowerBound.y - Settings.aabbExtension;
     upperBound.x = aabb.upperBound.x + Settings.aabbExtension;
@@ -196,14 +196,14 @@ public class DynamicTreeFlatNodes implements BroadPhaseStrategy {
     }
   }
 
-  private final Vec2 r = new Vec2();
+  private final float2 r = new float2();
   private final AABB aabb = new AABB();
   private final RayCastInput subInput = new RayCastInput();
 
   @Override
   public void raycast(TreeRayCastCallback callback, RayCastInput input) {
-    final Vec2 p1 = input.p1;
-    final Vec2 p2 = input.p2;
+    final float2 p1 = input.p1;
+    final float2 p2 = input.p2;
     float p1x = p1.x, p2x = p2.x, p1y = p1.y, p2y = p2.y;
     float vx, vy;
     float rx, ry;
@@ -849,7 +849,7 @@ public class DynamicTreeFlatNodes implements BroadPhaseStrategy {
   }
 
   private final Color3f color = new Color3f();
-  private final Vec2 textVec = new Vec2();
+  private final float2 textVec = new float2();
 
   public void drawTree(DebugDraw argDraw, int node, int spot, int height) {
     AABB a = m_aabb[node];

@@ -23,7 +23,7 @@
  ******************************************************************************/
 package org.jbox2d.dynamics.joints;
 
-import com.github.rccookie.geometry.performance.Vec2;
+import com.github.rccookie.geometry.performance.float2;
 import org.jbox2d.dynamics.Body;
 
 /**
@@ -37,12 +37,12 @@ public class WeldJointDef extends JointDef {
   /**
    * The local anchor point relative to body1's origin.
    */
-  public final Vec2 localAnchorA;
+  public final float2 localAnchorA;
 
   /**
    * The local anchor point relative to body2's origin.
    */
-  public final Vec2 localAnchorB;
+  public final float2 localAnchorB;
 
   /**
    * The body2 angle minus body1 angle in the reference state (radians).
@@ -61,8 +61,8 @@ public class WeldJointDef extends JointDef {
 
   public WeldJointDef() {
     super(JointType.WELD);
-    localAnchorA = new Vec2();
-    localAnchorB = new Vec2();
+    localAnchorA = new float2();
+    localAnchorB = new float2();
     referenceAngle = 0.0f;
   }
 
@@ -73,7 +73,7 @@ public class WeldJointDef extends JointDef {
    * @param bB
    * @param anchor
    */
-  public void initialize(Body bA, Body bB, Vec2 anchor) {
+  public void initialize(Body bA, Body bB, float2 anchor) {
     bodyA = bA;
     bodyB = bB;
     bodyA.getLocalPointToOut(anchor, localAnchorA);

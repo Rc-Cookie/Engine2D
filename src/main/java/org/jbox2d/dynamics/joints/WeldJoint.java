@@ -30,8 +30,8 @@ import org.jbox2d.common.Mat33;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Rot;
 import org.jbox2d.common.Settings;
-import com.github.rccookie.geometry.performance.Vec2;
-import com.github.rccookie.geometry.performance.Vec3;
+import com.github.rccookie.geometry.performance.float2;
+import com.github.rccookie.geometry.performance.float3;
 import org.jbox2d.dynamics.SolverData;
 import org.jbox2d.pooling.IWorldPool;
 
@@ -62,20 +62,20 @@ public class WeldJoint extends Joint {
   private float m_bias;
 
   // Solver shared
-  private final Vec2 m_localAnchorA;
-  private final Vec2 m_localAnchorB;
+  private final float2 m_localAnchorA;
+  private final float2 m_localAnchorB;
   private float m_referenceAngle;
   private float m_gamma;
-  private final Vec3 m_impulse;
+  private final float3 m_impulse;
 
 
   // Solver temp
   private int m_indexA;
   private int m_indexB;
-  private final Vec2 m_rA = new Vec2();
-  private final Vec2 m_rB = new Vec2();
-  private final Vec2 m_localCenterA = new Vec2();
-  private final Vec2 m_localCenterB = new Vec2();
+  private final float2 m_rA = new float2();
+  private final float2 m_rB = new float2();
+  private final float2 m_localCenterA = new float2();
+  private final float2 m_localCenterB = new float2();
   private float m_invMassA;
   private float m_invMassB;
   private float m_invIA;
@@ -84,13 +84,13 @@ public class WeldJoint extends Joint {
 
   protected WeldJoint(IWorldPool argWorld, WeldJointDef def) {
     super(argWorld, def);
-    m_localAnchorA = new Vec2(def.localAnchorA);
-    m_localAnchorB = new Vec2(def.localAnchorB);
+    m_localAnchorA = new float2(def.localAnchorA);
+    m_localAnchorB = new float2(def.localAnchorB);
     m_referenceAngle = def.referenceAngle;
     m_frequencyHz = def.frequencyHz;
     m_dampingRatio = def.dampingRatio;
 
-    m_impulse = new Vec3();
+    m_impulse = new float3();
     m_impulse.setZero();
   }
   
@@ -98,11 +98,11 @@ public class WeldJoint extends Joint {
     return m_referenceAngle;
   }
 
-  public Vec2 getLocalAnchorA() {
+  public float2 getLocalAnchorA() {
     return m_localAnchorA;
   }
 
-  public Vec2 getLocalAnchorB() {
+  public float2 getLocalAnchorB() {
     return m_localAnchorB;
   }
 
@@ -123,17 +123,17 @@ public class WeldJoint extends Joint {
   }
 
   @Override
-  public void getAnchorA(Vec2 argOut) {
+  public void getAnchorA(float2 argOut) {
     m_bodyA.getWorldPointToOut(m_localAnchorA, argOut);
   }
 
   @Override
-  public void getAnchorB(Vec2 argOut) {
+  public void getAnchorB(float2 argOut) {
     m_bodyB.getWorldPointToOut(m_localAnchorB, argOut);
   }
 
   @Override
-  public void getReactionForce(float inv_dt, Vec2 argOut) {
+  public void getReactionForce(float inv_dt, float2 argOut) {
     argOut.set(m_impulse.x, m_impulse.y);
     argOut.scale(inv_dt);
   }
@@ -156,24 +156,24 @@ public class WeldJoint extends Joint {
 
     // Vec2 cA = data.positions[m_indexA].c;
     float aA = data.positions[m_indexA].a;
-    Vec2 vA = data.velocities[m_indexA].v;
+    float2 vA = data.velocities[m_indexA].v;
     float wA = data.velocities[m_indexA].w;
 
     // Vec2 cB = data.positions[m_indexB].c;
     float aB = data.positions[m_indexB].a;
-    Vec2 vB = data.velocities[m_indexB].v;
+    float2 vB = data.velocities[m_indexB].v;
     float wB = data.velocities[m_indexB].w;
 
     final Rot qA = pool.popRot();
     final Rot qB = pool.popRot();
-    final Vec2 temp = pool.popVec2();
+    final float2 temp = pool.popVec2();
 
     qA.set(aA);
     qB.set(aB);
 
     // Compute the effective masses.
-    Rot.mulToOutUnsafe(qA, temp.set(m_localAnchorA).subtract(m_localCenterA), m_rA);
-    Rot.mulToOutUnsafe(qB, temp.set(m_localAnchorB).subtract(m_localCenterB), m_rB);
+    Rot.mulToOutUnsafe(qA, temp.set(m_localAnchorA).sub(m_localCenterA), m_rA);
+    Rot.mulToOutUnsafe(qB, temp.set(m_localAnchorB).sub(m_localCenterB), m_rB);
 
     // J = [-I -r1_skew I r2_skew]
     // [ 0 -1 0 1]
@@ -231,7 +231,7 @@ public class WeldJoint extends Joint {
     }
 
     if (data.step.warmStarting) {
-      final Vec2 P = pool.popVec2();
+      final float2 P = pool.popVec2();
       // Scale impulses to support a variable time step.
       m_impulse.scale(data.step.dtRatio);
 
@@ -239,11 +239,11 @@ public class WeldJoint extends Joint {
 
       vA.x -= mA * P.x;
       vA.y -= mA * P.y;
-      wA -= iA * (Vec2.cross(m_rA, P) + m_impulse.z);
+      wA -= iA * (float2.cross(m_rA, P) + m_impulse.z);
 
       vB.x += mB * P.x;
       vB.y += mB * P.y;
-      wB += iB * (Vec2.cross(m_rB, P) + m_impulse.z);
+      wB += iB * (float2.cross(m_rB, P) + m_impulse.z);
       pool.pushVec2(1);
     } else {
       m_impulse.setZero();
@@ -261,17 +261,17 @@ public class WeldJoint extends Joint {
 
   @Override
   public void solveVelocityConstraints(final SolverData data) {
-    Vec2 vA = data.velocities[m_indexA].v;
+    float2 vA = data.velocities[m_indexA].v;
     float wA = data.velocities[m_indexA].w;
-    Vec2 vB = data.velocities[m_indexB].v;
+    float2 vB = data.velocities[m_indexB].v;
     float wB = data.velocities[m_indexB].w;
 
     float mA = m_invMassA, mB = m_invMassB;
     float iA = m_invIA, iB = m_invIB;
 
-    final Vec2 Cdot1 = pool.popVec2();
-    final Vec2 P = pool.popVec2();
-    final Vec2 temp = pool.popVec2();
+    final float2 Cdot1 = pool.popVec2();
+    final float2 P = pool.popVec2();
+    final float2 temp = pool.popVec2();
     if (m_frequencyHz > 0.0f) {
       float Cdot2 = wB - wA;
 
@@ -281,11 +281,11 @@ public class WeldJoint extends Joint {
       wA -= iA * impulse2;
       wB += iB * impulse2;
 
-      Vec2.cross(wB, m_rB, Cdot1);
-      Vec2.cross(wA, m_rA, temp);
-      Cdot1.add(vB).subtract(vA).subtract(temp);
+      float2.cross(wB, m_rB, Cdot1);
+      float2.cross(wA, m_rA, temp);
+      Cdot1.add(vB).sub(vA).sub(temp);
 
-      final Vec2 impulse1 = P;
+      final float2 impulse1 = P;
       Mat33.mul22ToOutUnsafe(m_mass, Cdot1, impulse1);
       impulse1.negate();
 
@@ -294,21 +294,21 @@ public class WeldJoint extends Joint {
 
       vA.x -= mA * P.x;
       vA.y -= mA * P.y;
-      wA -= iA * Vec2.cross(m_rA, P);
+      wA -= iA * float2.cross(m_rA, P);
 
       vB.x += mB * P.x;
       vB.y += mB * P.y;
-      wB += iB * Vec2.cross(m_rB, P);
+      wB += iB * float2.cross(m_rB, P);
     } else {
-      Vec2.cross(wA, m_rA, temp);
-      Vec2.cross(wB, m_rB, Cdot1);
-      Cdot1.add(vB).subtract(vA).subtract(temp);
+      float2.cross(wA, m_rA, temp);
+      float2.cross(wB, m_rB, Cdot1);
+      Cdot1.add(vB).sub(vA).sub(temp);
       float Cdot2 = wB - wA;
 
-      final Vec3 Cdot = pool.popVec3();
+      final float3 Cdot = pool.popVec3();
       Cdot.set(Cdot1.x, Cdot1.y, Cdot2);
 
-      final Vec3 impulse = pool.popVec3();
+      final float3 impulse = pool.popVec3();
       Mat33.mulToOutUnsafe(m_mass, Cdot, impulse);
       impulse.negate();
       m_impulse.add(impulse);
@@ -317,11 +317,11 @@ public class WeldJoint extends Joint {
 
       vA.x -= mA * P.x;
       vA.y -= mA * P.y;
-      wA -= iA * (Vec2.cross(m_rA, P) + impulse.z);
+      wA -= iA * (float2.cross(m_rA, P) + impulse.z);
 
       vB.x += mB * P.x;
       vB.y += mB * P.y;
-      wB += iB * (Vec2.cross(m_rB, P) + impulse.z);
+      wB += iB * (float2.cross(m_rB, P) + impulse.z);
 
       pool.pushVec3(2);
     }
@@ -336,15 +336,15 @@ public class WeldJoint extends Joint {
 
   @Override
   public boolean solvePositionConstraints(final SolverData data) {
-    Vec2 cA = data.positions[m_indexA].c;
+    float2 cA = data.positions[m_indexA].c;
     float aA = data.positions[m_indexA].a;
-    Vec2 cB = data.positions[m_indexB].c;
+    float2 cB = data.positions[m_indexB].c;
     float aB = data.positions[m_indexB].a;
     final Rot qA = pool.popRot();
     final Rot qB = pool.popRot();
-    final Vec2 temp = pool.popVec2();
-    final Vec2 rA = pool.popVec2();
-    final Vec2 rB = pool.popVec2();
+    final float2 temp = pool.popVec2();
+    final float2 rA = pool.popVec2();
+    final float2 rB = pool.popVec2();
 
     qA.set(aA);
     qB.set(aB);
@@ -352,13 +352,13 @@ public class WeldJoint extends Joint {
     float mA = m_invMassA, mB = m_invMassB;
     float iA = m_invIA, iB = m_invIB;
 
-    Rot.mulToOutUnsafe(qA, temp.set(m_localAnchorA).subtract(m_localCenterA), rA);
-    Rot.mulToOutUnsafe(qB, temp.set(m_localAnchorB).subtract(m_localCenterB), rB);
+    Rot.mulToOutUnsafe(qA, temp.set(m_localAnchorA).sub(m_localCenterA), rA);
+    Rot.mulToOutUnsafe(qB, temp.set(m_localAnchorB).sub(m_localCenterB), rB);
     float positionError, angularError;
 
     final Mat33 K = pool.popMat33();
-    final Vec2 C1 = pool.popVec2();
-    final Vec2 P = pool.popVec2();
+    final float2 C1 = pool.popVec2();
+    final float2 P = pool.popVec2();
 
     K.ex.x = mA + mB + rA.y * rA.y * iA + rB.y * rB.y * iB;
     K.ey.x = -rA.y * rA.x * iA - rB.y * rB.x * iB;
@@ -370,7 +370,7 @@ public class WeldJoint extends Joint {
     K.ey.z = K.ez.y;
     K.ez.z = iA + iB;
     if (m_frequencyHz > 0.0f) {
-      C1.set(cB).add(rB).subtract(cA).subtract(rA);
+      C1.set(cB).add(rB).sub(cA).sub(rA);
 
       positionError = C1.abs();
       angularError = 0.0f;
@@ -380,20 +380,20 @@ public class WeldJoint extends Joint {
 
       cA.x -= mA * P.x;
       cA.y -= mA * P.y;
-      aA -= iA * Vec2.cross(rA, P);
+      aA -= iA * float2.cross(rA, P);
 
       cB.x += mB * P.x;
       cB.y += mB * P.y;
-      aB += iB * Vec2.cross(rB, P);
+      aB += iB * float2.cross(rB, P);
     } else {
-      C1.set(cB).add(rB).subtract(cA).subtract(rA);
+      C1.set(cB).add(rB).sub(cA).sub(rA);
       float C2 = aB - aA - m_referenceAngle;
 
       positionError = C1.abs();
       angularError = MathUtils.abs(C2);
 
-      final Vec3 C = pool.popVec3();
-      final Vec3 impulse = pool.popVec3();
+      final float3 C = pool.popVec3();
+      final float3 impulse = pool.popVec3();
       C.set(C1.x, C1.y, C2);
 
       K.solve33ToOut(C, impulse);
@@ -402,11 +402,11 @@ public class WeldJoint extends Joint {
 
       cA.x -= mA * P.x;
       cA.y -= mA * P.y;
-      aA -= iA * (Vec2.cross(rA, P) + impulse.z);
+      aA -= iA * (float2.cross(rA, P) + impulse.z);
 
       cB.x += mB * P.x;
       cB.y += mB * P.y;
-      aB += iB * (Vec2.cross(rB, P) + impulse.z);
+      aB += iB * (float2.cross(rB, P) + impulse.z);
       pool.pushVec3(2);
     }
 

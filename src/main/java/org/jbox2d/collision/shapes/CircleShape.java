@@ -31,18 +31,18 @@ import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Rot;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Transform;
-import com.github.rccookie.geometry.performance.Vec2;
+import com.github.rccookie.geometry.performance.float2;
 
 /**
  * A circle shape.
  */
 public class CircleShape extends Shape {
 
-  public final Vec2 m_p;
+  public final float2 m_p;
 
   public CircleShape() {
     super(ShapeType.CIRCLE);
-    m_p = new Vec2();
+    m_p = new float2();
     m_radius = 0;
   }
 
@@ -64,7 +64,7 @@ public class CircleShape extends Shape {
    * @param d
    * @return
    */
-  public final int getSupport(final Vec2 d) {
+  public final int getSupport(final float2 d) {
     return 0;
   }
 
@@ -74,7 +74,7 @@ public class CircleShape extends Shape {
    * @param d
    * @return
    */
-  public final Vec2 getSupportVertex(final Vec2 d) {
+  public final float2 getSupportVertex(final float2 d) {
     return m_p;
   }
 
@@ -93,20 +93,20 @@ public class CircleShape extends Shape {
    * @param index
    * @return
    */
-  public final Vec2 getVertex(final int index) {
+  public final float2 getVertex(final int index) {
     assert (index == 0);
     return m_p;
   }
 
   @Override
-  public final boolean testPoint(final Transform transform, final Vec2 p) {
+  public final boolean testPoint(final Transform transform, final float2 p) {
     // Rot.mulToOutUnsafe(transform.q, m_p, center);
     // center.addLocal(transform.p);
     //
     // final Vec2 d = center.subLocal(p).negateLocal();
     // return Vec2.dot(d, d) <= m_radius * m_radius;
     final Rot q = transform.q;
-    final Vec2 tp = transform.p;
+    final float2 tp = transform.p;
     float centerx = -(q.c * m_p.x - q.s * m_p.y + tp.x - p.x);
     float centery = -(q.s * m_p.x + q.c * m_p.y + tp.y - p.y);
 
@@ -114,7 +114,7 @@ public class CircleShape extends Shape {
   }
 
   @Override
-  public float computeDistanceToOut(Transform xf, Vec2 p, int childIndex, Vec2 normalOut) {
+  public float computeDistanceToOut(Transform xf, float2 p, int childIndex, float2 normalOut) {
     final Rot xfq = xf.q;
     float centerx = xfq.c * m_p.x - xfq.s * m_p.y + xf.p.x;
     float centery = xfq.s * m_p.x + xfq.c * m_p.y + xf.p.y;
@@ -134,10 +134,10 @@ public class CircleShape extends Shape {
   public final boolean raycast(RayCastOutput output, RayCastInput input, Transform transform,
       int childIndex) {
 
-    final Vec2 inputp1 = input.p1;
-    final Vec2 inputp2 = input.p2;
+    final float2 inputp1 = input.p1;
+    final float2 inputp2 = input.p2;
     final Rot tq = transform.q;
-    final Vec2 tp = transform.p;
+    final float2 tp = transform.p;
 
     // Rot.mulToOutUnsafe(transform.q, m_p, position);
     // position.addLocal(transform.p);
@@ -182,7 +182,7 @@ public class CircleShape extends Shape {
   @Override
   public final void computeAABB(final AABB aabb, final Transform transform, int childIndex) {
     final Rot tq = transform.q;
-    final Vec2 tp = transform.p;
+    final float2 tp = transform.p;
     final float px = tq.c * m_p.x - tq.s * m_p.y + tp.x;
     final float py = tq.s * m_p.x + tq.c * m_p.y + tp.y;
 

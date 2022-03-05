@@ -1,6 +1,6 @@
 package org.jbox2d.dynamics.joints;
 
-import com.github.rccookie.geometry.performance.Vec2;
+import com.github.rccookie.geometry.performance.float2;
 import org.jbox2d.dynamics.Body;
 
 /**
@@ -12,7 +12,7 @@ public class MotorJointDef extends JointDef {
   /**
    * Position of bodyB minus the position of bodyA, in bodyA's frame, in meters.
    */
-  public final Vec2 linearOffset = new Vec2();
+  public final float2 linearOffset = new float2();
 
   /**
    * The bodyB angle minus bodyA angle in radians.
@@ -45,7 +45,7 @@ public class MotorJointDef extends JointDef {
   public void initialize(Body bA, Body bB) {
     bodyA = bA;
     bodyB = bB;
-    Vec2 xB = bodyB.getPosition();
+    float2 xB = bodyB.getPosition();
     bodyA.getLocalPointToOut(xB, linearOffset);
 
     float angleA = bodyA.getAngle();

@@ -28,7 +28,7 @@ import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Rot;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Transform;
-import com.github.rccookie.geometry.performance.Vec2;
+import com.github.rccookie.geometry.performance.float2;
 import org.jbox2d.dynamics.SolverData;
 import org.jbox2d.pooling.IWorldPool;
 
@@ -42,25 +42,25 @@ import org.jbox2d.pooling.IWorldPool;
  */
 public class MouseJoint extends Joint {
 
-  private final Vec2 m_localAnchorB = new Vec2();
-  private final Vec2 m_targetA = new Vec2();
+  private final float2 m_localAnchorB = new float2();
+  private final float2 m_targetA = new float2();
   private float m_frequencyHz;
   private float m_dampingRatio;
   private float m_beta;
 
   // Solver shared
-  private final Vec2 m_impulse = new Vec2();
+  private final float2 m_impulse = new float2();
   private float m_maxForce;
   private float m_gamma;
 
   // Solver temp
   private int m_indexB;
-  private final Vec2 m_rB = new Vec2();
-  private final Vec2 m_localCenterB = new Vec2();
+  private final float2 m_rB = new float2();
+  private final float2 m_localCenterB = new float2();
   private float m_invMassB;
   private float m_invIB;
   private final Mat22 m_mass = new Mat22();
-  private final Vec2 m_C = new Vec2();
+  private final float2 m_C = new float2();
 
   protected MouseJoint(IWorldPool argWorld, MouseJointDef def) {
     super(argWorld, def);
@@ -83,17 +83,17 @@ public class MouseJoint extends Joint {
   }
 
   @Override
-  public void getAnchorA(Vec2 argOut) {
+  public void getAnchorA(float2 argOut) {
     argOut.set(m_targetA);
   }
 
   @Override
-  public void getAnchorB(Vec2 argOut) {
+  public void getAnchorB(float2 argOut) {
     m_bodyB.getWorldPointToOut(m_localAnchorB, argOut);
   }
 
   @Override
-  public void getReactionForce(float invDt, Vec2 argOut) {
+  public void getReactionForce(float invDt, float2 argOut) {
     argOut.set(m_impulse).scale(invDt);
   }
 
@@ -103,14 +103,14 @@ public class MouseJoint extends Joint {
   }
 
 
-  public void setTarget(Vec2 target) {
+  public void setTarget(float2 target) {
     if (m_bodyB.isAwake() == false) {
       m_bodyB.setAwake(true);
     }
     m_targetA.set(target);
   }
 
-  public Vec2 getTarget() {
+  public float2 getTarget() {
     return m_targetA;
   }
 
@@ -148,9 +148,9 @@ public class MouseJoint extends Joint {
     m_invMassB = m_bodyB.m_invMass;
     m_invIB = m_bodyB.m_invI;
 
-    Vec2 cB = data.positions[m_indexB].c;
+    float2 cB = data.positions[m_indexB].c;
     float aB = data.positions[m_indexB].a;
-    Vec2 vB = data.velocities[m_indexB].v;
+    float2 vB = data.velocities[m_indexB].v;
     float wB = data.velocities[m_indexB].w;
 
     final Rot qB = pool.popRot();
@@ -179,10 +179,10 @@ public class MouseJoint extends Joint {
     }
     m_beta = h * k * m_gamma;
 
-    Vec2 temp = pool.popVec2();
+    float2 temp = pool.popVec2();
 
     // Compute the effective mass matrix.
-    Rot.mulToOutUnsafe(qB, temp.set(m_localAnchorB).subtract(m_localCenterB), m_rB);
+    Rot.mulToOutUnsafe(qB, temp.set(m_localAnchorB).sub(m_localCenterB), m_rB);
 
     // K = [(1/m1 + 1/m2) * eye(2) - skew(r1) * invI1 * skew(r1) - skew(r2) * invI2 * skew(r2)]
     // = [1/m1+1/m2 0 ] + invI1 * [r1.y*r1.y -r1.x*r1.y] + invI2 * [r1.y*r1.y -r1.x*r1.y]
@@ -195,7 +195,7 @@ public class MouseJoint extends Joint {
 
     K.invertToOut(m_mass);
 
-    m_C.set(cB).add(m_rB).subtract(m_targetA);
+    m_C.set(cB).add(m_rB).sub(m_targetA);
     m_C.scale(m_beta);
 
     // Cheat with some damping
@@ -205,7 +205,7 @@ public class MouseJoint extends Joint {
       m_impulse.scale(data.step.dtRatio);
       vB.x += m_invMassB * m_impulse.x;
       vB.y += m_invMassB * m_impulse.y;
-      wB += m_invIB * Vec2.cross(m_rB, m_impulse);
+      wB += m_invIB * float2.cross(m_rB, m_impulse);
     } else {
       m_impulse.setZero();
     }
@@ -226,32 +226,32 @@ public class MouseJoint extends Joint {
   @Override
   public void solveVelocityConstraints(final SolverData data) {
 
-    Vec2 vB = data.velocities[m_indexB].v;
+    float2 vB = data.velocities[m_indexB].v;
     float wB = data.velocities[m_indexB].w;
 
     // Cdot = v + cross(w, r)
-    final Vec2 Cdot = pool.popVec2();
-    Vec2.cross(wB, m_rB, Cdot);
+    final float2 Cdot = pool.popVec2();
+    float2.cross(wB, m_rB, Cdot);
     Cdot.add(vB);
 
-    final Vec2 impulse = pool.popVec2();
-    final Vec2 temp = pool.popVec2();
+    final float2 impulse = pool.popVec2();
+    final float2 temp = pool.popVec2();
 
     temp.set(m_impulse).scale(m_gamma).add(m_C).add(Cdot).negate();
     Mat22.mulToOutUnsafe(m_mass, temp, impulse);
 
-    Vec2 oldImpulse = temp;
+    float2 oldImpulse = temp;
     oldImpulse.set(m_impulse);
     m_impulse.add(impulse);
     float maxImpulse = data.step.dt * m_maxForce;
     if (m_impulse.sqrAbs() > maxImpulse * maxImpulse) {
       m_impulse.scale(maxImpulse / m_impulse.abs());
     }
-    impulse.set(m_impulse).subtract(oldImpulse);
+    impulse.set(m_impulse).sub(oldImpulse);
 
     vB.x += m_invMassB * impulse.x;
     vB.y += m_invMassB * impulse.y;
-    wB += m_invIB * Vec2.cross(m_rB, impulse);
+    wB += m_invIB * float2.cross(m_rB, impulse);
 
 //    data.velocities[m_indexB].v.set(vB);
     data.velocities[m_indexB].w = wB;

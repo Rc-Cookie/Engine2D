@@ -1,7 +1,7 @@
 package org.jbox2d.particle;
 
 import org.jbox2d.common.Transform;
-import com.github.rccookie.geometry.performance.Vec2;
+import com.github.rccookie.geometry.performance.float2;
 
 public class ParticleGroup {
 
@@ -16,8 +16,8 @@ public class ParticleGroup {
   int m_timestamp;
   float m_mass;
   float m_inertia;
-  final Vec2 m_center = new Vec2();
-  final Vec2 m_linearVelocity = new Vec2();
+  final float2 m_center = new float2();
+  final float2 m_linearVelocity = new float2();
   float m_angularVelocity;
   final Transform m_transform = new Transform();
 
@@ -75,12 +75,12 @@ public class ParticleGroup {
     return m_inertia;
   }
 
-  public Vec2 getCenter() {
+  public float2 getCenter() {
     updateStatistics();
     return m_center;
   }
 
-  public Vec2 getLinearVelocity() {
+  public float2 getLinearVelocity() {
     updateStatistics();
     return m_linearVelocity;
   }
@@ -94,7 +94,7 @@ public class ParticleGroup {
     return m_transform;
   }
 
-  public Vec2 getPosition() {
+  public float2 getPosition() {
     return m_transform.p;
   }
 
@@ -120,10 +120,10 @@ public class ParticleGroup {
       m_linearVelocity.setZero();
       for (int i = m_firstIndex; i < m_lastIndex; i++) {
         m_mass += m;
-        Vec2 pos = m_system.m_positionBuffer.data[i];
+        float2 pos = m_system.m_positionBuffer.data[i];
         m_center.x += m * pos.x;
         m_center.y += m * pos.y;
-        Vec2 vel = m_system.m_velocityBuffer.data[i];
+        float2 vel = m_system.m_velocityBuffer.data[i];
         m_linearVelocity.x += m * vel.x;
         m_linearVelocity.y += m * vel.y;
       }
@@ -136,8 +136,8 @@ public class ParticleGroup {
       m_inertia = 0;
       m_angularVelocity = 0;
       for (int i = m_firstIndex; i < m_lastIndex; i++) {
-        Vec2 pos = m_system.m_positionBuffer.data[i];
-        Vec2 vel = m_system.m_velocityBuffer.data[i];
+        float2 pos = m_system.m_positionBuffer.data[i];
+        float2 vel = m_system.m_velocityBuffer.data[i];
         float px = pos.x - m_center.x;
         float py = pos.y - m_center.y;
         float vx = vel.x - m_linearVelocity.x;

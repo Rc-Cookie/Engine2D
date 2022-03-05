@@ -14,8 +14,11 @@ import com.github.rccookie.engine2d.impl.InputAdapter;
 import com.github.rccookie.engine2d.impl.MouseData;
 import com.github.rccookie.event.action.BiParamAction;
 import com.github.rccookie.event.action.ParamAction;
-import com.github.rccookie.geometry.performance.IVec2;
+import com.github.rccookie.geometry.performance.int2;
 
+/**
+ * AWT implementation of an {@link InputAdapter}.
+ */
 public class AWTInputAdapter implements InputAdapter {
 
     @Override
@@ -50,7 +53,7 @@ public class AWTInputAdapter implements InputAdapter {
             @Override
             public void mousePressed(MouseEvent e) {
                 Point displayOnScreenPoint = AWTDisplay.INSTANCE.getLocationOnScreen();
-                IVec2 pos = new IVec2(e.getXOnScreen() - displayOnScreenPoint.x,
+                int2 pos = new int2(e.getXOnScreen() - displayOnScreenPoint.x,
                         e.getYOnScreen() - displayOnScreenPoint.y);
                 event.run(new MouseData(pos, e.getButton()));
             }
@@ -58,7 +61,7 @@ public class AWTInputAdapter implements InputAdapter {
             @Override
             public void mouseReleased(MouseEvent e) {
                 Point displayOnScreenPoint = AWTDisplay.INSTANCE.getLocationOnScreen();
-                IVec2 pos = new IVec2(e.getXOnScreen() - displayOnScreenPoint.x,
+                int2 pos = new int2(e.getXOnScreen() - displayOnScreenPoint.x,
                         e.getYOnScreen() - displayOnScreenPoint.y);
                 event.run(new MouseData(pos, 0));
             }
@@ -66,10 +69,10 @@ public class AWTInputAdapter implements InputAdapter {
     }
 
     @Override
-    public IVec2 getMousePos() {
+    public int2 getMousePos() {
         PointerInfo pointer = MouseInfo.getPointerInfo();
         Point displayOnScreenPoint = AWTDisplay.INSTANCE.getLocationOnScreen();
-        return new IVec2(pointer.getLocation().x - displayOnScreenPoint.x,
+        return new int2(pointer.getLocation().x - displayOnScreenPoint.x,
                 pointer.getLocation().y - displayOnScreenPoint.y);
     }
 
@@ -86,6 +89,13 @@ public class AWTInputAdapter implements InputAdapter {
     }
 
 
+    /**
+     * Converts the key code of the given key event to a valid
+     * key string.
+     *
+     * @param event The key event
+     * @return The key that was affected
+     */
     private static String getKeyString(KeyEvent event) {
 
         int keyCode = event.getExtendedKeyCode();

@@ -1,6 +1,6 @@
 package org.jbox2d.particle;
 
-import com.github.rccookie.geometry.performance.Vec2;
+import com.github.rccookie.geometry.performance.float2;
 
 public class ParticleContact {
   /** Indices of the respective particles making contact. */
@@ -10,5 +10,5 @@ public class ParticleContact {
   /** Weight of the contact. A value between 0.0f and 1.0f. */
   public float weight;
   /** The normalized direction from A to B. */
-  public final Vec2 normal = new Vec2();
+  public final float2 normal = new float2();
 }

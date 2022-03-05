@@ -28,8 +28,8 @@ import org.jbox2d.common.Mat33;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Rot;
 import org.jbox2d.common.Settings;
-import com.github.rccookie.geometry.performance.Vec2;
-import com.github.rccookie.geometry.performance.Vec3;
+import com.github.rccookie.geometry.performance.float2;
+import com.github.rccookie.geometry.performance.float3;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.SolverData;
 import org.jbox2d.pooling.IWorldPool;
@@ -111,12 +111,12 @@ import org.jbox2d.pooling.IWorldPool;
 public class PrismaticJoint extends Joint {
 
   // Solver shared
-  protected final Vec2 m_localAnchorA;
-  protected final Vec2 m_localAnchorB;
-  protected final Vec2 m_localXAxisA;
-  protected final Vec2 m_localYAxisA;
+  protected final float2 m_localAnchorA;
+  protected final float2 m_localAnchorB;
+  protected final float2 m_localXAxisA;
+  protected final float2 m_localYAxisA;
   protected float m_referenceAngle;
-  private final Vec3 m_impulse;
+  private final float3 m_impulse;
   private float m_motorImpulse;
   private float m_lowerTranslation;
   private float m_upperTranslation;
@@ -129,13 +129,13 @@ public class PrismaticJoint extends Joint {
   // Solver temp
   private int m_indexA;
   private int m_indexB;
-  private final Vec2 m_localCenterA = new Vec2();
-  private final Vec2 m_localCenterB = new Vec2();
+  private final float2 m_localCenterA = new float2();
+  private final float2 m_localCenterB = new float2();
   private float m_invMassA;
   private float m_invMassB;
   private float m_invIA;
   private float m_invIB;
-  private final Vec2 m_axis, m_perp;
+  private final float2 m_axis, m_perp;
   private float m_s1, m_s2;
   private float m_a1, m_a2;
   private final Mat33 m_K;
@@ -143,15 +143,15 @@ public class PrismaticJoint extends Joint {
 
   protected PrismaticJoint(IWorldPool argWorld, PrismaticJointDef def) {
     super(argWorld, def);
-    m_localAnchorA = new Vec2(def.localAnchorA);
-    m_localAnchorB = new Vec2(def.localAnchorB);
-    m_localXAxisA = new Vec2(def.localAxisA);
+    m_localAnchorA = new float2(def.localAnchorA);
+    m_localAnchorB = new float2(def.localAnchorB);
+    m_localXAxisA = new float2(def.localAxisA);
     m_localXAxisA.norm();
-    m_localYAxisA = new Vec2();
-    Vec2.cross(1f, m_localXAxisA, m_localYAxisA);
+    m_localYAxisA = new float2();
+    float2.cross(1f, m_localXAxisA, m_localYAxisA);
     m_referenceAngle = def.referenceAngle;
 
-    m_impulse = new Vec3();
+    m_impulse = new float3();
     m_motorMass = 0.0f;
     m_motorImpulse = 0.0f;
 
@@ -164,31 +164,31 @@ public class PrismaticJoint extends Joint {
     m_limitState = LimitState.INACTIVE;
 
     m_K = new Mat33();
-    m_axis = new Vec2();
-    m_perp = new Vec2();
+    m_axis = new float2();
+    m_perp = new float2();
   }
 
-  public Vec2 getLocalAnchorA() {
+  public float2 getLocalAnchorA() {
     return m_localAnchorA;
   }
 
-  public Vec2 getLocalAnchorB() {
+  public float2 getLocalAnchorB() {
     return m_localAnchorB;
   }
 
   @Override
-  public void getAnchorA(Vec2 argOut) {
+  public void getAnchorA(float2 argOut) {
     m_bodyA.getWorldPointToOut(m_localAnchorA, argOut);
   }
 
   @Override
-  public void getAnchorB(Vec2 argOut) {
+  public void getAnchorB(float2 argOut) {
     m_bodyB.getWorldPointToOut(m_localAnchorB, argOut);
   }
 
   @Override
-  public void getReactionForce(float inv_dt, Vec2 argOut) {
-    Vec2 temp = pool.popVec2();
+  public void getReactionForce(float inv_dt, float2 argOut) {
+    float2 temp = pool.popVec2();
     temp.set(m_axis).scale(m_motorImpulse + m_impulse.z);
     argOut.set(m_perp).scale(m_impulse.x).add(temp).scale(inv_dt);
     pool.pushVec2(1);
@@ -206,40 +206,40 @@ public class PrismaticJoint extends Joint {
     Body bA = m_bodyA;
     Body bB = m_bodyB;
 
-    Vec2 temp = pool.popVec2();
-    Vec2 rA = pool.popVec2();
-    Vec2 rB = pool.popVec2();
-    Vec2 p1 = pool.popVec2();
-    Vec2 p2 = pool.popVec2();
-    Vec2 d = pool.popVec2();
-    Vec2 axis = pool.popVec2();
-    Vec2 temp2 = pool.popVec2();
-    Vec2 temp3 = pool.popVec2();
+    float2 temp = pool.popVec2();
+    float2 rA = pool.popVec2();
+    float2 rB = pool.popVec2();
+    float2 p1 = pool.popVec2();
+    float2 p2 = pool.popVec2();
+    float2 d = pool.popVec2();
+    float2 axis = pool.popVec2();
+    float2 temp2 = pool.popVec2();
+    float2 temp3 = pool.popVec2();
 
-    temp.set(m_localAnchorA).subtract(bA.m_sweep.localCenter);
+    temp.set(m_localAnchorA).sub(bA.m_sweep.localCenter);
     Rot.mulToOutUnsafe(bA.m_xf.q, temp, rA);
 
-    temp.set(m_localAnchorB).subtract(bB.m_sweep.localCenter);
+    temp.set(m_localAnchorB).sub(bB.m_sweep.localCenter);
     Rot.mulToOutUnsafe(bB.m_xf.q, temp, rB);
 
     p1.set(bA.m_sweep.c).add(rA);
     p2.set(bB.m_sweep.c).add(rB);
 
-    d.set(p2).subtract(p1);
+    d.set(p2).sub(p1);
     Rot.mulToOutUnsafe(bA.m_xf.q, m_localXAxisA, axis);
 
-    Vec2 vA = bA.m_linearVelocity;
-    Vec2 vB = bB.m_linearVelocity;
+    float2 vA = bA.m_linearVelocity;
+    float2 vB = bB.m_linearVelocity;
     float wA = bA.m_angularVelocity;
     float wB = bB.m_angularVelocity;
 
 
-    Vec2.cross(wA, axis, temp);
-    Vec2.cross(wB, rB, temp2);
-    Vec2.cross(wA, rA, temp3);
+    float2.cross(wA, axis, temp);
+    float2.cross(wB, rB, temp2);
+    float2.cross(wA, rA, temp3);
 
-    temp2.add(vB).subtract(vA).subtract(temp3);
-    float speed = Vec2.dot(d, temp) + Vec2.dot(axis, temp2);
+    temp2.add(vB).sub(vA).sub(temp3);
+    float speed = float2.dot(d, temp) + float2.dot(axis, temp2);
 
     pool.pushVec2(9);
 
@@ -247,12 +247,12 @@ public class PrismaticJoint extends Joint {
   }
 
   public float getJointTranslation() {
-    Vec2 pA = pool.popVec2(), pB = pool.popVec2(), axis = pool.popVec2();
+    float2 pA = pool.popVec2(), pB = pool.popVec2(), axis = pool.popVec2();
     m_bodyA.getWorldPointToOut(m_localAnchorA, pA);
     m_bodyB.getWorldPointToOut(m_localAnchorB, pB);
     m_bodyA.getWorldVectorToOutUnsafe(m_localXAxisA, axis);
-    pB.subtract(pA);
-    float translation = Vec2.dot(pB, axis);
+    pB.sub(pA);
+    float translation = float2.dot(pB, axis);
     pool.pushVec2(3);
     return translation;
   }
@@ -384,7 +384,7 @@ public class PrismaticJoint extends Joint {
     return m_referenceAngle;
   }
 
-  public Vec2 getLocalAxisA() {
+  public float2 getLocalAxisA() {
     return m_localXAxisA;
   }
 
@@ -399,30 +399,30 @@ public class PrismaticJoint extends Joint {
     m_invIA = m_bodyA.m_invI;
     m_invIB = m_bodyB.m_invI;
 
-    Vec2 cA = data.positions[m_indexA].c;
+    float2 cA = data.positions[m_indexA].c;
     float aA = data.positions[m_indexA].a;
-    Vec2 vA = data.velocities[m_indexA].v;
+    float2 vA = data.velocities[m_indexA].v;
     float wA = data.velocities[m_indexA].w;
 
-    Vec2 cB = data.positions[m_indexB].c;
+    float2 cB = data.positions[m_indexB].c;
     float aB = data.positions[m_indexB].a;
-    Vec2 vB = data.velocities[m_indexB].v;
+    float2 vB = data.velocities[m_indexB].v;
     float wB = data.velocities[m_indexB].w;
 
     final Rot qA = pool.popRot();
     final Rot qB = pool.popRot();
-    final Vec2 d = pool.popVec2();
-    final Vec2 temp = pool.popVec2();
-    final Vec2 rA = pool.popVec2();
-    final Vec2 rB = pool.popVec2();
+    final float2 d = pool.popVec2();
+    final float2 temp = pool.popVec2();
+    final float2 rA = pool.popVec2();
+    final float2 rB = pool.popVec2();
 
     qA.set(aA);
     qB.set(aB);
 
     // Compute the effective masses.
-    Rot.mulToOutUnsafe(qA, d.set(m_localAnchorA).subtract(m_localCenterA), rA);
-    Rot.mulToOutUnsafe(qB, d.set(m_localAnchorB).subtract(m_localCenterB), rB);
-    d.set(cB).subtract(cA).add(rB).subtract(rA);
+    Rot.mulToOutUnsafe(qA, d.set(m_localAnchorA).sub(m_localCenterA), rA);
+    Rot.mulToOutUnsafe(qB, d.set(m_localAnchorB).sub(m_localCenterB), rB);
+    d.set(cB).sub(cA).add(rB).sub(rA);
 
     float mA = m_invMassA, mB = m_invMassB;
     float iA = m_invIA, iB = m_invIB;
@@ -431,8 +431,8 @@ public class PrismaticJoint extends Joint {
     {
       Rot.mulToOutUnsafe(qA, m_localXAxisA, m_axis);
       temp.set(d).add(rA);
-      m_a1 = Vec2.cross(temp, m_axis);
-      m_a2 = Vec2.cross(rB, m_axis);
+      m_a1 = float2.cross(temp, m_axis);
+      m_a2 = float2.cross(rB, m_axis);
 
       m_motorMass = mA + mB + iA * m_a1 * m_a1 + iB * m_a2 * m_a2;
       if (m_motorMass > 0.0f) {
@@ -445,8 +445,8 @@ public class PrismaticJoint extends Joint {
       Rot.mulToOutUnsafe(qA, m_localYAxisA, m_perp);
 
       temp.set(d).add(rA);
-      m_s1 = Vec2.cross(temp, m_perp);
-      m_s2 = Vec2.cross(rB, m_perp);
+      m_s1 = float2.cross(temp, m_perp);
+      m_s2 = float2.cross(rB, m_perp);
 
       float k11 = mA + mB + iA * m_s1 * m_s1 + iB * m_s2 * m_s2;
       float k12 = iA * m_s1 + iB * m_s2;
@@ -467,7 +467,7 @@ public class PrismaticJoint extends Joint {
     // Compute motor and limit terms.
     if (m_enableLimit) {
 
-      float jointTranslation = Vec2.dot(m_axis, d);
+      float jointTranslation = float2.dot(m_axis, d);
       if (MathUtils.abs(m_upperTranslation - m_lowerTranslation) < 2.0f * Settings.linearSlop) {
         m_limitState = LimitState.EQUAL;
       } else if (jointTranslation <= m_lowerTranslation) {
@@ -498,7 +498,7 @@ public class PrismaticJoint extends Joint {
       m_impulse.scale(data.step.dtRatio);
       m_motorImpulse *= data.step.dtRatio;
 
-      final Vec2 P = pool.popVec2();
+      final float2 P = pool.popVec2();
       temp.set(m_axis).scale(m_motorImpulse + m_impulse.z);
       P.set(m_perp).scale(m_impulse.x).add(temp);
 
@@ -530,27 +530,27 @@ public class PrismaticJoint extends Joint {
 
   @Override
   public void solveVelocityConstraints(final SolverData data) {
-    Vec2 vA = data.velocities[m_indexA].v;
+    float2 vA = data.velocities[m_indexA].v;
     float wA = data.velocities[m_indexA].w;
-    Vec2 vB = data.velocities[m_indexB].v;
+    float2 vB = data.velocities[m_indexB].v;
     float wB = data.velocities[m_indexB].w;
 
     float mA = m_invMassA, mB = m_invMassB;
     float iA = m_invIA, iB = m_invIB;
 
-    final Vec2 temp = pool.popVec2();
+    final float2 temp = pool.popVec2();
 
     // Solve linear motor constraint.
     if (m_enableMotor && m_limitState != LimitState.EQUAL) {
-      temp.set(vB).subtract(vA);
-      float Cdot = Vec2.dot(m_axis, temp) + m_a2 * wB - m_a1 * wA;
+      temp.set(vB).sub(vA);
+      float Cdot = float2.dot(m_axis, temp) + m_a2 * wB - m_a1 * wA;
       float impulse = m_motorMass * (m_motorSpeed - Cdot);
       float oldImpulse = m_motorImpulse;
       float maxImpulse = data.step.dt * m_maxMotorForce;
       m_motorImpulse = MathUtils.clamp(m_motorImpulse + impulse, -maxImpulse, maxImpulse);
       impulse = m_motorImpulse - oldImpulse;
 
-      final Vec2 P = pool.popVec2();
+      final float2 P = pool.popVec2();
       P.set(m_axis).scale(impulse);
       float LA = impulse * m_a1;
       float LB = impulse * m_a2;
@@ -566,23 +566,23 @@ public class PrismaticJoint extends Joint {
       pool.pushVec2(1);
     }
 
-    final Vec2 Cdot1 = pool.popVec2();
-    temp.set(vB).subtract(vA);
-    Cdot1.x = Vec2.dot(m_perp, temp) + m_s2 * wB - m_s1 * wA;
+    final float2 Cdot1 = pool.popVec2();
+    temp.set(vB).sub(vA);
+    Cdot1.x = float2.dot(m_perp, temp) + m_s2 * wB - m_s1 * wA;
     Cdot1.y = wB - wA;
     // System.out.println(Cdot1);
 
     if (m_enableLimit && m_limitState != LimitState.INACTIVE) {
       // Solve prismatic and limit constraint in block form.
       float Cdot2;
-      temp.set(vB).subtract(vA);
-      Cdot2 = Vec2.dot(m_axis, temp) + m_a2 * wB - m_a1 * wA;
+      temp.set(vB).sub(vA);
+      Cdot2 = float2.dot(m_axis, temp) + m_a2 * wB - m_a1 * wA;
 
-      final Vec3 Cdot = pool.popVec3();
+      final float3 Cdot = pool.popVec3();
       Cdot.set(Cdot1.x, Cdot1.y, Cdot2);
 
-      final Vec3 f1 = pool.popVec3();
-      final Vec3 df = pool.popVec3();
+      final float3 f1 = pool.popVec3();
+      final float3 df = pool.popVec3();
 
       f1.set(m_impulse);
       m_K.solve33ToOut(Cdot.negate(), df);
@@ -597,20 +597,20 @@ public class PrismaticJoint extends Joint {
 
       // f2(1:2) = invK(1:2,1:2) * (-Cdot(1:2) - K(1:2,3) * (f2(3) - f1(3))) +
       // f1(1:2)
-      final Vec2 b = pool.popVec2();
-      final Vec2 f2r = pool.popVec2();
+      final float2 b = pool.popVec2();
+      final float2 f2r = pool.popVec2();
 
       temp.set(m_K.ez.x, m_K.ez.y).scale(m_impulse.z - f1.z);
-      b.set(Cdot1).negate().subtract(temp);
+      b.set(Cdot1).negate().sub(temp);
 
       m_K.solve22ToOut(b, f2r);
       f2r.add(f1.x, f1.y);
       m_impulse.x = f2r.x;
       m_impulse.y = f2r.y;
 
-      df.set(m_impulse).subtract(f1);
+      df.set(m_impulse).sub(f1);
 
-      final Vec2 P = pool.popVec2();
+      final float2 P = pool.popVec2();
       temp.set(m_axis).scale(df.z);
       P.set(m_perp).scale(df.x).add(temp);
 
@@ -629,14 +629,14 @@ public class PrismaticJoint extends Joint {
       pool.pushVec3(3);
     } else {
       // Limit is inactive, just solve the prismatic constraint in block form.
-      final Vec2 df = pool.popVec2();
+      final float2 df = pool.popVec2();
       m_K.solve22ToOut(Cdot1.negate(), df);
       Cdot1.negate();
 
       m_impulse.x += df.x;
       m_impulse.y += df.y;
 
-      final Vec2 P = pool.popVec2();
+      final float2 P = pool.popVec2();
       P.set(m_perp).scale(df.x);
       float LA = df.x * m_s1 + df.y;
       float LB = df.x * m_s2 + df.y;
@@ -666,19 +666,19 @@ public class PrismaticJoint extends Joint {
 
     final Rot qA = pool.popRot();
     final Rot qB = pool.popRot();
-    final Vec2 rA = pool.popVec2();
-    final Vec2 rB = pool.popVec2();
-    final Vec2 d = pool.popVec2();
-    final Vec2 axis = pool.popVec2();
-    final Vec2 perp = pool.popVec2();
-    final Vec2 temp = pool.popVec2();
-    final Vec2 C1 = pool.popVec2();
+    final float2 rA = pool.popVec2();
+    final float2 rB = pool.popVec2();
+    final float2 d = pool.popVec2();
+    final float2 axis = pool.popVec2();
+    final float2 perp = pool.popVec2();
+    final float2 temp = pool.popVec2();
+    final float2 C1 = pool.popVec2();
 
-    final Vec3 impulse = pool.popVec3();
+    final float3 impulse = pool.popVec3();
 
-    Vec2 cA = data.positions[m_indexA].c;
+    float2 cA = data.positions[m_indexA].c;
     float aA = data.positions[m_indexA].a;
-    Vec2 cB = data.positions[m_indexB].c;
+    float2 cB = data.positions[m_indexB].c;
     float aB = data.positions[m_indexB].a;
 
     qA.set(aA);
@@ -688,19 +688,19 @@ public class PrismaticJoint extends Joint {
     float iA = m_invIA, iB = m_invIB;
 
     // Compute fresh Jacobians
-    Rot.mulToOutUnsafe(qA, temp.set(m_localAnchorA).subtract(m_localCenterA), rA);
-    Rot.mulToOutUnsafe(qB, temp.set(m_localAnchorB).subtract(m_localCenterB), rB);
-    d.set(cB).add(rB).subtract(cA).subtract(rA);
+    Rot.mulToOutUnsafe(qA, temp.set(m_localAnchorA).sub(m_localCenterA), rA);
+    Rot.mulToOutUnsafe(qB, temp.set(m_localAnchorB).sub(m_localCenterB), rB);
+    d.set(cB).add(rB).sub(cA).sub(rA);
 
     Rot.mulToOutUnsafe(qA, m_localXAxisA, axis);
-    float a1 = Vec2.cross(temp.set(d).add(rA), axis);
-    float a2 = Vec2.cross(rB, axis);
+    float a1 = float2.cross(temp.set(d).add(rA), axis);
+    float a2 = float2.cross(rB, axis);
     Rot.mulToOutUnsafe(qA, m_localYAxisA, perp);
 
-    float s1 = Vec2.cross(temp.set(d).add(rA), perp);
-    float s2 = Vec2.cross(rB, perp);
+    float s1 = float2.cross(temp.set(d).add(rA), perp);
+    float s2 = float2.cross(rB, perp);
 
-    C1.x = Vec2.dot(perp, d);
+    C1.x = float2.dot(perp, d);
     C1.y = aB - aA - m_referenceAngle;
 
     float linearError = MathUtils.abs(C1.x);
@@ -709,7 +709,7 @@ public class PrismaticJoint extends Joint {
     boolean active = false;
     float C2 = 0.0f;
     if (m_enableLimit) {
-      float translation = Vec2.dot(axis, d);
+      float translation = float2.dot(axis, d);
       if (MathUtils.abs(m_upperTranslation - m_lowerTranslation) < 2.0f * Settings.linearSlop) {
         // Prevent large angular corrections
         C2 =
@@ -751,7 +751,7 @@ public class PrismaticJoint extends Joint {
       K.ey.set(k12, k22, k23);
       K.ez.set(k13, k23, k33);
 
-      final Vec3 C = pool.popVec3();
+      final float3 C = pool.popVec3();
       C.x = C1.x;
       C.y = C1.y;
       C.z = C2;

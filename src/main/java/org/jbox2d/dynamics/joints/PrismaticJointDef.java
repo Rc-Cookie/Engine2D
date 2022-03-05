@@ -23,7 +23,7 @@
  ******************************************************************************/
 package org.jbox2d.dynamics.joints;
 
-import com.github.rccookie.geometry.performance.Vec2;
+import com.github.rccookie.geometry.performance.float2;
 import org.jbox2d.dynamics.Body;
 
 /**
@@ -43,17 +43,17 @@ public class PrismaticJointDef extends JointDef {
   /**
    * The local anchor point relative to body1's origin.
    */
-  public final Vec2 localAnchorA;
+  public final float2 localAnchorA;
 
   /**
    * The local anchor point relative to body2's origin.
    */
-  public final Vec2 localAnchorB;
+  public final float2 localAnchorB;
 
   /**
    * The local translation axis in body1.
    */
-  public final Vec2 localAxisA;
+  public final float2 localAxisA;
 
   /**
    * The constrained angle between the bodies: body2_angle - body1_angle.
@@ -92,9 +92,9 @@ public class PrismaticJointDef extends JointDef {
 
   public PrismaticJointDef() {
     super(JointType.PRISMATIC);
-    localAnchorA = new Vec2();
-    localAnchorB = new Vec2();
-    localAxisA = new Vec2(1.0f, 0.0f);
+    localAnchorA = new float2();
+    localAnchorB = new float2();
+    localAxisA = new float2(1.0f, 0.0f);
     referenceAngle = 0.0f;
     enableLimit = false;
     lowerTranslation = 0.0f;
@@ -109,7 +109,7 @@ public class PrismaticJointDef extends JointDef {
    * Initialize the bodies, anchors, axis, and reference angle using the world anchor and world
    * axis.
    */
-  public void initialize(Body b1, Body b2, Vec2 anchor, Vec2 axis) {
+  public void initialize(Body b1, Body b2, float2 anchor, float2 axis) {
     bodyA = b1;
     bodyB = b2;
     bodyA.getLocalPointToOut(anchor, localAnchorA);

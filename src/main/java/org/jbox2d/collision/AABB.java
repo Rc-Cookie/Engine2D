@@ -23,7 +23,7 @@
  ******************************************************************************/
 package org.jbox2d.collision;
 
-import com.github.rccookie.geometry.performance.Vec2;
+import com.github.rccookie.geometry.performance.float2;
 
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Settings;
@@ -33,16 +33,16 @@ import org.jbox2d.pooling.normal.DefaultWorldPool;
 /** An axis-aligned bounding box. */
 public class AABB {
   /** Bottom left vertex of bounding box. */
-  public final Vec2 lowerBound;
+  public final float2 lowerBound;
   /** Top right vertex of bounding box. */
-  public final Vec2 upperBound;
+  public final float2 upperBound;
 
   /**
    * Creates the default object, with vertices at 0,0 and 0,0.
    */
   public AABB() {
-    lowerBound = new Vec2();
-    upperBound = new Vec2();
+    lowerBound = new float2();
+    upperBound = new float2();
   }
 
   /**
@@ -60,7 +60,7 @@ public class AABB {
    * @param lowerVertex the bottom left vertex of the bounding box
    * @param maxVertex the top right vertex of the bounding box
    */
-  public AABB(final Vec2 lowerVertex, final Vec2 upperVertex) {
+  public AABB(final float2 lowerVertex, final float2 upperVertex) {
     this.lowerBound = lowerVertex.clone(); // clone to be safe
     this.upperBound = upperVertex.clone();
   }
@@ -71,10 +71,10 @@ public class AABB {
    * @param aabb the object to copy from
    */
   public final void set(final AABB aabb) {
-    Vec2 v = aabb.lowerBound;
+    float2 v = aabb.lowerBound;
     lowerBound.x = v.x;
     lowerBound.y = v.y;
-    Vec2 v1 = aabb.upperBound;
+    float2 v1 = aabb.upperBound;
     upperBound.x = v1.x;
     upperBound.y = v1.y;
   }
@@ -97,14 +97,14 @@ public class AABB {
    * 
    * @return
    */
-  public final Vec2 getCenter() {
-    final Vec2 center = new Vec2(lowerBound);
+  public final float2 getCenter() {
+    final float2 center = new float2(lowerBound);
     center.add(upperBound);
     center.scale(.5f);
     return center;
   }
 
-  public final void getCenterToOut(final Vec2 out) {
+  public final void getCenterToOut(final float2 out) {
     out.x = (lowerBound.x + upperBound.x) * .5f;
     out.y = (lowerBound.y + upperBound.y) * .5f;
   }
@@ -114,19 +114,19 @@ public class AABB {
    * 
    * @return
    */
-  public final Vec2 getExtents() {
-    final Vec2 center = new Vec2(upperBound);
-    center.subtract(lowerBound);
+  public final float2 getExtents() {
+    final float2 center = new float2(upperBound);
+    center.sub(lowerBound);
     center.scale(.5f);
     return center;
   }
 
-  public final void getExtentsToOut(final Vec2 out) {
+  public final void getExtentsToOut(final float2 out) {
     out.x = (upperBound.x - lowerBound.x) * .5f;
     out.y = (upperBound.y - lowerBound.y) * .5f; // thanks FDN1
   }
 
-  public final void getVertices(Vec2[] argRay) {
+  public final void getVertices(float2[] argRay) {
     argRay[0].set(lowerBound);
     argRay[1].set(lowerBound);
     argRay[1].x += upperBound.x - lowerBound.x;
@@ -209,13 +209,13 @@ public class AABB {
     float tmin = -Float.MAX_VALUE;
     float tmax = Float.MAX_VALUE;
 
-    final Vec2 p = argPool.popVec2();
-    final Vec2 d = argPool.popVec2();
-    final Vec2 absD = argPool.popVec2();
-    final Vec2 normal = argPool.popVec2();
+    final float2 p = argPool.popVec2();
+    final float2 d = argPool.popVec2();
+    final float2 absD = argPool.popVec2();
+    final float2 normal = argPool.popVec2();
 
     p.set(input.p1);
-    d.set(input.p2).subtract(input.p1);
+    d.set(input.p2).sub(input.p1);
     absD.x = Math.abs(d.x);
     absD.y = Math.abs(d.y);
 

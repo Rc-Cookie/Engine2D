@@ -23,9 +23,9 @@
  ******************************************************************************/
 package org.jbox2d.dynamics.contacts;
 
-import com.github.rccookie.geometry.performance.Vec2;
+import com.github.rccookie.geometry.performance.float2;
 
 public class Position {
-  public final Vec2 c = new Vec2();
+  public final float2 c = new float2();
   public float a;
 }

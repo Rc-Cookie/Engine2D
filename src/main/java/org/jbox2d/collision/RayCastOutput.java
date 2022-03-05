@@ -23,7 +23,7 @@
  ******************************************************************************/
 package org.jbox2d.collision;
 
-import com.github.rccookie.geometry.performance.Vec2;
+import com.github.rccookie.geometry.performance.float2;
 
 // updated to rev 100
 /**
@@ -31,11 +31,11 @@ import com.github.rccookie.geometry.performance.Vec2;
  * come from b2RayCastInput.
  */
 public class RayCastOutput{
-	public final Vec2 normal;
+	public final float2 normal;
 	public float fraction;
 
 	public RayCastOutput(){
-		normal = new Vec2();
+		normal = new float2();
 		fraction = 0;
 	}
 

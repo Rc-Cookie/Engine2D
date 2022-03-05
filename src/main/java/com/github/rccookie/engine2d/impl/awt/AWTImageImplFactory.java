@@ -7,24 +7,27 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 
 import com.github.rccookie.engine2d.Color;
-import com.github.rccookie.engine2d.impl.ImageImpl;
 import com.github.rccookie.engine2d.impl.ImageImplFactory;
 import com.github.rccookie.engine2d.util.RuntimeIOException;
-import com.github.rccookie.geometry.performance.IVec2;
+import com.github.rccookie.geometry.performance.int2;
 
+/**
+ * Factory for {@link AWTImageImpl}s.
+ */
 public class AWTImageImplFactory implements ImageImplFactory {
+
     @Override
-    public ImageImpl createNew(IVec2 size) {
+    public AWTImageImpl createNew(int2 size) {
         return new AWTImageImpl(size);
     }
 
     @Override
-    public ImageImpl createNew(String file) throws RuntimeIOException {
+    public AWTImageImpl createNew(String file) throws RuntimeIOException {
         return new AWTImageImpl(file);
     }
 
     @Override
-    public ImageImpl createText(String text, int size, Color color) {
+    public AWTImageImpl createText(String text, int size, Color color) {
         String[] lines = text.split("\n");
         BufferedImage image = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = image.createGraphics();

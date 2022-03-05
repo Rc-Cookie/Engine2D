@@ -18,21 +18,50 @@ import com.github.rccookie.engine2d.Execute;
 import com.github.rccookie.engine2d.core.DrawObject;
 import com.github.rccookie.engine2d.impl.Display;
 import com.github.rccookie.engine2d.impl.DisplayController;
-import com.github.rccookie.geometry.performance.IVec2;
+import com.github.rccookie.geometry.performance.int2;
 
+/**
+ * AWT implementation of {@link Display} using a double-buffered JFrame.
+ */
 public class AWTDisplay extends JPanel implements Display {
 
+    /**
+     * The display controller.
+     */
     static DisplayController displayController;
+
+    /**
+     * Only one instance.
+     */
     static AWTDisplay INSTANCE;
 
+
+    /**
+     * The window containing the JPanel.
+     */
     final JFrame window;
 
-    private IVec2 resolution;
+    /**
+     * Currently set resulution.
+     */
+    private int2 resolution;
 
+
+    /**
+     * Draw objects for the next rendering pass.
+     */
     private DrawObject[] objects;
+    /**
+     * Background color for the next rendering pass.
+     */
     private Color background;
 
 
+    /**
+     * Creates a new AWTDisplay with the given window title.
+     *
+     * @param title The window title
+     */
     public AWTDisplay(String title) {
         window = new JFrame(title);
         window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -40,7 +69,7 @@ public class AWTDisplay extends JPanel implements Display {
         window.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
-                Application.getDisplayController().setResolution(new IVec2(window.getWidth() - 8, window.getHeight() - 39));
+                Application.getDisplayController().setResolution(new int2(window.getWidth() - 16, window.getHeight() - 39));
             }
         });
 
@@ -61,11 +90,11 @@ public class AWTDisplay extends JPanel implements Display {
     }
 
     @Override
-    public void setResolution(IVec2 resolution) {
+    public void setResolution(int2 resolution) {
         this.resolution = resolution;
         // Does not seem to have an impact even after a call to window.pack()
         setMinimumSize(new Dimension(resolution.x, resolution.y));
-        window.setSize(resolution.x + 8, resolution.y + 39);
+        window.setSize(resolution.x + 16, resolution.y + 39);
     }
 
     @Override
@@ -73,6 +102,11 @@ public class AWTDisplay extends JPanel implements Display {
         Execute.nextFrame(() -> window.setResizable(allowed));
     }
 
+    /**
+     * Draws the last set draw objects onto the buffer and sets the buffer.
+     *
+     * @param g1d The Graphics2D to draw onto
+     */
     @Override
     protected void paintComponent(Graphics g1d) {
         super.paintComponent(g1d);
@@ -98,7 +132,7 @@ public class AWTDisplay extends JPanel implements Display {
             AffineTransform oldTransform = null;
 
             BufferedImage oImage = ((AWTImageImpl) o.image).image;
-            IVec2 drawPos = o.screenLocation.subtracted(new IVec2(oImage.getWidth() / 2, oImage.getHeight() / 2));
+            int2 drawPos = o.screenLocation.subed(new int2(oImage.getWidth() / 2, oImage.getHeight() / 2));
             if(o.rotation != 0) {
                 oldTransform = g.getTransform();
                 g.rotate(Math.toRadians(o.rotation), o.screenLocation.x, o.screenLocation.y);
@@ -110,5 +144,8 @@ public class AWTDisplay extends JPanel implements Display {
         }
     }
 
+    /**
+     * For class initialization.
+     */
     static void init() { }
 }

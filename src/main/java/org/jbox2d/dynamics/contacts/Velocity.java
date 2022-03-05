@@ -23,9 +23,9 @@
  ******************************************************************************/
 package org.jbox2d.dynamics.contacts;
 
-import com.github.rccookie.geometry.performance.Vec2;
+import com.github.rccookie.geometry.performance.float2;
 
 public class Velocity {
-  public final Vec2 v = new Vec2();
+  public final float2 v = new float2();
   public float w;
 }

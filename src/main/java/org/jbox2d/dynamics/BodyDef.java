@@ -23,7 +23,7 @@
  ******************************************************************************/
 package org.jbox2d.dynamics;
 
-import com.github.rccookie.geometry.performance.Vec2;
+import com.github.rccookie.geometry.performance.float2;
 
 /**
  * A body definition holds all the data needed to construct a rigid body. You can safely re-use body
@@ -48,7 +48,7 @@ public class BodyDef {
    * The world position of the body. Avoid creating bodies at the origin since this can lead to many
    * overlapping shapes.
    */
-  public Vec2 position;
+  public float2 position;
 
   /**
    * The world angle of the body in radians.
@@ -58,7 +58,7 @@ public class BodyDef {
   /**
    * The linear velocity of the body in world co-ordinates.
    */
-  public Vec2 linearVelocity;
+  public float2 linearVelocity;
 
   /**
    * The angular velocity of the body.
@@ -116,9 +116,9 @@ public class BodyDef {
 
   public BodyDef() {
     userData = null;
-    position = new Vec2();
+    position = new float2();
     angle = 0f;
-    linearVelocity = new Vec2();
+    linearVelocity = new float2();
     angularVelocity = 0f;
     linearDamping = 0f;
     angularDamping = 0f;
@@ -165,7 +165,7 @@ public class BodyDef {
    * The world position of the body. Avoid creating bodies at the origin since this can lead to many
    * overlapping shapes.
    */
-  public Vec2 getPosition() {
+  public float2 getPosition() {
     return position;
   }
 
@@ -173,7 +173,7 @@ public class BodyDef {
    * The world position of the body. Avoid creating bodies at the origin since this can lead to many
    * overlapping shapes.
    */
-  public void setPosition(Vec2 position) {
+  public void setPosition(float2 position) {
     this.position = position;
   }
 
@@ -194,14 +194,14 @@ public class BodyDef {
   /**
    * The linear velocity of the body in world co-ordinates.
    */
-  public Vec2 getLinearVelocity() {
+  public float2 getLinearVelocity() {
     return linearVelocity;
   }
 
   /**
    * The linear velocity of the body in world co-ordinates.
    */
-  public void setLinearVelocity(Vec2 linearVelocity) {
+  public void setLinearVelocity(float2 linearVelocity) {
     this.linearVelocity = linearVelocity;
   }
 

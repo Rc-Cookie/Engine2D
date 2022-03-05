@@ -23,19 +23,19 @@
  ******************************************************************************/
 package org.jbox2d.collision;
 
-import com.github.rccookie.geometry.performance.Vec2;
+import com.github.rccookie.geometry.performance.float2;
 
 // updated to rev 100
 /**
  * Ray-cast input data. The ray extends from p1 to p1 + maxFraction * (p2 - p1).
  */
 public class RayCastInput{
-	public final Vec2 p1, p2;
+	public final float2 p1, p2;
 	public float maxFraction;
 
 	public RayCastInput(){
-		p1 = new Vec2();
-		p2 = new Vec2();
+		p1 = new float2();
+		p2 = new float2();
 		maxFraction = 0;
 	}
 

@@ -1,6 +1,6 @@
 package org.jbox2d.particle;
 
-import com.github.rccookie.geometry.performance.Vec2;
+import com.github.rccookie.geometry.performance.float2;
 
 public class ParticleDef {
   /**
@@ -11,10 +11,10 @@ public class ParticleDef {
   int flags;
 
   /** The world position of the particle. */
-  public final Vec2 position = new Vec2();
+  public final float2 position = new float2();
 
   /** The linear velocity of the particle in world co-ordinates. */
-  public final Vec2 velocity = new Vec2();
+  public final float2 velocity = new float2();
 
   /** The color of the particle. */
   public ParticleColor color;

@@ -31,7 +31,7 @@ import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Rot;
 import org.jbox2d.common.Settings;
-import com.github.rccookie.geometry.performance.Vec2;
+import com.github.rccookie.geometry.performance.float2;
 import org.jbox2d.common.Transform;
 
 // updated to rev 100
@@ -52,9 +52,9 @@ public class Distance {
    * GJK using Voronoi regions (Christer Ericson) and Barycentric coordinates.
    */
   private class SimplexVertex {
-    public final Vec2 wA = new Vec2(); // support point in shapeA
-    public final Vec2 wB = new Vec2(); // support point in shapeB
-    public final Vec2 w = new Vec2(); // wB - wA
+    public final float2 wA = new float2(); // support point in shapeA
+    public final float2 wB = new float2(); // support point in shapeB
+    public final float2 w = new float2(); // wB - wA
     public float a; // barycentric coordinate for closest point
     public int indexA; // wA index
     public int indexB; // wB index
@@ -120,11 +120,11 @@ public class Distance {
         SimplexVertex v = vertices[i];
         v.indexA = cache.indexA[i];
         v.indexB = cache.indexB[i];
-        Vec2 wALocal = proxyA.getVertex(v.indexA);
-        Vec2 wBLocal = proxyB.getVertex(v.indexB);
+        float2 wALocal = proxyA.getVertex(v.indexA);
+        float2 wBLocal = proxyB.getVertex(v.indexB);
         Transform.mulToOutUnsafe(transformA, wALocal, v.wA);
         Transform.mulToOutUnsafe(transformB, wBLocal, v.wB);
-        v.w.set(v.wB).subtract(v.wA);
+        v.w.set(v.wB).sub(v.wA);
         v.a = 0.0f;
       }
 
@@ -144,11 +144,11 @@ public class Distance {
         SimplexVertex v = vertices[0];
         v.indexA = 0;
         v.indexB = 0;
-        Vec2 wALocal = proxyA.getVertex(0);
-        Vec2 wBLocal = proxyB.getVertex(0);
+        float2 wALocal = proxyA.getVertex(0);
+        float2 wBLocal = proxyB.getVertex(0);
         Transform.mulToOutUnsafe(transformA, wALocal, v.wA);
         Transform.mulToOutUnsafe(transformB, wBLocal, v.wB);
-        v.w.set(v.wB).subtract(v.wA);
+        v.w.set(v.wB).sub(v.wA);
         m_count = 1;
       }
     }
@@ -163,26 +163,26 @@ public class Distance {
       }
     }
 
-    private final Vec2 e12 = new Vec2();
+    private final float2 e12 = new float2();
 
-    public final void getSearchDirection(final Vec2 out) {
+    public final void getSearchDirection(final float2 out) {
       switch (m_count) {
         case 1:
           out.set(m_v1.w).negate();
           return;
         case 2:
-          e12.set(m_v2.w).subtract(m_v1.w);
+          e12.set(m_v2.w).sub(m_v1.w);
           // use out for a temp variable real quick
           out.set(m_v1.w).negate();
-          float sgn = Vec2.cross(e12, out);
+          float sgn = float2.cross(e12, out);
 
           if (sgn > 0f) {
             // Origin is left of e12.
-            Vec2.cross(1f, e12, out);
+            float2.cross(1f, e12, out);
             return;
           } else {
             // Origin is right of e12.
-            Vec2.cross(e12, 1f, out);
+            float2.cross(e12, 1f, out);
             return;
           }
         default:
@@ -193,15 +193,15 @@ public class Distance {
     }
 
     // djm pooled
-    private final Vec2 case2 = new Vec2();
-    private final Vec2 case22 = new Vec2();
+    private final float2 case2 = new float2();
+    private final float2 case22 = new float2();
 
     /**
      * this returns pooled objects. don't keep or modify them
      * 
      * @return
      */
-    public void getClosestPoint(final Vec2 out) {
+    public void getClosestPoint(final float2 out) {
       switch (m_count) {
         case 0:
           assert (false);
@@ -226,10 +226,10 @@ public class Distance {
     }
 
     // djm pooled, and from above
-    private final Vec2 case3 = new Vec2();
-    private final Vec2 case33 = new Vec2();
+    private final float2 case3 = new float2();
+    private final float2 case33 = new float2();
 
-    public void getWitnessPoints(Vec2 pA, Vec2 pB) {
+    public void getWitnessPoints(float2 pA, float2 pB) {
       switch (m_count) {
         case 0:
           assert (false);
@@ -280,10 +280,10 @@ public class Distance {
           return MathUtils.distance(m_v1.w, m_v2.w);
 
         case 3:
-          case3.set(m_v2.w).subtract(m_v1.w);
-          case33.set(m_v3.w).subtract(m_v1.w);
+          case3.set(m_v2.w).sub(m_v1.w);
+          case33.set(m_v3.w).sub(m_v1.w);
           // return Vec2.cross(m_v2.w - m_v1.w, m_v3.w - m_v1.w);
-          return Vec2.cross(case3, case33);
+          return float2.cross(case3, case33);
 
         default:
           assert (false);
@@ -319,12 +319,12 @@ public class Distance {
       // Solution
       // a1 = d12_1 / d12
       // a2 = d12_2 / d12
-      final Vec2 w1 = m_v1.w;
-      final Vec2 w2 = m_v2.w;
-      e12.set(w2).subtract(w1);
+      final float2 w1 = m_v1.w;
+      final float2 w2 = m_v2.w;
+      e12.set(w2).sub(w1);
 
       // w1 region
-      float d12_2 = -Vec2.dot(w1, e12);
+      float d12_2 = -float2.dot(w1, e12);
       if (d12_2 <= 0.0f) {
         // a2 <= 0, so we clamp it to 0
         m_v1.a = 1.0f;
@@ -333,7 +333,7 @@ public class Distance {
       }
 
       // w2 region
-      float d12_1 = Vec2.dot(w2, e12);
+      float d12_1 = float2.dot(w2, e12);
       if (d12_1 <= 0.0f) {
         // a1 <= 0, so we clamp it to 0
         m_v2.a = 1.0f;
@@ -350,11 +350,11 @@ public class Distance {
     }
 
     // djm pooled, and from above
-    private final Vec2 e13 = new Vec2();
-    private final Vec2 e23 = new Vec2();
-    private final Vec2 w1 = new Vec2();
-    private final Vec2 w2 = new Vec2();
-    private final Vec2 w3 = new Vec2();
+    private final float2 e13 = new float2();
+    private final float2 e23 = new float2();
+    private final float2 w1 = new float2();
+    private final float2 w2 = new float2();
+    private final float2 w3 = new float2();
 
     /**
      * Solve a line segment using barycentric coordinates.<br/>
@@ -373,9 +373,9 @@ public class Distance {
       // [1 1 ][a1] = [1]
       // [w1.e12 w2.e12][a2] = [0]
       // a3 = 0
-      e12.set(w2).subtract(w1);
-      float w1e12 = Vec2.dot(w1, e12);
-      float w2e12 = Vec2.dot(w2, e12);
+      e12.set(w2).sub(w1);
+      float w1e12 = float2.dot(w1, e12);
+      float w2e12 = float2.dot(w2, e12);
       float d12_1 = w2e12;
       float d12_2 = -w1e12;
 
@@ -383,9 +383,9 @@ public class Distance {
       // [1 1 ][a1] = [1]
       // [w1.e13 w3.e13][a3] = [0]
       // a2 = 0
-      e13.set(w3).subtract(w1);
-      float w1e13 = Vec2.dot(w1, e13);
-      float w3e13 = Vec2.dot(w3, e13);
+      e13.set(w3).sub(w1);
+      float w1e13 = float2.dot(w1, e13);
+      float w3e13 = float2.dot(w3, e13);
       float d13_1 = w3e13;
       float d13_2 = -w1e13;
 
@@ -393,18 +393,18 @@ public class Distance {
       // [1 1 ][a2] = [1]
       // [w2.e23 w3.e23][a3] = [0]
       // a1 = 0
-      e23.set(w3).subtract(w2);
-      float w2e23 = Vec2.dot(w2, e23);
-      float w3e23 = Vec2.dot(w3, e23);
+      e23.set(w3).sub(w2);
+      float w2e23 = float2.dot(w2, e23);
+      float w3e23 = float2.dot(w3, e23);
       float d23_1 = w3e23;
       float d23_2 = -w2e23;
 
       // Triangle123
-      float n123 = Vec2.cross(e12, e13);
+      float n123 = float2.cross(e12, e13);
 
-      float d123_1 = n123 * Vec2.cross(w2, w3);
-      float d123_2 = n123 * Vec2.cross(w3, w1);
-      float d123_3 = n123 * Vec2.cross(w1, w2);
+      float d123_1 = n123 * float2.cross(w2, w3);
+      float d123_2 = n123 * float2.cross(w3, w1);
+      float d123_3 = n123 * float2.cross(w1, w2);
 
       // w1 region
       if (d12_2 <= 0.0f && d13_2 <= 0.0f) {
@@ -474,17 +474,17 @@ public class Distance {
    * @author daniel
    */
   public static class DistanceProxy {
-    public final Vec2[] m_vertices;
+    public final float2[] m_vertices;
     public int m_count;
     public float m_radius;
-    public final Vec2[] m_buffer;
+    public final float2[] m_buffer;
 
     public DistanceProxy() {
-      m_vertices = new Vec2[Settings.maxPolygonVertices];
+      m_vertices = new float2[Settings.maxPolygonVertices];
       for (int i = 0; i < m_vertices.length; i++) {
-        m_vertices[i] = new Vec2();
+        m_vertices[i] = new float2();
       }
-      m_buffer = new Vec2[2];
+      m_buffer = new float2[2];
       m_count = 0;
       m_radius = 0f;
     }
@@ -544,11 +544,11 @@ public class Distance {
      * @param d
      * @return
      */
-    public final int getSupport(final Vec2 d) {
+    public final int getSupport(final float2 d) {
       int bestIndex = 0;
-      float bestValue = Vec2.dot(m_vertices[0], d);
+      float bestValue = float2.dot(m_vertices[0], d);
       for (int i = 1; i < m_count; i++) {
-        float value = Vec2.dot(m_vertices[i], d);
+        float value = float2.dot(m_vertices[i], d);
         if (value > bestValue) {
           bestIndex = i;
           bestValue = value;
@@ -564,11 +564,11 @@ public class Distance {
      * @param d
      * @return
      */
-    public final Vec2 getSupportVertex(final Vec2 d) {
+    public final float2 getSupportVertex(final float2 d) {
       int bestIndex = 0;
-      float bestValue = Vec2.dot(m_vertices[0], d);
+      float bestValue = float2.dot(m_vertices[0], d);
       for (int i = 1; i < m_count; i++) {
-        float value = Vec2.dot(m_vertices[i], d);
+        float value = float2.dot(m_vertices[i], d);
         if (value > bestValue) {
           bestIndex = i;
           bestValue = value;
@@ -593,7 +593,7 @@ public class Distance {
      * @param index
      * @return
      */
-    public final Vec2 getVertex(int index) {
+    public final float2 getVertex(int index) {
       assert (0 <= index && index < m_count);
       return m_vertices[index];
     }
@@ -602,10 +602,10 @@ public class Distance {
   private Simplex simplex = new Simplex();
   private int[] saveA = new int[3];
   private int[] saveB = new int[3];
-  private Vec2 closestPoint = new Vec2();
-  private Vec2 d = new Vec2();
-  private Vec2 temp = new Vec2();
-  private Vec2 normal = new Vec2();
+  private float2 closestPoint = new float2();
+  private float2 d = new float2();
+  private float2 temp = new float2();
+  private float2 normal = new float2();
 
   /**
    * Compute the closest points between two shapes. Supports any combination of: CircleShape and
@@ -711,7 +711,7 @@ public class Distance {
       Rot.mulTransUnsafe(transformB.q, d.negate(), temp);
       vertex.indexB = proxyB.getSupport(temp);
       Transform.mulToOutUnsafe(transformB, proxyB.getVertex(vertex.indexB), vertex.wB);
-      vertex.w.set(vertex.wB).subtract(vertex.wA);
+      vertex.w.set(vertex.wB).sub(vertex.wA);
 
       // Iteration count is equated to the number of support point calls.
       ++iter;
@@ -754,12 +754,12 @@ public class Distance {
         // Shapes are still no overlapped.
         // Move the witness points to the outer surface.
         output.distance -= rA + rB;
-        normal.set(output.pointB).subtract(output.pointA);
+        normal.set(output.pointB).sub(output.pointA);
         normal.norm();
         temp.set(normal).scale(rA);
         output.pointA.add(temp);
         temp.set(normal).scale(rB);
-        output.pointB.subtract(temp);
+        output.pointB.sub(temp);
       } else {
         // Shapes are overlapped when radii are considered.
         // Move the witness points to the middle.

@@ -31,7 +31,7 @@ import org.jbox2d.callbacks.TreeCallback;
 import org.jbox2d.callbacks.TreeRayCastCallback;
 import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.RayCastInput;
-import com.github.rccookie.geometry.performance.Vec2;
+import com.github.rccookie.geometry.performance.float2;
 
 /**
  * The broad-phase is used for computing pairs and performing volume queries and ray casts. This
@@ -90,7 +90,7 @@ public class DefaultBroadPhaseBuffer implements TreeCallback, BroadPhase {
   }
 
   @Override
-  public final void moveProxy(int proxyId, final AABB aabb, final Vec2 displacement) {
+  public final void moveProxy(int proxyId, final AABB aabb, final float2 displacement) {
     boolean buffer = m_tree.moveProxy(proxyId, aabb, displacement);
     if (buffer) {
       bufferMove(proxyId);

@@ -23,7 +23,7 @@
  ******************************************************************************/
 package org.jbox2d.common;
 
-import com.github.rccookie.geometry.performance.Vec2;
+import com.github.rccookie.geometry.performance.float2;
 
 /**
  * Orientated bounding box viewport transform
@@ -34,8 +34,8 @@ public class OBBViewportTransform implements IViewportTransform {
 
   public static class OBB {
     public final Mat22 R = new Mat22();
-    public final Vec2 center = new Vec2();
-    public final Vec2 extents = new Vec2();
+    public final float2 center = new float2();
+    public final float2 extents = new float2();
   }
 
   protected final OBB box = new OBB();
@@ -58,7 +58,7 @@ public class OBBViewportTransform implements IViewportTransform {
     Mat22.createScaleTransform(scale, box.R);
   }
 
-  public Vec2 getExtents() {
+  public float2 getExtents() {
     return box.extents;
   }
   
@@ -67,7 +67,7 @@ public class OBBViewportTransform implements IViewportTransform {
     return box.R;
   }
 
-  public void setExtents(Vec2 argExtents) {
+  public void setExtents(float2 argExtents) {
     box.extents.set(argExtents);
   }
 
@@ -75,11 +75,11 @@ public class OBBViewportTransform implements IViewportTransform {
     box.extents.set(halfWidth, halfHeight);
   }
 
-  public Vec2 getCenter() {
+  public float2 getCenter() {
     return box.center;
   }
 
-  public void setCenter(Vec2 argPos) {
+  public void setCenter(float2 argPos) {
     box.center.set(argPos);
   }
 
@@ -119,7 +119,7 @@ public class OBBViewportTransform implements IViewportTransform {
 
   private final Mat22 inv = new Mat22();
 
-  public void getScreenVectorToWorld(Vec2 screen, Vec2 world) {
+  public void getScreenVectorToWorld(float2 screen, float2 world) {
     box.R.invertToOut(inv);
     inv.mulToOut(screen, world);
     if (yFlip) {
@@ -127,14 +127,14 @@ public class OBBViewportTransform implements IViewportTransform {
     }
   }
 
-  public void getWorldVectorToScreen(Vec2 world, Vec2 screen) {
+  public void getWorldVectorToScreen(float2 world, float2 screen) {
     box.R.mulToOut(world, screen);
     if (yFlip) {
       yFlipMat.mulToOut(screen, screen);
     }
   }
 
-  public void getWorldToScreen(Vec2 world, Vec2 screen) {
+  public void getWorldToScreen(float2 world, float2 screen) {
     screen.x = world.x - box.center.x;
     screen.y = world.y - box.center.y;
     box.R.mulToOut(screen, screen);
@@ -147,7 +147,7 @@ public class OBBViewportTransform implements IViewportTransform {
 
   private final Mat22 inv2 = new Mat22();
 
-  public void getScreenToWorld(Vec2 screen, Vec2 world) {
+  public void getScreenToWorld(float2 screen, float2 world) {
     world.x = screen.x - box.extents.x;
     world.y = screen.y - box.extents.y;
     if (yFlip) {

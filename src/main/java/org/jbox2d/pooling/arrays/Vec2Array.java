@@ -25,7 +25,7 @@ package org.jbox2d.pooling.arrays;
 
 import java.util.HashMap;
 
-import com.github.rccookie.geometry.performance.Vec2;
+import com.github.rccookie.geometry.performance.float2;
 
 /**
  * not thread safe Vec2[] pool
@@ -34,9 +34,9 @@ import com.github.rccookie.geometry.performance.Vec2;
  */
 public class Vec2Array {
 
-	private final HashMap<Integer, Vec2[]> map = new HashMap<Integer, Vec2[]>();
+	private final HashMap<Integer, float2[]> map = new HashMap<Integer, float2[]>();
 	
-	public Vec2[] get(int argLength){
+	public float2[] get(int argLength){
 		assert(argLength > 0);
 		
 		if(!map.containsKey(argLength)){
@@ -47,10 +47,10 @@ public class Vec2Array {
 		return map.get(argLength);
 	}
 	
-	protected Vec2[] getInitializedArray(int argLength){
-		final Vec2[] ray = new Vec2[argLength];
+	protected float2[] getInitializedArray(int argLength){
+		final float2[] ray = new float2[argLength];
 		for (int i = 0; i < ray.length; i++) {
-			ray[i] = new Vec2();
+			ray[i] = new float2();
 		}
 		return ray;
 	}

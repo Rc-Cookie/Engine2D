@@ -23,7 +23,7 @@
  ******************************************************************************/
 package org.jbox2d.collision;
 
-import com.github.rccookie.geometry.performance.Vec2;
+import com.github.rccookie.geometry.performance.float2;
 
 /**
  * Output for Distance.
@@ -31,10 +31,10 @@ import com.github.rccookie.geometry.performance.Vec2;
  */
 public class DistanceOutput {
 	/** Closest point on shapeA */
-	public final Vec2 pointA = new Vec2();
+	public final float2 pointA = new float2();
 	
 	/** Closest point on shapeB */
-	public final Vec2 pointB = new Vec2();
+	public final float2 pointB = new float2();
 	
 	public float distance;
 	

@@ -11,48 +11,143 @@ import com.github.rccookie.engine2d.impl.Display;
 import com.github.rccookie.engine2d.util.NamedCaughtEvent;
 import com.github.rccookie.engine2d.util.Pool;
 import com.github.rccookie.event.Event;
-import com.github.rccookie.geometry.performance.IVec2;
-import com.github.rccookie.geometry.performance.Vec2;
+import com.github.rccookie.geometry.performance.int2;
+import com.github.rccookie.geometry.performance.float2;
 import com.github.rccookie.util.ArgumentOutOfRangeException;
 import com.github.rccookie.util.Arguments;
 import com.github.rccookie.util.Console;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+/**
+ * The camera is responsible for rendering the image of the application window.
+ * There can always be only one camera active at a time, which can be obtained
+ * using {@link #getActive()}. The first camera created will automatically set
+ * itself as the active camera, other cameras will have to be set as active
+ * manually. Only the active camera gets rendered, so there is no performance
+ * penalty for having multiple cameras at the same time. If no camera is active
+ * a suitable replacement will render an error message.
+ *
+ * <p>A camera can render up to two things: a {@link Map}, and a ui tree starting
+ * at an instance of {@link UI}. UI is always rendered on top of the map. UI and
+ * map can also be used with each other; the camera can also just render one of
+ * them. The camera is not attached to a map directly, but rather to a {@link GameObject},
+ * and the camera will render the map the gameobject is on at the position and
+ * rotation of that gameobject.</p>
+ *
+ * <p>The camera is also responsible for executing the update loop, or rather,
+ * it determines which objects get updated. The update loop will only run on the
+ * active camera, the map and the map's gameobjects that the camera is attached
+ * to, and the camera's ui tree.</p>
+ */
 public class Camera {
 
     static {
         Application.checkSetup();
     }
 
+    /**
+     * Whether the next camera is the first camera.
+     */
     static boolean first = true;
+
+    /**
+     * The currently active camera, or {@link NoCameraCamera#INSTANCE}.
+     */
     @SuppressWarnings("StaticInitializerReferencesSubClass")
+    @NotNull
     private static Camera active = NoCameraCamera.INSTANCE;
 
+    /**
+     * Whether external resizing (i.e. by dragging the window edges) is
+     * allowed.
+     */
     static boolean allowsExternalResizing = true;
 
 
+    /**
+     * The output target of the application.
+     */
     static final Display DISPLAY = Application.getImplementation().getDisplay();
 
+    /**
+     * The gameobject the camera is attached to. May be null.
+     */
     private GameObject gameObject = null;
+
+    /**
+     * The ui of the camera. May be null.
+     */
     private UI ui = null;
-    final IVec2 resolution = IVec2.ZERO.clone();
-    final Vec2 halfResolution = Vec2.ZERO.clone();
+
+    /**
+     * The camera's resolution, in other words, the resolution of
+     * the output display.
+     */
+    final int2 resolution = int2.ZERO.clone();
+
+    /**
+     * Half of {@link #resolution}.
+     */
+    final float2 halfResolution = float2.ZERO.clone();
+
+    /**
+     * Rendering background color.
+     */
     private Color backgroundColor = Color.WHITE;
 
+
+    /**
+     * Pool of reusable draw objects.
+     */
     private final Pool<DrawObject> drawObjectPool = new Pool<>(DrawObject::new);
+
+    /**
+     * Draw objects for the current frame.
+     */
     final List<DrawObject> drawObjects = new ArrayList<>();
+
+
+    /**
+     * Performance stats (milliseconds).
+     */
     long updateDuration = 0, physicsDuration = 0, uiUpdateDuration = 0;
-    long renderPrepDuration = 0;
-    long renderDuration = 0;
+
+    /**
+     * Performance stats (milliseconds).
+     */
+    long renderPrepDuration = 0, renderDuration = 0;
+
+    /**
+     * Number of objects on the screen / potentially on the screen.
+     */
     int drawCount = 0;
 
+
+    /**
+     * Main update event of the camera.
+     */
     public final Event update = new NamedCaughtEvent(false, () -> "Camera.update on " + this);
 
+    /**
+     * Local input only active when the camera is.
+     */
     public final LocalInputManager input = new LocalInputManager.Impl(update, this::isActive);
+
+    /**
+     * Local executor only active when the camera is.
+     */
     public final LocalExecutionManager execute = new LocalExecutionManager(this::isActive);
 
 
 
-    public Camera(IVec2 resolution) {
+    /**
+     * Creates a new camera with the given resolution.
+     *
+     * @param resolution The render output resolution
+     */
+    public Camera(int2 resolution) {
         Application.checkSetup();
 
         update.add(this::update);
@@ -71,11 +166,28 @@ public class Camera {
         }
     }
 
-    public void setResolution(IVec2 resolution) {
+    /**
+     * Creates a new camera with the given resolution.
+     *
+     * @param width Output resolution width, in pixels
+     * @param height Output resolution height, in pixels
+     */
+    public Camera(int width, int height) {
+        this(new int2(width, height));
+    }
+
+
+
+    /**
+     * Sets the output resolution of this camera.
+     *
+     * @param resolution The resolution to set
+     */
+    public void setResolution(int2 resolution) {
+        Arguments.checkNull(resolution, "resolution");
         if(this.resolution.equals(resolution)) return;
-        Arguments.checkNull(resolution);
-        if(resolution.x < 0 || resolution.y < 0)
-            throw new ArgumentOutOfRangeException();
+        if(resolution.x <= 0 || resolution.y <= 0)
+            throw new ArgumentOutOfRangeException("Non-positive resolution");
 
         Execute.nextFrame(() -> {
             if(active != this) return;
@@ -84,66 +196,155 @@ public class Camera {
             this.resolution.set(resolution);
             this.halfResolution.set(resolution.x * 0.5f, resolution.y * 0.5f);
             DISPLAY.setResolution(resolution);
+            if(ui != null)
+                ui.onParentSizeChange.invoke(resolution);
         });
     }
 
-    public IVec2 getResolution() {
+    /**
+     * Returns the camera's current output resolution.
+     *
+     * @return The camera's resolution
+     */
+    public int2 getResolution() {
         return resolution;
     }
 
+    /**
+     * Returns whether the application supports external resizing (i.e. dragging
+     * edges of the window).
+     *
+     * @return Whether external resizing is possible
+     */
     public static boolean allowsExternalResizing() {
         return allowsExternalResizing;
     }
 
+    /**
+     * Sets whether external resizing should be allowed. Note that depending on
+     * the underlying implementation may not be possible regardless of the used
+     * setting.
+     *
+     * @param allowExternalResizing Whether to allow external resizing
+     */
     public static void setAllowExternalResizing(boolean allowExternalResizing) {
         if(allowsExternalResizing == allowExternalResizing) return;
         allowsExternalResizing = allowExternalResizing;
         DISPLAY.allowResizingChanged(allowsExternalResizing);
     }
 
+    /**
+     * Returns the rendering background color.
+     *
+     * @return The rendering background
+     */
     public Color getBackgroundColor() {
         return backgroundColor;
     }
 
+    /**
+     * Sets the rendering background color
+     *
+     * @param backgroundColor The color to set
+     */
     public void setBackgroundColor(Color backgroundColor) {
         this.backgroundColor = Arguments.checkNull(backgroundColor);
     }
 
+    /**
+     * Returns the gameobject the camera is currently attached to. {@code null}
+     * indicates that the camera is not attached to any gameobject.
+     *
+     * @return The gameobject of the camera
+     */
     public GameObject getGameObject() {
         return gameObject;
     }
 
+    /**
+     * Returns the map the camera is currently rendering, or {@code null} if
+     * the camera is either not attached to a gameobject or the gameobject
+     * is not on a map.
+     *
+     * @return The map the camera is rendering
+     */
     public Map getMap() {
         return gameObject != null ? gameObject.map : null;
     }
 
-    public void setGameObject(GameObject gameObject) {
+    /**
+     * Returns the map the camera is currently rendering, cast to the given
+     * type.
+     *
+     * @param type The type of map to cast to
+     * @return The map the camera is rendering
+     */
+    public <M> M getMap(Class<M> type) {
+        return gameObject != null ? type.cast(gameObject.map) : null;
+    }
+
+    /**
+     * Sets the gameobject that the camera is attached to. {@code null}
+     * detaches the camera from any gameobject.
+     *
+     * @param gameObject The gameobject to attach to
+     */
+    public void setGameObject(@Nullable GameObject gameObject) {
         this.gameObject = gameObject;
     }
 
-    public IVec2 pointToPixel(Vec2 location) {
+    /**
+     * Converts the given map-location to the nearest pixel on the screen.
+     *
+     * @param point The point to convert
+     * @return The pixel closest to that point
+     */
+    public int2 pointToPixel(float2 point) {
         if(gameObject == null || gameObject.map == null)
-            throw new IllegalStateException();
-        return location.added(halfResolution).subtracted(gameObject.location).rotateAround(halfResolution, -gameObject.angle).toI();
+            throw new IllegalStateException("Cannot convert from map location because the camera is not rendering a map");
+        return point.added(halfResolution).subed(gameObject.location).rotateAround(halfResolution, -gameObject.angle).toI();
     }
 
-    public Vec2 pixelToPoint(IVec2 pixel) {
+    /**
+     * Converts the given pixel to map coordinates.
+     *
+     * @param pixel The pixel to convert
+     * @return The point under the pixel
+     */
+    public float2 pixelToPoint(int2 pixel) {
         if(gameObject == null || gameObject.map == null)
-            throw new IllegalStateException();
-        return pixel.toF().rotateAround(halfResolution, gameObject.angle).add(gameObject.location).subtract(halfResolution);
+            throw new IllegalStateException("Cannot convert to map location because the camera is not rendering a map");
+        return pixel.toF().rotateAround(halfResolution, gameObject.angle).add(gameObject.location).sub(halfResolution);
     }
 
+    /**
+     * Returns the ui of this camera. {@code null} indicates that this camera currently
+     * has no ui.
+     *
+     * @return The camera's ui
+     */
     public UI getUI() {
         return ui;
     }
 
-    public void setUI(UI ui) {
+    /**
+     * Sets the ui of this camera. {@code null} will remove any ui.
+     *
+     * @param ui The ui to set
+     */
+    public void setUI(@Nullable UI ui) {
         if(this.ui == ui) return;
         if(this.ui != null) this.ui.camera = null;
         this.ui = ui;
-        if(ui != null) ui.camera = this;
+        if(ui != null) {
+            ui.camera = this;
+            ui.modified(); // for potentially setting the background color
+        }
     }
 
+    /**
+     * Calls update on map and ui, if present.
+     */
     protected void update() {
         if(gameObject != null && gameObject.map != null) {
             gameObject.map.update();
@@ -159,7 +360,11 @@ public class Camera {
     }
 
     /**
-     * Should be called only from the update thread.
+     * Prepares rendering the current state of map and ui by saving its current state.
+     *
+     * <p>This is an internal method. It should be called from the update thread only.</p>
+     *
+     * @return The time the preparation took, in milliseconds
      */
     public long prepareRender() {
 
@@ -169,7 +374,7 @@ public class Camera {
 
         if(gameObject != null && gameObject.map != null) {
             // Filter out objects with images that may be on the screen
-            Vec2 loc = gameObject.location;
+            float2 loc = gameObject.location;
             gameObjects = gameObject.map.paintOrderObjects.stream()
                     .filter(o -> {
                         Image image = o.getImage();
@@ -179,7 +384,7 @@ public class Camera {
                         // Simple circle collision detection
                         float w = image.size.x / 2f + halfResolution.x, h = image.size.y / 2f + halfResolution.y;
                         float maxSqrDistance = w * w + h * h;
-                        float sqrDistance = Vec2.sqrDist(loc, o.location);
+                        float sqrDistance = float2.sqrDist(loc, o.location);
 
                         return sqrDistance < maxSqrDistance;
                     }).toArray(GameObject[]::new);
@@ -207,7 +412,7 @@ public class Camera {
                     drawObjects.add(drawObjectPool.get());
 
             if(gameObject != null && gameObject.map != null) {
-                Vec2 screenOffset = halfResolution.subtracted(gameObject.location);
+                float2 screenOffset = halfResolution.subed(gameObject.location);
 
                 // Set a draw object for each gameobject (draw first -> below UI)
                 for (int i = 0; i < gameObjects.length; i++) {
@@ -252,6 +457,8 @@ public class Camera {
      * Renders the last prepared state of the camera. The state has to
      * be prepared previously using {@link #prepareRender()}. May be called from
      * any thread at any time.
+     *
+     * @return The time the rendering took, in milliseconds
      */
     public long render() {
 
@@ -275,12 +482,22 @@ public class Camera {
 
 
 
+    /**
+     * Returns the number of objects on the screen / potentially on the screen
+     * from the last frame.
+     *
+     * @return The current number of drawn objects
+     */
     public int getDrawCount() {
         synchronized (drawObjects) {
             return drawObjects.size();
         }
     }
 
+    /**
+     * Returns the draw pool size.
+     * @return
+     */
     int getPoolSize() {
         synchronized (drawObjects) {
             return drawObjectPool.size();
@@ -288,7 +505,11 @@ public class Camera {
     }
 
 
-
+    /**
+     * Returns whether this camera is the currently active camera.
+     *
+     * @return Whether this camera is active
+     */
     public boolean isActive() {
         return this == Camera.active;
     }
@@ -300,11 +521,20 @@ public class Camera {
      *
      * @return The currently shown camera
      */
+    @NotNull
     public static Camera getActive() {
         return active;
     }
 
-    public static void setActive(Camera active) {
+    /**
+     * Sets the given camera as active camera. The first camera created will
+     * automatically set itself as active, so there is no need to set it
+     * active manually. Passing null will stop rendering any camera and show
+     * an error message instead.
+     *
+     * @param active The camera to set
+     */
+    public static void setActive(@Nullable Camera active) {
         if(active == null) active = NoCameraCamera.INSTANCE;
         if(Camera.active == active) return;
         Camera old = Camera.active;
@@ -313,6 +543,8 @@ public class Camera {
             if(active == NoCameraCamera.INSTANCE)
                 active.setResolution(old.resolution);
             else DISPLAY.setResolution(active.resolution);
+            if(active.ui != null)
+                active.ui.onParentSizeChange.invoke(active.resolution);
         }
     }
 }

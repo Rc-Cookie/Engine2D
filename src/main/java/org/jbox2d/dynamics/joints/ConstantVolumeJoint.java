@@ -25,7 +25,7 @@ package org.jbox2d.dynamics.joints;
 
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Settings;
-import com.github.rccookie.geometry.performance.Vec2;
+import com.github.rccookie.geometry.performance.float2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.SolverData;
 import org.jbox2d.dynamics.World;
@@ -38,7 +38,7 @@ public class ConstantVolumeJoint extends Joint {
   private float[] targetLengths;
   private float targetVolume;
 
-  private Vec2[] normals;
+  private float2[] normals;
   private float m_impulse = 0.0f;
 
   private World world;
@@ -69,7 +69,7 @@ public class ConstantVolumeJoint extends Joint {
     targetLengths = new float[bodies.length];
     for (int i = 0; i < targetLengths.length; ++i) {
       final int next = (i == targetLengths.length - 1) ? 0 : i + 1;
-      float dist = bodies[i].getWorldCenter().subtracted(bodies[next].getWorldCenter()).abs();
+      float dist = bodies[i].getWorldCenter().subed(bodies[next].getWorldCenter()).abs();
       targetLengths[i] = dist;
     }
     targetVolume = getBodyArea();
@@ -94,9 +94,9 @@ public class ConstantVolumeJoint extends Joint {
       distanceJoints = def.joints.toArray(new DistanceJoint[0]);
     }
 
-    normals = new Vec2[bodies.length];
+    normals = new float2[bodies.length];
     for (int i = 0; i < normals.length; ++i) {
-      normals[i] = new Vec2();
+      normals[i] = new float2();
     }
   }
 
@@ -146,7 +146,7 @@ public class ConstantVolumeJoint extends Joint {
       perimeter += dist;
     }
 
-    final Vec2 delta = pool.popVec2();
+    final float2 delta = pool.popVec2();
 
     float deltaArea = targetVolume - getSolverArea(positions);
     float toExtrude = 0.5f * deltaArea / perimeter; // *relaxationFactor
@@ -179,13 +179,13 @@ public class ConstantVolumeJoint extends Joint {
   public void initVelocityConstraints(final SolverData step) {
     Velocity[] velocities = step.velocities;
     Position[] positions = step.positions;
-    final Vec2[] d = pool.getVec2Array(bodies.length);
+    final float2[] d = pool.getVec2Array(bodies.length);
 
     for (int i = 0; i < bodies.length; ++i) {
       final int prev = (i == 0) ? bodies.length - 1 : i - 1;
       final int next = (i == bodies.length - 1) ? 0 : i + 1;
       d[i].set(positions[bodies[next].m_islandIndex].c);
-      d[i].subtract(positions[bodies[prev].m_islandIndex].c);
+      d[i].sub(positions[bodies[prev].m_islandIndex].c);
     }
 
     if (step.step.warmStarting) {
@@ -216,15 +216,15 @@ public class ConstantVolumeJoint extends Joint {
 
     Velocity[] velocities = step.velocities;
     Position[] positions = step.positions;
-    final Vec2 d[] = pool.getVec2Array(bodies.length);
+    final float2 d[] = pool.getVec2Array(bodies.length);
 
     for (int i = 0; i < bodies.length; ++i) {
       final int prev = (i == 0) ? bodies.length - 1 : i - 1;
       final int next = (i == bodies.length - 1) ? 0 : i + 1;
       d[i].set(positions[bodies[next].m_islandIndex].c);
-      d[i].subtract(positions[bodies[prev].m_islandIndex].c);
+      d[i].sub(positions[bodies[prev].m_islandIndex].c);
       dotMassSum += (d[i].sqrAbs()) / bodies[i].getMass();
-      crossMassSum += Vec2.cross(velocities[bodies[i].m_islandIndex].v, d[i]);
+      crossMassSum += float2.cross(velocities[bodies[i].m_islandIndex].v, d[i]);
     }
     float lambda = -2.0f * crossMassSum / dotMassSum;
     // System.out.println(crossMassSum + " " +dotMassSum);
@@ -240,15 +240,15 @@ public class ConstantVolumeJoint extends Joint {
 
   /** No-op */
   @Override
-  public void getAnchorA(Vec2 argOut) {}
+  public void getAnchorA(float2 argOut) {}
 
   /** No-op */
   @Override
-  public void getAnchorB(Vec2 argOut) {}
+  public void getAnchorB(float2 argOut) {}
 
   /** No-op */
   @Override
-  public void getReactionForce(float inv_dt, Vec2 argOut) {}
+  public void getReactionForce(float inv_dt, float2 argOut) {}
 
   /** No-op */
   @Override

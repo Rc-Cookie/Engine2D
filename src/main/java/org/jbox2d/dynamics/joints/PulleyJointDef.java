@@ -27,7 +27,7 @@
 package org.jbox2d.dynamics.joints;
 
 import org.jbox2d.common.Settings;
-import com.github.rccookie.geometry.performance.Vec2;
+import com.github.rccookie.geometry.performance.float2;
 import org.jbox2d.dynamics.Body;
 
 /**
@@ -41,22 +41,22 @@ public class PulleyJointDef extends JointDef {
   /**
    * The first ground anchor in world coordinates. This point never moves.
    */
-  public Vec2 groundAnchorA;
+  public float2 groundAnchorA;
 
   /**
    * The second ground anchor in world coordinates. This point never moves.
    */
-  public Vec2 groundAnchorB;
+  public float2 groundAnchorB;
 
   /**
    * The local anchor point relative to bodyA's origin.
    */
-  public Vec2 localAnchorA;
+  public float2 localAnchorA;
 
   /**
    * The local anchor point relative to bodyB's origin.
    */
-  public Vec2 localAnchorB;
+  public float2 localAnchorB;
 
   /**
    * The a reference length for the segment attached to bodyA.
@@ -75,10 +75,10 @@ public class PulleyJointDef extends JointDef {
 
   public PulleyJointDef() {
     super(JointType.PULLEY);
-    groundAnchorA = new Vec2(-1.0f, 1.0f);
-    groundAnchorB = new Vec2(1.0f, 1.0f);
-    localAnchorA = new Vec2(-1.0f, 0.0f);
-    localAnchorB = new Vec2(1.0f, 0.0f);
+    groundAnchorA = new float2(-1.0f, 1.0f);
+    groundAnchorB = new float2(1.0f, 1.0f);
+    localAnchorA = new float2(-1.0f, 0.0f);
+    localAnchorB = new float2(1.0f, 0.0f);
     lengthA = 0.0f;
     lengthB = 0.0f;
     ratio = 1.0f;
@@ -88,16 +88,16 @@ public class PulleyJointDef extends JointDef {
   /**
    * Initialize the bodies, anchors, lengths, max lengths, and ratio using the world anchors.
    */
-  public void initialize(Body b1, Body b2, Vec2 ga1, Vec2 ga2, Vec2 anchor1, Vec2 anchor2, float r) {
+  public void initialize(Body b1, Body b2, float2 ga1, float2 ga2, float2 anchor1, float2 anchor2, float r) {
     bodyA = b1;
     bodyB = b2;
     groundAnchorA = ga1;
     groundAnchorB = ga2;
     localAnchorA = bodyA.getLocalPoint(anchor1);
     localAnchorB = bodyB.getLocalPoint(anchor2);
-    Vec2 d1 = anchor1.subtracted(ga1);
+    float2 d1 = anchor1.subed(ga1);
     lengthA = d1.abs();
-    Vec2 d2 = anchor2.subtracted(ga2);
+    float2 d2 = anchor2.subed(ga2);
     lengthB = d2.abs();
     ratio = r;
     assert (ratio > Settings.EPSILON);

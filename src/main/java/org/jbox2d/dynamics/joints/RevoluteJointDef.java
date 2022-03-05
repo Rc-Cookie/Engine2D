@@ -46,7 +46,7 @@
 
 package org.jbox2d.dynamics.joints;
 
-import com.github.rccookie.geometry.performance.Vec2;
+import com.github.rccookie.geometry.performance.float2;
 import org.jbox2d.dynamics.Body;
 
 /**
@@ -65,12 +65,12 @@ public class RevoluteJointDef extends JointDef {
   /**
    * The local anchor point relative to body1's origin.
    */
-  public Vec2 localAnchorA;
+  public float2 localAnchorA;
 
   /**
    * The local anchor point relative to body2's origin.
    */
-  public Vec2 localAnchorB;
+  public float2 localAnchorB;
 
   /**
    * The body2 angle minus body1 angle in the reference state (radians).
@@ -109,8 +109,8 @@ public class RevoluteJointDef extends JointDef {
 
   public RevoluteJointDef() {
     super(JointType.REVOLUTE);
-    localAnchorA = new Vec2(0.0f, 0.0f);
-    localAnchorB = new Vec2(0.0f, 0.0f);
+    localAnchorA = new float2(0.0f, 0.0f);
+    localAnchorB = new float2(0.0f, 0.0f);
     referenceAngle = 0.0f;
     lowerAngle = 0.0f;
     upperAngle = 0.0f;
@@ -127,7 +127,7 @@ public class RevoluteJointDef extends JointDef {
    * @param b2
    * @param anchor
    */
-  public void initialize(final Body b1, final Body b2, final Vec2 anchor) {
+  public void initialize(final Body b1, final Body b2, final float2 anchor) {
     bodyA = b1;
     bodyB = b2;
     bodyA.getLocalPointToOut(anchor, localAnchorA);

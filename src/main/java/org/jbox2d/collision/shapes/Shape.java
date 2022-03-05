@@ -27,7 +27,7 @@ import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.RayCastInput;
 import org.jbox2d.collision.RayCastOutput;
 import org.jbox2d.common.Transform;
-import com.github.rccookie.geometry.performance.Vec2;
+import com.github.rccookie.geometry.performance.float2;
 
 /**
  * A shape is used for collision detection. You can create a shape however you like. Shapes used for
@@ -85,7 +85,7 @@ public abstract class Shape {
    * @param xf the shape world transform.
    * @param p a point in world coordinates.
    */
-  public abstract boolean testPoint(final Transform xf, final Vec2 p);
+  public abstract boolean testPoint(final Transform xf, final float2 p);
 
   /**
    * Cast a ray against a child shape.
@@ -126,7 +126,7 @@ public abstract class Shape {
    * @param normalOut returns the direction in which the distance increases.
    * @return distance returns the distance from the current shape.
    */
-  public abstract float computeDistanceToOut(Transform xf, Vec2 p, int childIndex, Vec2 normalOut);
+  public abstract float computeDistanceToOut(Transform xf, float2 p, int childIndex, float2 normalOut);
 
   public abstract Shape clone();
 }

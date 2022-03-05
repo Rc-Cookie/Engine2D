@@ -1,10 +1,16 @@
 package com.github.rccookie.engine2d;
 
 import com.github.rccookie.engine2d.core.DrawObject;
-import com.github.rccookie.geometry.performance.IVec2;
+import com.github.rccookie.geometry.performance.int2;
 
+/**
+ * Used when no camera is set.
+ */
 final class NoCameraCamera extends Camera {
 
+    /**
+     * The instance.
+     */
     static final NoCameraCamera INSTANCE = new NoCameraCamera();
 
     static final Color BACKGROUND_COLOR = Color.DARK_GRAY;
@@ -18,20 +24,24 @@ final class NoCameraCamera extends Camera {
     }
 
     private NoCameraCamera() {
-        super(new IVec2(600, 400));
+        super(new int2(600, 400));
     }
 
+    // No need to do anything
     @Override
     protected void update() { }
 
     @Override
-    public void prepareRender() {
+    public long prepareRender() {
         // Nothing required here
+        return 0;
     }
 
     @Override
-    public void render() {
+    public long render() {
+        long start = System.nanoTime();
         TEXT_OBJECT.screenLocation.set(halfResolution.toI());
         DISPLAY.draw(DRAW_OBJECTS, BACKGROUND_COLOR);
+        return System.nanoTime() - start;
     }
 }

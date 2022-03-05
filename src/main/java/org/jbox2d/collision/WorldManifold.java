@@ -27,7 +27,7 @@ import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Rot;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Transform;
-import com.github.rccookie.geometry.performance.Vec2;
+import com.github.rccookie.geometry.performance.float2;
 
 /**
  * This is used to compute the current state of a contact manifold.
@@ -38,12 +38,12 @@ public class WorldManifold {
   /**
    * World vector pointing from A to B
    */
-  public final Vec2 normal;
+  public final float2 normal;
 
   /**
    * World contact point (point of intersection)
    */
-  public final Vec2[] points;
+  public final float2[] points;
 
   /**
    * A negative value indicates overlap, in meters.
@@ -51,16 +51,16 @@ public class WorldManifold {
   public final float[] separations;
 
   public WorldManifold() {
-    normal = new Vec2();
-    points = new Vec2[Settings.maxManifoldPoints];
+    normal = new float2();
+    points = new float2[Settings.maxManifoldPoints];
     separations = new float[Settings.maxManifoldPoints];
     for (int i = 0; i < Settings.maxManifoldPoints; i++) {
-      points[i] = new Vec2();
+      points[i] = new float2();
     }
   }
 
-  private final Vec2 pool3 = new Vec2();
-  private final Vec2 pool4 = new Vec2();
+  private final float2 pool3 = new float2();
+  private final float2 pool4 = new float2();
 
   public final void initialize(final Manifold manifold, final Transform xfA, float radiusA,
       final Transform xfB, float radiusB) {
@@ -70,17 +70,17 @@ public class WorldManifold {
 
     switch (manifold.type) {
       case CIRCLES: {
-        final Vec2 pointA = pool3;
-        final Vec2 pointB = pool4;
+        final float2 pointA = pool3;
+        final float2 pointB = pool4;
 
         normal.x = 1;
         normal.y = 0;
-        Vec2 v = manifold.localPoint;
+        float2 v = manifold.localPoint;
         // Transform.mulToOutUnsafe(xfA, manifold.localPoint, pointA);
         // Transform.mulToOutUnsafe(xfB, manifold.points[0].localPoint, pointB);
         pointA.x = (xfA.q.c * v.x - xfA.q.s * v.y) + xfA.p.x;
         pointA.y = (xfA.q.s * v.x + xfA.q.c * v.y) + xfA.p.y;
-        Vec2 mp0p = manifold.points[0].localPoint;
+        float2 mp0p = manifold.points[0].localPoint;
         pointB.x = (xfB.q.c * mp0p.x - xfB.q.s * mp0p.y) + xfB.p.x;
         pointB.y = (xfB.q.s * mp0p.x + xfB.q.c * mp0p.y) + xfB.p.y;
 
@@ -102,12 +102,12 @@ public class WorldManifold {
       }
         break;
       case FACE_A: {
-        final Vec2 planePoint = pool3;
+        final float2 planePoint = pool3;
 
         Rot.mulToOutUnsafe(xfA.q, manifold.localNormal, normal);
         Transform.mulToOut(xfA, manifold.localPoint, planePoint);
 
-        final Vec2 clipPoint = pool4;
+        final float2 clipPoint = pool4;
 
         for (int i = 0; i < manifold.pointCount; i++) {
           // b2Vec2 clipPoint = b2Mul(xfB, manifold->points[i].localPoint);
@@ -141,7 +141,7 @@ public class WorldManifold {
       }
         break;
       case FACE_B:
-        final Vec2 planePoint = pool3;
+        final float2 planePoint = pool3;
         Rot.mulToOutUnsafe(xfB.q, manifold.localNormal, normal);
         Transform.mulToOut(xfB, manifold.localPoint, planePoint);
 
@@ -152,7 +152,7 @@ public class WorldManifold {
         // planePoint.x = xfB.p.x + xfB.q.ex.x * v.x + xfB.q.ey.x * v.y;
         // planePoint.y = xfB.p.y + xfB.q.ex.y * v.x + xfB.q.ey.y * v.y;
 
-        final Vec2 clipPoint = pool4;
+        final float2 clipPoint = pool4;
 
         for (int i = 0; i < manifold.pointCount; i++) {
           // b2Vec2 clipPoint = b2Mul(xfA, manifold->points[i].localPoint);

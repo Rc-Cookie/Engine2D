@@ -23,7 +23,7 @@
  ******************************************************************************/
 package org.jbox2d.common;
 
-import com.github.rccookie.geometry.performance.Vec2;
+import com.github.rccookie.geometry.performance.float2;
 
 import java.io.Serializable;
 
@@ -80,11 +80,11 @@ public class Rot implements Serializable {
     return MathUtils.atan2(s, c);
   }
 
-  public void getXAxis(Vec2 xAxis) {
+  public void getXAxis(float2 xAxis) {
     xAxis.set(c, s);
   }
 
-  public void getYAxis(Vec2 yAxis) {
+  public void getYAxis(float2 yAxis) {
     yAxis.set(-s, c);
   }
 
@@ -128,24 +128,24 @@ public class Rot implements Serializable {
     out.c = q.c * r.c + q.s * r.s;
   }
 
-  public static final void mulToOut(Rot q, Vec2 v, Vec2 out) {
+  public static final void mulToOut(Rot q, float2 v, float2 out) {
     float tempy = q.s * v.x + q.c * v.y;
     out.x = q.c * v.x - q.s * v.y;
     out.y = tempy;
   }
 
-  public static final void mulToOutUnsafe(Rot q, Vec2 v, Vec2 out) {
+  public static final void mulToOutUnsafe(Rot q, float2 v, float2 out) {
     out.x = q.c * v.x - q.s * v.y;
     out.y = q.s * v.x + q.c * v.y;
   }
 
-  public static final void mulTrans(Rot q, Vec2 v, Vec2 out) {
+  public static final void mulTrans(Rot q, float2 v, float2 out) {
     final float tempy = -q.s * v.x + q.c * v.y;
     out.x = q.c * v.x + q.s * v.y;
     out.y = tempy;
   }
 
-  public static final void mulTransUnsafe(Rot q, Vec2 v, Vec2 out) {
+  public static final void mulTransUnsafe(Rot q, float2 v, float2 out) {
     out.x = q.c * v.x + q.s * v.y;
     out.y = -q.s * v.x + q.c * v.y;
   }

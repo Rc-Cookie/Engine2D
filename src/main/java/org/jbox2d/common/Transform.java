@@ -23,7 +23,7 @@
  ******************************************************************************/
 package org.jbox2d.common;
 
-import com.github.rccookie.geometry.performance.Vec2;
+import com.github.rccookie.geometry.performance.float2;
 
 import java.io.Serializable;
 
@@ -37,14 +37,14 @@ public class Transform implements Serializable {
   private static final long serialVersionUID = 1L;
 
   /** The translation caused by the transform */
-  public final Vec2 p;
+  public final float2 p;
 
   /** A matrix representing a rotation */
   public final Rot q;
 
   /** The default constructor. */
   public Transform() {
-    p = new Vec2();
+    p = new float2();
     q = new Rot();
   }
 
@@ -55,7 +55,7 @@ public class Transform implements Serializable {
   }
 
   /** Initialize using a position vector and a rotation matrix. */
-  public Transform(final Vec2 _position, final Rot _R) {
+  public Transform(final float2 _position, final Rot _R) {
     p = _position.clone();
     q = _R.clone();
   }
@@ -73,7 +73,7 @@ public class Transform implements Serializable {
    * @param p
    * @param angle
    */
-  public final void set(Vec2 p, float angle) {
+  public final void set(float2 p, float angle) {
     this.p.set(p);
     q.set(angle);
   }
@@ -84,29 +84,29 @@ public class Transform implements Serializable {
     q.setIdentity();
   }
 
-  public final static Vec2 mul(final Transform T, final Vec2 v) {
-    return new Vec2((T.q.c * v.x - T.q.s * v.y) + T.p.x, (T.q.s * v.x + T.q.c * v.y) + T.p.y);
+  public final static float2 mul(final Transform T, final float2 v) {
+    return new float2((T.q.c * v.x - T.q.s * v.y) + T.p.x, (T.q.s * v.x + T.q.c * v.y) + T.p.y);
   }
 
-  public final static void mulToOut(final Transform T, final Vec2 v, final Vec2 out) {
+  public final static void mulToOut(final Transform T, final float2 v, final float2 out) {
     final float tempy = (T.q.s * v.x + T.q.c * v.y) + T.p.y;
     out.x = (T.q.c * v.x - T.q.s * v.y) + T.p.x;
     out.y = tempy;
   }
 
-  public final static void mulToOutUnsafe(final Transform T, final Vec2 v, final Vec2 out) {
+  public final static void mulToOutUnsafe(final Transform T, final float2 v, final float2 out) {
     assert (v != out);
     out.x = (T.q.c * v.x - T.q.s * v.y) + T.p.x;
     out.y = (T.q.s * v.x + T.q.c * v.y) + T.p.y;
   }
 
-  public final static Vec2 mulTrans(final Transform T, final Vec2 v) {
+  public final static float2 mulTrans(final Transform T, final float2 v) {
     final float px = v.x - T.p.x;
     final float py = v.y - T.p.y;
-    return new Vec2((T.q.c * px + T.q.s * py), (-T.q.s * px + T.q.c * py));
+    return new float2((T.q.c * px + T.q.s * py), (-T.q.s * px + T.q.c * py));
   }
 
-  public final static void mulTransToOut(final Transform T, final Vec2 v, final Vec2 out) {
+  public final static void mulTransToOut(final Transform T, final float2 v, final float2 out) {
     final float px = v.x - T.p.x;
     final float py = v.y - T.p.y;
     final float tempy = (-T.q.s * px + T.q.c * py);
@@ -114,7 +114,7 @@ public class Transform implements Serializable {
     out.y = tempy;
   }
   
-  public final static void mulTransToOutUnsafe(final Transform T, final Vec2 v, final Vec2 out) {
+  public final static void mulTransToOutUnsafe(final Transform T, final float2 v, final float2 out) {
     assert(v != out);
     final float px = v.x - T.p.x;
     final float py = v.y - T.p.y;
@@ -145,12 +145,12 @@ public class Transform implements Serializable {
     out.p.add(A.p);
   }
 
-  private static Vec2 pool = new Vec2();
+  private static float2 pool = new float2();
 
   public final static Transform mulTrans(final Transform A, final Transform B) {
     Transform C = new Transform();
     Rot.mulTransUnsafe(A.q, B.q, C.q);
-    pool.set(B.p).subtract(A.p);
+    pool.set(B.p).sub(A.p);
     Rot.mulTransUnsafe(A.q, pool, C.p);
     return C;
   }
@@ -158,7 +158,7 @@ public class Transform implements Serializable {
   public final static void mulTransToOut(final Transform A, final Transform B, final Transform out) {
     assert (out != A);
     Rot.mulTrans(A.q, B.q, out.q);
-    pool.set(B.p).subtract(A.p);
+    pool.set(B.p).sub(A.p);
     Rot.mulTrans(A.q, pool, out.p);
   }
 
@@ -167,7 +167,7 @@ public class Transform implements Serializable {
     assert (out != A);
     assert (out != B);
     Rot.mulTransUnsafe(A.q, B.q, out.q);
-    pool.set(B.p).subtract(A.p);
+    pool.set(B.p).sub(A.p);
     Rot.mulTransUnsafe(A.q, pool, out.p);
   }
 

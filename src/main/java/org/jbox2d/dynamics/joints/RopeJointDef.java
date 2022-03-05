@@ -1,6 +1,6 @@
 package org.jbox2d.dynamics.joints;
 
-import com.github.rccookie.geometry.performance.Vec2;
+import com.github.rccookie.geometry.performance.float2;
 
 /**
  * Rope joint definition. This requires two body anchor points and a maximum lengths. Note: by
@@ -13,12 +13,12 @@ public class RopeJointDef extends JointDef {
   /**
    * The local anchor point relative to bodyA's origin.
    */
-  public final Vec2 localAnchorA = new Vec2();
+  public final float2 localAnchorA = new float2();
 
   /**
    * The local anchor point relative to bodyB's origin.
    */
-  public final Vec2 localAnchorB = new Vec2();
+  public final float2 localAnchorB = new float2();
 
   /**
    * The maximum length of the rope. Warning: this must be larger than b2_linearSlop or the joint

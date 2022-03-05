@@ -2,7 +2,7 @@ package com.github.rccookie.engine2d.physics;
 
 import com.github.rccookie.engine2d.Collider;
 import com.github.rccookie.engine2d.GameObject;
-import com.github.rccookie.geometry.performance.Vec2;
+import com.github.rccookie.geometry.performance.float2;
 import com.github.rccookie.util.Arguments;
 import org.jbox2d.collision.RayCastInput;
 import org.jbox2d.collision.RayCastOutput;
@@ -11,16 +11,46 @@ import org.jbox2d.common.Transform;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.FixtureDef;
+import org.jetbrains.annotations.NotNull;
 
+/**
+ * Generic implementation of a collider.
+ *
+ * @param <S> The shape type of the collider
+ */
 abstract class AbstractCollider<S extends Shape> extends Collider {
 
+    /**
+     * The Box2D shape.
+     */
     final S shape;
+    /**
+     * The currently used fixture.
+     */
     Fixture fixture;
+    /**
+     * The factory for new fixtures.
+     */
     final FixtureDef fixtureData;
+    /**
+     * The offset of the collider to the gameobject's center.
+     */
+    final float2 offset = float2.ZERO.clone();
 
+
+    /**
+     * A body that is queued up for fixture generation.
+     */
     private Body delayed = null;
 
-    AbstractCollider(GameObject gameObject, S shape) {
+
+    /**
+     * Creates a new abstract collider.
+     *
+     * @param gameObject The gameobject to attach to
+     * @param shape The shape of the collider
+     */
+    AbstractCollider(@NotNull GameObject gameObject, @NotNull S shape) {
         super(gameObject);
         this.shape = Arguments.checkNull(shape);
         fixtureData = new FixtureDef();
@@ -50,8 +80,8 @@ abstract class AbstractCollider<S extends Shape> extends Collider {
     }
 
     @Override
-    public boolean contains(Vec2 p) {
-        return shape.testPoint(new Transform(), new Vec2(p));
+    public boolean contains(float2 p) {
+        return shape.testPoint(new Transform(), new float2(p));
     }
 
     @Override
@@ -103,7 +133,13 @@ abstract class AbstractCollider<S extends Shape> extends Collider {
     }
 
     @Override
-    public Raycast raycast(Vec2 p, Vec2 d, float maxDLength) {
+    public float2 getOffset() {
+        return offset;
+    }
+
+    @Override
+    @Deprecated
+    public Raycast raycast(float2 p, float2 d, float maxDLength) {
         if(fixture == null) return null;
         RayCastInput input = new RayCastInput();
         input.p1.set(p);

@@ -5,12 +5,20 @@ import com.github.rccookie.engine2d.core.stats.PerformanceStats;
 import com.github.rccookie.engine2d.ui.ColorPanel;
 import com.github.rccookie.engine2d.ui.KeyValueText;
 import com.github.rccookie.engine2d.ui.SimpleList;
-import com.github.rccookie.geometry.performance.IVec2;
+import com.github.rccookie.geometry.performance.int2;
 
+/**
+ * A panel that shows debug information.
+ */
 public class DebugPanel extends ColorPanel {
 
+    /**
+     * Creates a new debug display.
+     *
+     * @param parent The parent for the debug panel
+     */
     public DebugPanel(UIObject parent) {
-        super(parent, new IVec2(180, 180), Color.BLACK.setAlpha(0.3f));
+        super(parent, new int2(180, 180), Color.BLACK.setAlpha(0.3f));
 
         if(parent != null)
             parent.onChildChange.add((o,t) -> {
