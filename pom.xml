@@ -177,7 +177,7 @@
                 <addDependencies>true</addDependencies>
               </classPath>
               <jre>
-<!--                <minVersion>11</minVersion>-->
+                <!--                <minVersion>11</minVersion>-->
                 <path>C:\Program Files\Greenfoot\jdk</path>
               </jre>
               <versionInfo>
