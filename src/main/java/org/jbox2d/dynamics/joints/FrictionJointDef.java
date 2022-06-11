@@ -31,8 +31,9 @@ import org.jbox2d.dynamics.Body;
 
 /**
  * Friction joint definition.
- * 
+ *
  * @author Daniel Murphy
+ * @version $Id: $Id
  */
 public class FrictionJointDef extends JointDef {
 
@@ -57,6 +58,9 @@ public class FrictionJointDef extends JointDef {
    */
   public float maxTorque;
 
+  /**
+   * <p>Constructor for FrictionJointDef.</p>
+   */
   public FrictionJointDef() {
     super(JointType.FRICTION);
     localAnchorA = new float2();
@@ -68,6 +72,10 @@ public class FrictionJointDef extends JointDef {
   /**
    * Initialize the bodies, anchors, axis, and reference angle using the world anchor and world
    * axis.
+   *
+   * @param bA a {@link org.jbox2d.dynamics.Body} object
+   * @param bB a {@link org.jbox2d.dynamics.Body} object
+   * @param anchor a {@link com.github.rccookie.geometry.performance.float2} object
    */
   public void initialize(Body bA, Body bB, float2 anchor) {
     bodyA = bA;

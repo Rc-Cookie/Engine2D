@@ -29,16 +29,25 @@ import com.github.rccookie.geometry.performance.float2;
 /**
  * Ray-cast output data. The ray hits at p1 + fraction * (p2 - p1), where p1 and p2
  * come from b2RayCastInput.
+ *
  */
 public class RayCastOutput{
 	public final float2 normal;
 	public float fraction;
 
+	/**
+	 * <p>Constructor for RayCastOutput.</p>
+	 */
 	public RayCastOutput(){
 		normal = new float2();
 		fraction = 0;
 	}
 
+	/**
+	 * <p>set.</p>
+	 *
+	 * @param rco a {@link org.jbox2d.collision.RayCastOutput} object
+	 */
 	public void set(final RayCastOutput rco){
 		normal.set(rco.normal);
 		fraction = rco.fraction;

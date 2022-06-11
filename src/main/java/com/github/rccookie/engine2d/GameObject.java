@@ -8,12 +8,16 @@ import java.util.stream.Stream;
 
 import com.github.rccookie.engine2d.core.LocalExecutionManager;
 import com.github.rccookie.engine2d.core.LocalInputManager;
+import com.github.rccookie.engine2d.image.Image;
 import com.github.rccookie.engine2d.physics.BoxCollider;
 import com.github.rccookie.engine2d.util.Convert;
-import com.github.rccookie.engine2d.util.NamedCaughtEvent;
+import com.github.rccookie.engine2d.util.NamedLazyEvent;
 import com.github.rccookie.event.BiParamEvent;
 import com.github.rccookie.event.CaughtBiParamEvent;
 import com.github.rccookie.event.Event;
+import com.github.rccookie.event.LazyEvent;
+import com.github.rccookie.event.action.Action;
+import com.github.rccookie.event.action.IAction;
 import com.github.rccookie.geometry.performance.float2;
 import com.github.rccookie.util.ModIterableArrayList;
 import com.github.rccookie.util.Utils;
@@ -71,17 +75,34 @@ public class GameObject {
 
 
     /**
+     * Count how many of the by update/lateUpdate invoked events are used. If none,
+     * the respective event will be temporarily unregistered from the map update.
+     */
+    private int updateUses = 0, lateUpdateUses = 0;
+    /**
+     * Early update event for components to attach to.
+     */
+    final Event componentEarlyUpdate = new LazyEvent(this::incUpdateUse, this::decUpdateUse);
+    /**
+     * Update event for components to attach to.
+     */
+    final Event componentUpdate = new LazyEvent(this::incUpdateUse, this::decUpdateUse);
+    /**
+     * Late update event for components to attach to.
+     */
+    final Event componentLateUpdate = new LazyEvent(this::incLateUpdateUse, this::decLateUpdateUse);
+
+
+    /**
      * Executed once per frame after the {@link Component#earlyUpdate} and before
      * the {@link Component#update} event and the physics update, if enabled.
      */
-    public final Event update = new NamedCaughtEvent(false, () -> "Gameobject.update on " + this) {
+    public final Event update = new NamedLazyEvent(this::incUpdateUse, this::decUpdateUse, false, () -> "Gameobject.update on " + this) {
         @Override
         public boolean invoke() {
-            for(Component c : components)
-                if(c.enabled) c.earlyUpdate.invoke();
+            componentEarlyUpdate.invoke();
             super.invoke();
-            for(Component c : components)
-                if(c.enabled) c.update.invoke();
+            componentUpdate.invoke();
             return false;
         }
     };
@@ -90,15 +111,19 @@ public class GameObject {
      * Executed once per frame after physics update and {@link Component#update} event,
      * but before the {@link Component#lateUpdate} event.
      */
-    public final Event lateUpdate = new NamedCaughtEvent(false, () -> "GameObject.lateUpdate on " + this) {
+    public final Event lateUpdate = new NamedLazyEvent(this::incLateUpdateUse, this::decLateUpdateUse, false, () -> "GameObject.lateUpdate on " + this) {
         @Override
         public boolean invoke() {
             super.invoke();
-            for(Component c : components)
-                if(c.enabled) c.lateUpdate.invoke();
+            componentLateUpdate.invoke();
             return false;
         }
     };
+
+    /**
+     * The {@code update.invoke()} / {@code lateUpdate.invoke()} methods as {@link Action}.
+     */
+    private final Action updateAction = update::invoke, lateUpdateAction = lateUpdate::invoke;
 
     /**
      * Executed when the gameobject changes map, with the old and new map as parameters.
@@ -137,18 +162,46 @@ public class GameObject {
     private BoxCollider imageCollider = null;
 
 
+    /**
+     * The action responsible for calling {@link #update}. Used to unregister
+     * that call if the update method is found not to be overridden.
+     */
+    private IAction localUpdateAction;
+
 
     /**
      * Creates a new gameobject with no image.
      */
     public GameObject() {
         Application.checkSetup();
-        update.add(this::update);
+        localUpdateAction = update.add(this::update);
         bodyData = new BodyDef();
         bodyData.type = BodyType.KINEMATIC;
         bodyData.linearDamping = 0.2f;
         bodyData.angularDamping = 0.2f;
         bodyData.fixedRotation = false;
+    }
+
+
+
+    private void incUpdateUse() {
+        if(updateUses++ == 0 && map != null)
+            map.gameobjectUpdate.add(updateAction);
+    }
+
+    private void decUpdateUse() {
+        if(--updateUses == 0 && map != null)
+            map.gameobjectUpdate.remove(updateAction);
+    }
+
+    private void incLateUpdateUse() {
+        if(lateUpdateUses++ == 0 && map != null)
+            map.gameobjectLateUpdate.add(lateUpdateAction);
+    }
+
+    private void decLateUpdateUse() {
+        if(--lateUpdateUses == 0 && map != null)
+            map.gameobjectLateUpdate.remove(lateUpdateAction);
     }
 
 
@@ -202,6 +255,10 @@ public class GameObject {
             for(var c : colliders) c.clearFixture();
             this.map.objects.remove(this);
             this.map.paintOrderObjects.remove(this);
+            if(updateUses != 0)
+                this.map.gameobjectUpdate.remove(updateAction);
+            if(lateUpdateUses != 0)
+                this.map.gameobjectLateUpdate.remove(lateUpdateAction);
         }
         Map old = this.map;
         this.map = map;
@@ -210,6 +267,10 @@ public class GameObject {
             map.paintOrderObjects.add(this);
             body = map.physicsWorld.createBody(bodyData);
             for(var c : colliders) c.generateFixture(body);
+            if(updateUses != 0)
+                this.map.gameobjectUpdate.add(updateAction);
+            if(lateUpdateUses != 0)
+                this.map.gameobjectLateUpdate.add(lateUpdateAction);
         }
         onMapChange.invoke(old, map);
     }
@@ -437,7 +498,9 @@ public class GameObject {
      * Called once per frame. Intended to be overridden. Default implementation does nothing.
      */
     protected void update() {
-
+        // If this code is reached the method does nothing, so we may as well unregister it
+        update.remove(localUpdateAction);
+        localUpdateAction = null;
     }
 
 

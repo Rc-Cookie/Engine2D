@@ -7,9 +7,11 @@ import java.util.function.Supplier;
 
 import com.github.rccookie.engine2d.coroutine.Coroutine;
 import com.github.rccookie.engine2d.coroutine.Wait;
-import com.github.rccookie.engine2d.util.Future;
-import com.github.rccookie.engine2d.util.FutureImpl;
+import com.github.rccookie.engine2d.util.Num;
 import com.github.rccookie.util.Console;
+import com.github.rccookie.util.Future;
+import com.github.rccookie.util.FutureImpl;
+import com.github.rccookie.util.NoWaitFutureImpl;
 
 /**
  * Utility class to execute tasks repeatedly or delayed.
@@ -31,7 +33,7 @@ public enum Execute {
     static {
         Application.earlyUpdate.add(Execute::runTasks);
         Application.lateUpdate.add(Execute::runAllTasks);
-        repeating(() -> Console.custom("FPS", Time.fps()), 1, 1, true);
+        repeating(() -> Console.write("FPS", Time.fps()), 1, 1, true);
     }
 
 
@@ -65,7 +67,7 @@ public enum Execute {
             tasks = TASKS.toArray(new ExecutionTask[0]);
         }
         for(ExecutionTask<Object> task : tasks) {
-            if(task.result.isCancelled()) {
+            if(task.result.isCanceled()) {
                 synchronized (TASKS) {
                     TASKS.remove(task);
                 }
@@ -75,9 +77,9 @@ public enum Execute {
                     TASKS.remove(task);
                 }
                 try {
-                    task.result.setValue(task.action.get());
+                    task.result.complete(task.action.get());
                 } catch(Exception e) {
-                    task.result.cancel();
+                    task.result.fail(e);
                     System.err.println("Exception occurred while executing Execute task:");
                     e.printStackTrace();
                 }
@@ -127,7 +129,7 @@ public enum Execute {
 
     /**
      * Executes the given task repeatedly in the given interval while the return value
-     * is {@code true).
+     * is {@code true}.
      *
      * @param task The task to run
      * @param delay The execution interval, in seconds
@@ -138,7 +140,7 @@ public enum Execute {
 
     /**
      * Executes the given task repeatedly in the given interval while the return value
-     * is {@code true).
+     * is {@code true}.
      *
      * @param task The task to run
      * @param delay The execution interval, in seconds
@@ -150,7 +152,7 @@ public enum Execute {
 
     /**
      * Executes the given task repeatedly in the given interval while the return value
-     * is {@code true).
+     * is {@code true}.
      *
      * @param task The task to run
      * @param delay The execution interval, in seconds
@@ -165,6 +167,8 @@ public enum Execute {
             @Override
             public boolean getAsBoolean() {
                 if((realTime ? Time.realTime() : Time.time()) < nextTime) return false;
+                if(realTime)
+                    nextTime = Num.max(Time.realTime() - 1, nextTime);
                 nextTime += delay;
                 return true;
             }
@@ -172,6 +176,25 @@ public enum Execute {
         synchronized (REPEATING_TASKS) {
             REPEATING_TASKS.add(executionTask);
         }
+    }
+
+    /**
+     * Executes the given task on the main thread. If this is called from the main thread,
+     * the task will be executed immediately, otherwise it will be executed within this or
+     * the next frame.
+     *
+     * @param task The task to run
+     */
+    public static void synced(Runnable task) {
+        if(Application.getImplementation().isMainThread()) {
+            try {
+                task.run();
+            } catch(Exception e) {
+                Console.error("Exception executing task:");
+                Console.error(e);
+            }
+        }
+        else Execute.later(task);
     }
 
     /**
@@ -346,7 +369,7 @@ public enum Execute {
 
         public final Supplier<T> action;
         public final BooleanSupplier requirement;
-        public final FutureImpl<T> result = new FutureImpl<>();
+        public final FutureImpl<T> result = new NoWaitFutureImpl<>();
 
         private ExecutionTask(Supplier<T> action, BooleanSupplier requirement) {
             this.action = action;

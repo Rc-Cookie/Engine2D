@@ -25,6 +25,10 @@ package org.jbox2d.pooling.normal;
 
 import org.jbox2d.pooling.IOrderedStack;
 
+/**
+ * <p>Abstract CircleStack class.</p>
+ *
+ */
 public abstract class CircleStack<E> implements IOrderedStack<E>{
 
   private final Object[] pool;
@@ -32,6 +36,12 @@ public abstract class CircleStack<E> implements IOrderedStack<E>{
   private final int size;
   private final Object[] container;
 
+  /**
+   * <p>Constructor for CircleStack.</p>
+   *
+   * @param argStackSize a int
+   * @param argContainerSize a int
+   */
   public CircleStack(int argStackSize, int argContainerSize) {
     size = argStackSize;
     pool = new Object[argStackSize];
@@ -42,6 +52,11 @@ public abstract class CircleStack<E> implements IOrderedStack<E>{
     container = new Object[argContainerSize];
   }
 
+  /**
+   * <p>pop.</p>
+   *
+   * @return a E object
+   */
   @SuppressWarnings("unchecked")
   public final E pop() {
     index++;
@@ -51,6 +66,7 @@ public abstract class CircleStack<E> implements IOrderedStack<E>{
     return (E) pool[index];
   }
 
+  /** {@inheritDoc} */
   @SuppressWarnings("unchecked")
   public final E[] pop(int argNum) {
     assert (argNum <= container.length) : "Container array is too small";
@@ -66,9 +82,14 @@ public abstract class CircleStack<E> implements IOrderedStack<E>{
     return (E[]) container;
   }
 
+  /** {@inheritDoc} */
   @Override
   public void push(int argNum) {}
 
-  /** Creates a new instance of the object contained by this stack. */
+  /**
+   * Creates a new instance of the object contained by this stack.
+   *
+   * @return a E object
+   */
   protected abstract E newInstance();
 }

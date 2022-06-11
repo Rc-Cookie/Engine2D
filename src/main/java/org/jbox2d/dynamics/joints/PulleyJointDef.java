@@ -33,8 +33,9 @@ import org.jbox2d.dynamics.Body;
 /**
  * Pulley joint definition. This requires two ground anchors, two dynamic body anchor points, and a
  * pulley ratio.
- * 
+ *
  * @author Daniel Murphy
+ * @version $Id: $Id
  */
 public class PulleyJointDef extends JointDef {
 
@@ -73,6 +74,9 @@ public class PulleyJointDef extends JointDef {
    */
   public float ratio;
 
+  /**
+   * <p>Constructor for PulleyJointDef.</p>
+   */
   public PulleyJointDef() {
     super(JointType.PULLEY);
     groundAnchorA = new float2(-1.0f, 1.0f);
@@ -87,6 +91,14 @@ public class PulleyJointDef extends JointDef {
 
   /**
    * Initialize the bodies, anchors, lengths, max lengths, and ratio using the world anchors.
+   *
+   * @param b1 a {@link org.jbox2d.dynamics.Body} object
+   * @param b2 a {@link org.jbox2d.dynamics.Body} object
+   * @param ga1 a {@link com.github.rccookie.geometry.performance.float2} object
+   * @param ga2 a {@link com.github.rccookie.geometry.performance.float2} object
+   * @param anchor1 a {@link com.github.rccookie.geometry.performance.float2} object
+   * @param anchor2 a {@link com.github.rccookie.geometry.performance.float2} object
+   * @param r a float
    */
   public void initialize(Body b1, Body b2, float2 ga1, float2 ga2, float2 anchor1, float2 anchor2, float r) {
     bodyA = b1;

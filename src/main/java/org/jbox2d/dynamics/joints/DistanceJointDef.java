@@ -55,8 +55,8 @@ import org.jbox2d.dynamics.Body;
  * Distance joint definition. This requires defining an anchor point on both bodies and the non-zero
  * length of the distance joint. The definition uses local anchor points so that the initial
  * configuration can violate the constraint slightly. This helps when saving and loading a game.
- * 
- * @warning Do not use a zero or short length.
+ *
+ *
  */
 public class DistanceJointDef extends JointDef {
   /** The local anchor point relative to body1's origin. */
@@ -78,6 +78,9 @@ public class DistanceJointDef extends JointDef {
    */
   public float dampingRatio;
 
+  /**
+   * <p>Constructor for DistanceJointDef.</p>
+   */
   public DistanceJointDef() {
     super(JointType.DISTANCE);
     localAnchorA = new float2(0.0f, 0.0f);
@@ -89,7 +92,7 @@ public class DistanceJointDef extends JointDef {
 
   /**
    * Initialize the bodies, anchors, and length using the world anchors.
-   * 
+   *
    * @param b1 First body
    * @param b2 Second body
    * @param anchor1 World anchor on first body

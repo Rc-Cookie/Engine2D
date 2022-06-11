@@ -13,8 +13,9 @@ import org.jbox2d.pooling.IWorldPool;
  * some non-physical behavior. A model that would allow you to dynamically modify the length would
  * have some sponginess, so I chose not to implement it that way. See DistanceJoint if you want to
  * dynamically control length.
- * 
+ *
  * @author Daniel Murphy
+ * @version $Id: $Id
  */
 public class RopeJoint extends Joint {
   // Solver shared
@@ -39,6 +40,12 @@ public class RopeJoint extends Joint {
   private float m_mass;
   private LimitState m_state;
 
+  /**
+   * <p>Constructor for RopeJoint.</p>
+   *
+   * @param worldPool a {@link org.jbox2d.pooling.IWorldPool} object
+   * @param def a {@link org.jbox2d.dynamics.joints.RopeJointDef} object
+   */
   protected RopeJoint(IWorldPool worldPool, RopeJointDef def) {
     super(worldPool, def);
     m_localAnchorA.set(def.localAnchorA);
@@ -52,6 +59,7 @@ public class RopeJoint extends Joint {
     m_length = 0.0f;
   }
 
+  /** {@inheritDoc} */
   @Override
   public void initVelocityConstraints(final SolverData data) {
     m_indexA = m_bodyA.m_islandIndex;
@@ -139,6 +147,7 @@ public class RopeJoint extends Joint {
     data.velocities[m_indexB].w = wB;
   }
 
+  /** {@inheritDoc} */
   @Override
   public void solveVelocityConstraints(final SolverData data) {
     float2 vA = data.velocities[m_indexA].v;
@@ -186,6 +195,7 @@ public class RopeJoint extends Joint {
     data.velocities[m_indexB].w = wB;
   }
 
+  /** {@inheritDoc} */
   @Override
   public boolean solvePositionConstraints(final SolverData data) {
     float2 cA = data.positions[m_indexA].c;
@@ -236,42 +246,71 @@ public class RopeJoint extends Joint {
     return length - m_maxLength < Settings.linearSlop;
   }
 
+  /** {@inheritDoc} */
   @Override
   public void getAnchorA(float2 argOut) {
     m_bodyA.getWorldPointToOut(m_localAnchorA, argOut);
   }
 
+  /** {@inheritDoc} */
   @Override
   public void getAnchorB(float2 argOut) {
     m_bodyB.getWorldPointToOut(m_localAnchorB, argOut);
   }
 
+  /** {@inheritDoc} */
   @Override
   public void getReactionForce(float inv_dt, float2 argOut) {
     argOut.set(m_u).scale(inv_dt).scale(m_impulse);
   }
 
+  /** {@inheritDoc} */
   @Override
   public float getReactionTorque(float inv_dt) {
     return 0f;
   }
 
+  /**
+   * <p>getLocalAnchorA.</p>
+   *
+   * @return a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public float2 getLocalAnchorA() {
     return m_localAnchorA;
   }
 
+  /**
+   * <p>getLocalAnchorB.</p>
+   *
+   * @return a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public float2 getLocalAnchorB() {
     return m_localAnchorB;
   }
 
+  /**
+   * <p>getMaxLength.</p>
+   *
+   * @return a float
+   */
   public float getMaxLength() {
     return m_maxLength;
   }
 
+  /**
+   * <p>setMaxLength.</p>
+   *
+   * @param maxLength a float
+   */
   public void setMaxLength(float maxLength) {
     this.m_maxLength = maxLength;
   }
 
+  /**
+   * <p>getLimitState.</p>
+   *
+   * @return a {@link org.jbox2d.dynamics.joints.LimitState} object
+   */
   public LimitState getLimitState() {
     return m_state;
   }

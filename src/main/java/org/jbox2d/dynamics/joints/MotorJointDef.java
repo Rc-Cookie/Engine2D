@@ -5,8 +5,9 @@ import org.jbox2d.dynamics.Body;
 
 /**
  * Motor joint definition.
- * 
+ *
  * @author dmurph
+ * @version $Id: $Id
  */
 public class MotorJointDef extends JointDef {
   /**
@@ -34,6 +35,9 @@ public class MotorJointDef extends JointDef {
    */
   public float correctionFactor;
 
+  /**
+   * <p>Constructor for MotorJointDef.</p>
+   */
   public MotorJointDef() {
     super(JointType.MOTOR);
     angularOffset = 0;
@@ -42,6 +46,12 @@ public class MotorJointDef extends JointDef {
     correctionFactor = 0.3f;
   }
 
+  /**
+   * <p>initialize.</p>
+   *
+   * @param bA a {@link org.jbox2d.dynamics.Body} object
+   * @param bB a {@link org.jbox2d.dynamics.Body} object
+   */
   public void initialize(Body bA, Body bB) {
     bodyA = bA;
     bodyB = bB;

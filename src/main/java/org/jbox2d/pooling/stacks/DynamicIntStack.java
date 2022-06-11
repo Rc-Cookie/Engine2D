@@ -23,27 +23,49 @@
  ******************************************************************************/
 package org.jbox2d.pooling.stacks;
 
+/**
+ * <p>DynamicIntStack class.</p>
+ *
+ */
 public class DynamicIntStack {
 
   private int[] stack;
   private int size;
   private int position;
 
+  /**
+   * <p>Constructor for DynamicIntStack.</p>
+   *
+   * @param initialSize a int
+   */
   public DynamicIntStack(int initialSize) {
     stack = new int[initialSize];
     position = 0;
     size = initialSize;
   }
 
+  /**
+   * <p>reset.</p>
+   */
   public void reset() {
     position = 0;
   }
 
+  /**
+   * <p>pop.</p>
+   *
+   * @return a int
+   */
   public int pop() {
     assert (position > 0);
     return stack[--position];
   }
 
+  /**
+   * <p>push.</p>
+   *
+   * @param i a int
+   */
   public void push(int i) {
     if (position == size) {
       int[] old = stack;
@@ -54,6 +76,11 @@ public class DynamicIntStack {
     stack[position++] = i;
   }
 
+  /**
+   * <p>getCount.</p>
+   *
+   * @return a int
+   */
   public int getCount() {
     return position;
   }

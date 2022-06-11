@@ -32,8 +32,9 @@ import org.jbox2d.dynamics.contacts.ContactEdge;
 
 /**
  * Delegate of World.
- * 
+ *
  * @author Daniel Murphy
+ * @version $Id: $Id
  */
 public class ContactManager implements PairCallback {
 
@@ -45,6 +46,12 @@ public class ContactManager implements PairCallback {
 
   private final World pool;
 
+  /**
+   * <p>Constructor for ContactManager.</p>
+   *
+   * @param argPool a {@link org.jbox2d.dynamics.World} object
+   * @param broadPhase a {@link org.jbox2d.collision.broadphase.BroadPhase} object
+   */
   public ContactManager(World argPool, BroadPhase broadPhase) {
     m_contactList = null;
     m_contactCount = 0;
@@ -55,10 +62,9 @@ public class ContactManager implements PairCallback {
   }
 
   /**
+   * {@inheritDoc}
+   *
    * Broad-phase callback.
-   * 
-   * @param proxyUserDataA
-   * @param proxyUserDataB
    */
   public void addPair(Object proxyUserDataA, Object proxyUserDataB) {
     FixtureProxy proxyA = (FixtureProxy) proxyUserDataA;
@@ -168,10 +174,18 @@ public class ContactManager implements PairCallback {
     ++m_contactCount;
   }
 
+  /**
+   * <p>findNewContacts.</p>
+   */
   public void findNewContacts() {
     m_broadPhase.updatePairs(this);
   }
 
+  /**
+   * <p>destroy.</p>
+   *
+   * @param c a {@link org.jbox2d.dynamics.contacts.Contact} object
+   */
   public void destroy(Contact c) {
     Fixture fixtureA = c.getFixtureA();
     Fixture fixtureB = c.getFixtureB();

@@ -3,6 +3,10 @@ package com.github.rccookie.engine2d.ui;
 import java.util.List;
 
 import com.github.rccookie.engine2d.UIObject;
+import com.github.rccookie.engine2d.util.Num;
+import com.github.rccookie.geometry.performance.int2;
+
+import org.jetbrains.annotations.NotNull;
 
 /**
  * A structure that automatically spaces out its children in a
@@ -30,17 +34,44 @@ public class SimpleList extends Structure {
         super(parent);
         this.vertical = vertical;
         onChildChange.add(this::modified);
+        onParentSizeChange.add(this::modified);
+        setRenderOrder(RenderOrder.AFTER_CHILDREN);
     }
 
+    private boolean calculatingSize = false;
+
+    private int2 lastSize = null;
+
+    @Override
+    public @NotNull int2 getSize() {
+        if(lastSize != null) return lastSize;
+        if(calculatingSize) return super.getSize();
+
+        List<UIObject> children = getChildren();
+        calculatingSize = true;
+
+        int max = 0;
+        for(UIObject child : children)
+            max = Num.max(max, vertical ? child.getSize().x : child.getSize().y);
+        calculatingSize = false;
+
+        // It's important to use the full size in the list direction because otherwise
+        // the relative location will not be correct no more that is used for positioning
+        // the elements.
+        return lastSize = vertical ? new int2(max, super.getSize().y) : new int2(super.getSize().x, max);
+    }
 
     @Override
     protected void updateStructure() {
+        lastSize = null;
+
         List<UIObject> objects = getChildren();
         if(objects.isEmpty()) return;
         if(objects.size() == 1) {
             objects.get(0).relativeLoc.setZero();
             return;
         }
+        // TODO: Use offset instead of relativeLoc, then calculate the size properly
         if(outsideGap) {
             float spacing = 2f / objects.size();
             for (int i = 0; i < objects.size(); i++) {

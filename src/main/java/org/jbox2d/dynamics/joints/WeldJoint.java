@@ -52,8 +52,9 @@ import org.jbox2d.pooling.IWorldPool;
 /**
  * A weld joint essentially glues two bodies together. A weld joint may distort somewhat because the
  * island constraint solver is approximate.
- * 
+ *
  * @author Daniel Murphy
+ * @version $Id: $Id
  */
 public class WeldJoint extends Joint {
 
@@ -82,6 +83,12 @@ public class WeldJoint extends Joint {
   private float m_invIB;
   private final Mat33 m_mass = new Mat33();
 
+  /**
+   * <p>Constructor for WeldJoint.</p>
+   *
+   * @param argWorld a {@link org.jbox2d.pooling.IWorldPool} object
+   * @param def a {@link org.jbox2d.dynamics.joints.WeldJointDef} object
+   */
   protected WeldJoint(IWorldPool argWorld, WeldJointDef def) {
     super(argWorld, def);
     m_localAnchorA = new float2(def.localAnchorA);
@@ -94,55 +101,95 @@ public class WeldJoint extends Joint {
     m_impulse.setZero();
   }
   
+  /**
+   * <p>getReferenceAngle.</p>
+   *
+   * @return a float
+   */
   public float getReferenceAngle() {
     return m_referenceAngle;
   }
 
+  /**
+   * <p>getLocalAnchorA.</p>
+   *
+   * @return a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public float2 getLocalAnchorA() {
     return m_localAnchorA;
   }
 
+  /**
+   * <p>getLocalAnchorB.</p>
+   *
+   * @return a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public float2 getLocalAnchorB() {
     return m_localAnchorB;
   }
 
+  /**
+   * <p>getFrequency.</p>
+   *
+   * @return a float
+   */
   public float getFrequency() {
     return m_frequencyHz;
   }
 
+  /**
+   * <p>setFrequency.</p>
+   *
+   * @param frequencyHz a float
+   */
   public void setFrequency(float frequencyHz) {
     this.m_frequencyHz = frequencyHz;
   }
 
+  /**
+   * <p>getDampingRatio.</p>
+   *
+   * @return a float
+   */
   public float getDampingRatio() {
     return m_dampingRatio;
   }
 
+  /**
+   * <p>setDampingRatio.</p>
+   *
+   * @param dampingRatio a float
+   */
   public void setDampingRatio(float dampingRatio) {
     this.m_dampingRatio = dampingRatio;
   }
 
+  /** {@inheritDoc} */
   @Override
   public void getAnchorA(float2 argOut) {
     m_bodyA.getWorldPointToOut(m_localAnchorA, argOut);
   }
 
+  /** {@inheritDoc} */
   @Override
   public void getAnchorB(float2 argOut) {
     m_bodyB.getWorldPointToOut(m_localAnchorB, argOut);
   }
 
+  /** {@inheritDoc} */
   @Override
   public void getReactionForce(float inv_dt, float2 argOut) {
     argOut.set(m_impulse.x, m_impulse.y);
     argOut.scale(inv_dt);
   }
 
+  /** {@inheritDoc} */
   @Override
   public float getReactionTorque(float inv_dt) {
     return inv_dt * m_impulse.z;
   }
 
+  /** {@inheritDoc} */
   @Override
   public void initVelocityConstraints(final SolverData data) {
     m_indexA = m_bodyA.m_islandIndex;
@@ -259,6 +306,7 @@ public class WeldJoint extends Joint {
     pool.pushMat33(1);
   }
 
+  /** {@inheritDoc} */
   @Override
   public void solveVelocityConstraints(final SolverData data) {
     float2 vA = data.velocities[m_indexA].v;
@@ -334,6 +382,7 @@ public class WeldJoint extends Joint {
     pool.pushVec2(3);
   }
 
+  /** {@inheritDoc} */
   @Override
   public boolean solvePositionConstraints(final SolverData data) {
     float2 cA = data.positions[m_indexA].c;

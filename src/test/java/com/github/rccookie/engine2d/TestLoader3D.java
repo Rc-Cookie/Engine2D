@@ -1,7 +1,7 @@
 package com.github.rccookie.engine2d;
 
-import com.github.rccookie.engine2d.impl.awt.AWTApplicationLoader;
-import com.github.rccookie.engine2d.impl.awt.AWTStartupPrefs;
+import com.github.rccookie.engine2d.image.Color;
+import com.github.rccookie.engine2d.image.Image;
 import com.github.rccookie.engine2d.physics.SimplePlayerController;
 import com.github.rccookie.engine2d.ui.IconPanel;
 import com.github.rccookie.geometry.performance.Coll3;
@@ -12,7 +12,7 @@ import com.github.rccookie.geometry.performance.int2;
 import com.github.rccookie.geometry.performance.raycast.BVH3;
 import com.github.rccookie.geometry.performance.raycast.GPURaycast3;
 
-public class TestLoader3D implements ILoader {
+class TestLoader3D implements ILoader {
 
     private static final int ITS = 2;
     private static float z = 0;
@@ -93,7 +93,7 @@ public class TestLoader3D implements ILoader {
     }
 
 
-    public static void main(String[] args) {
-        new AWTApplicationLoader(new TestLoader3D(), new AWTStartupPrefs()) { };
-    }
+//    public static void main(String[] args) {
+//        new AWTApplicationLoader(new TestLoader3D(), new AWTStartupPrefs()) { };
+//    }
 }

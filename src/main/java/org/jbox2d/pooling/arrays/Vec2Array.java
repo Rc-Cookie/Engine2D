@@ -29,13 +29,20 @@ import com.github.rccookie.geometry.performance.float2;
 
 /**
  * not thread safe Vec2[] pool
- * @author dmurph
  *
+ * @author dmurph
+ * @version $Id: $Id
  */
 public class Vec2Array {
 
 	private final HashMap<Integer, float2[]> map = new HashMap<Integer, float2[]>();
 	
+	/**
+	 * <p>get.</p>
+	 *
+	 * @param argLength a int
+	 * @return an array of {@link com.github.rccookie.geometry.performance.float2} objects
+	 */
 	public float2[] get(int argLength){
 		assert(argLength > 0);
 		
@@ -47,6 +54,12 @@ public class Vec2Array {
 		return map.get(argLength);
 	}
 	
+	/**
+	 * <p>getInitializedArray.</p>
+	 *
+	 * @param argLength a int
+	 * @return an array of {@link com.github.rccookie.geometry.performance.float2} objects
+	 */
 	protected float2[] getInitializedArray(int argLength){
 		final float2[] ray = new float2[argLength];
 		for (int i = 0; i < ray.length; i++) {

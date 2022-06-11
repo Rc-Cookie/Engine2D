@@ -2,13 +2,19 @@ package com.github.rccookie.engine2d.ui;
 
 import java.util.Objects;
 
-import com.github.rccookie.engine2d.Color;
-import com.github.rccookie.engine2d.Image;
+import com.github.rccookie.engine2d.image.Color;
+import com.github.rccookie.engine2d.image.Font;
+import com.github.rccookie.engine2d.image.FontAlignment;
+import com.github.rccookie.engine2d.image.Image;
 import com.github.rccookie.engine2d.UIObject;
+import com.github.rccookie.engine2d.image.ThemeColor;
+import com.github.rccookie.engine2d.util.ColorProperty;
+import com.github.rccookie.event.action.ParamAction;
 import com.github.rccookie.geometry.performance.int2;
 import com.github.rccookie.util.Arguments;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * A ui object that displays text.
@@ -18,15 +24,31 @@ public class Text extends UIObject {
     /**
      * The content of this text.
      */
+    @NotNull
     private String text;
     /**
-     * The font size of the text.
+     * The font of the text.
      */
-    private int fontSize = 16;
+    @NotNull
+    private Font font = Font.DEFAULT;
+    /**
+     * Whether to soft-wrap long lines.
+     */
+    private boolean softWrap = false;
     /**
      * The text color.
      */
-    private ThemeColor color = ThemeColor.TEXT_FIRST;
+    public final ColorProperty color = new ColorProperty(this, ThemeColor.TEXT_FIRST);
+    /**
+     * Listener to update the text's max size according to the parent's
+     * size. {@code null} means that there is currently no listener
+     * attached.
+     */
+    @Nullable
+    private ParamAction<int2> parentSizeChangeListener = null;
+
+
+    // TODO: Implement mouse selection rendering and ability for ctrl+c
 
 
     /**
@@ -35,19 +57,36 @@ public class Text extends UIObject {
      * @param parent The parent for the text
      * @param text The content of the text
      */
-    public Text(UIObject parent, String text) {
+    public Text(UIObject parent, @NotNull String text) {
         super(parent);
-        this.text = text;
+        this.text = Arguments.checkNull(text, "text");
+        setFocusable(false);
     }
 
     @Override
     protected Image generateImage() {
-        Image textImage = Image.text(text, fontSize, color.get(getTheme()));
+        Color color = this.color.get();
+
+        Image textImage;
+        if(softWrap)
+            textImage = font.render(text, color, getMaxSize().x);
+        else
+            textImage = font.render(text, color);
+
         int2 clampedSize = clampSize(textImage.size);
         if(textImage.size.equals(clampedSize)) return textImage;
 
-        Image image = new Image(textImage.size);
-        image.drawImageCr(textImage, image.center);
+        int overflowX;
+        if(font.alignment == FontAlignment.LEFT)
+            overflowX = 0;
+        else if(font.alignment == FontAlignment.CENTER)
+            overflowX = (clampedSize.x - textImage.size.x) / 2;
+        else // font.alignment == FontAlignment.RIGHT
+            overflowX = clampedSize.x - textImage.size.x;
+
+        Image image = new Image(clampedSize);
+        image.drawImage(textImage, new int2(overflowX, 0));
+//        image.drawImageCr(textImage, image.center);
         return image;
     }
 
@@ -56,6 +95,7 @@ public class Text extends UIObject {
      *
      * @return The string content
      */
+    @NotNull
     public String getText() {
         return text;
     }
@@ -65,17 +105,18 @@ public class Text extends UIObject {
      *
      * @return The font size
      */
-    public int getFontSize() {
-        return fontSize;
+    @NotNull
+    public Font getFont() {
+        return font;
     }
 
     /**
-     * Returns the current text color of the text.
+     * Returns whether soft-wrap for long lines is enabled.
      *
-     * @return The text color
+     * @return Whether soft-wrap is enabled
      */
-    public ThemeColor getColor() {
-        return color;
+    public boolean isSoftWrap() {
+        return softWrap;
     }
 
     /**
@@ -90,33 +131,67 @@ public class Text extends UIObject {
     }
 
     /**
-     * Sets the font size of the text.
+     * Sets the font to use for the text rendering.
+     *
+     * @param font The font to use
+     */
+    public void setFont(Font font) {
+        if(this.font.equals(Arguments.checkNull(font, "font"))) return;
+        this.font = font;
+        modified();
+    }
+
+    /**
+     * Shorthand for setting a copy of the current font with the given font size.
      *
      * @param fontSize The font size to use
      */
     public void setFontSize(int fontSize) {
-        if(this.fontSize == fontSize) return;
-        this.fontSize = fontSize;
+        setFont(getFont().setSize(fontSize));
+    }
+
+    /**
+     * Sets whether soft-wrap should be used (off by default). Soft-wrap
+     * means that lines that exceed the max width specified using
+     * {@link #setMaxSize(int2)} will automatically be wrapped using a
+     * newline.
+     *
+     * @param softWrap Whether to use soft-wrap
+     */
+    public void setSoftWrap(boolean softWrap) {
+        if(this.softWrap == softWrap) return;
+        this.softWrap = softWrap;
         modified();
     }
 
     /**
-     * Sets the color of the text.
+     * Sets this text to use soft-wrap based on the parent's size.
+     * <p>When enabled, this will do the following three things:</p>
+     * <ul>
+     *     <li>Enable soft-wrap</li>
+     *     <li>Set the text's max size to the parent's size (if a
+     *     parent is present)</li>
+     *     <li>Attach a listener to {@link #onParentSizeChange} that updates
+     *     the text's max size to the current parent's size</li>
+     * </ul>
+     * <p>When disabled, any attached listeners will be removed, and
+     * soft-wrap will be disabled. <b>The initial max size and soft-wrap
+     * state will not be restored.</b></p>
      *
-     * @param color The color to use
+     * @param softWrap Whether to use soft-wrap
      */
-    public void setColor(@NotNull Color color) {
-        setColor(ThemeColor.of(color));
-    }
-
-    /**
-     * Sets the color of the text.
-     *
-     * @param color The theme color to use
-     */
-    public void setColor(@NotNull ThemeColor color) {
-        if(Objects.equals(this.color, Arguments.checkNull(color, "color"))) return;
-        this.color = color;
-        modified();
+    public void setSoftWrapToParent(boolean softWrap) {
+        if(this.softWrap == softWrap && softWrap == (parentSizeChangeListener != null)) return;
+        setSoftWrap(softWrap);
+        if(softWrap) {
+            parentSizeChangeListener = onParentSizeChange.add(this::setMaxSize);
+            UIObject parent = getParent();
+            if(parent != null)
+                setMaxSize(parent.getSize());
+        }
+        else {
+            onParentSizeChange.remove(parentSizeChangeListener);
+            parentSizeChangeListener = null;
+        }
     }
 }

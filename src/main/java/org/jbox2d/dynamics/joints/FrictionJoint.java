@@ -34,7 +34,10 @@ import org.jbox2d.dynamics.SolverData;
 import org.jbox2d.pooling.IWorldPool;
 
 /**
+ * <p>FrictionJoint class.</p>
+ *
  * @author Daniel Murphy
+ * @version $Id: $Id
  */
 public class FrictionJoint extends Joint {
 
@@ -61,6 +64,12 @@ public class FrictionJoint extends Joint {
   private final Mat22 m_linearMass = new Mat22();
   private float m_angularMass;
 
+  /**
+   * <p>Constructor for FrictionJoint.</p>
+   *
+   * @param argWorldPool a {@link org.jbox2d.pooling.IWorldPool} object
+   * @param def a {@link org.jbox2d.dynamics.joints.FrictionJointDef} object
+   */
   protected FrictionJoint(IWorldPool argWorldPool, FrictionJointDef def) {
     super(argWorldPool, def);
     m_localAnchorA = new float2(def.localAnchorA);
@@ -73,55 +82,87 @@ public class FrictionJoint extends Joint {
     m_maxTorque = def.maxTorque;
   }
 
+  /**
+   * <p>getLocalAnchorA.</p>
+   *
+   * @return a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public float2 getLocalAnchorA() {
     return m_localAnchorA;
   }
 
+  /**
+   * <p>getLocalAnchorB.</p>
+   *
+   * @return a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public float2 getLocalAnchorB() {
     return m_localAnchorB;
   }
 
+  /** {@inheritDoc} */
   @Override
   public void getAnchorA(float2 argOut) {
     m_bodyA.getWorldPointToOut(m_localAnchorA, argOut);
   }
 
+  /** {@inheritDoc} */
   @Override
   public void getAnchorB(float2 argOut) {
     m_bodyB.getWorldPointToOut(m_localAnchorB, argOut);
   }
 
+  /** {@inheritDoc} */
   @Override
   public void getReactionForce(float inv_dt, float2 argOut) {
     argOut.set(m_linearImpulse).scale(inv_dt);
   }
 
+  /** {@inheritDoc} */
   @Override
   public float getReactionTorque(float inv_dt) {
     return inv_dt * m_angularImpulse;
   }
 
+  /**
+   * <p>setMaxForce.</p>
+   *
+   * @param force a float
+   */
   public void setMaxForce(float force) {
     assert (force >= 0.0f);
     m_maxForce = force;
   }
 
+  /**
+   * <p>getMaxForce.</p>
+   *
+   * @return a float
+   */
   public float getMaxForce() {
     return m_maxForce;
   }
 
+  /**
+   * <p>setMaxTorque.</p>
+   *
+   * @param torque a float
+   */
   public void setMaxTorque(float torque) {
     assert (torque >= 0.0f);
     m_maxTorque = torque;
   }
 
+  /**
+   * <p>getMaxTorque.</p>
+   *
+   * @return a float
+   */
   public float getMaxTorque() {
     return m_maxTorque;
   }
 
-  /**
-   * @see Joint#initVelocityConstraints(org.jbox2d.dynamics.TimeStep)
-   */
+  /** {@inheritDoc} */
   @Override
   public void initVelocityConstraints(final SolverData data) {
     m_indexA = m_bodyA.m_islandIndex;
@@ -212,6 +253,7 @@ public class FrictionJoint extends Joint {
     pool.pushMat22(1);
   }
 
+  /** {@inheritDoc} */
   @Override
   public void solveVelocityConstraints(final SolverData data) {
     float2 vA = data.velocities[m_indexA].v;
@@ -287,6 +329,7 @@ public class FrictionJoint extends Joint {
     pool.pushVec2(4);
   }
 
+  /** {@inheritDoc} */
   @Override
   public boolean solvePositionConstraints(final SolverData data) {
     return true;

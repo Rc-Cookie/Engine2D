@@ -46,19 +46,26 @@
 
 package org.jbox2d.common;
 
-import com.github.rccookie.geometry.performance.float2;
-
 import java.util.Random;
+
+import com.github.rccookie.geometry.performance.float2;
 
 /**
  * A few math methods that don't fit very well anywhere else.
+ *
  */
 public class MathUtils extends PlatformMathUtils {
+  /** Constant <code>PI=(float) Math.PI</code> */
   public static final float PI = (float) Math.PI;
+  /** Constant <code>TWOPI=(float) (Math.PI * 2)</code> */
   public static final float TWOPI = (float) (Math.PI * 2);
+  /** Constant <code>INV_PI=1f / PI</code> */
   public static final float INV_PI = 1f / PI;
+  /** Constant <code>HALF_PI=PI / 2</code> */
   public static final float HALF_PI = PI / 2;
+  /** Constant <code>QUARTER_PI=PI / 4</code> */
   public static final float QUARTER_PI = PI / 4;
+  /** Constant <code>THREE_HALVES_PI=TWOPI - HALF_PI</code> */
   public static final float THREE_HALVES_PI = TWOPI - HALF_PI;
 
   /**
@@ -71,6 +78,7 @@ public class MathUtils extends PlatformMathUtils {
    */
   public static final float RAD2DEG = 180 / PI;
 
+  /** Constant <code>sinLUT</code> */
   public static final float[] sinLUT = new float[Settings.SINCOS_LUT_LENGTH];
 
   static {
@@ -79,6 +87,12 @@ public class MathUtils extends PlatformMathUtils {
     }
   }
 
+  /**
+   * <p>sin.</p>
+   *
+   * @param x a float
+   * @return a float
+   */
   public static final float sin(float x) {
     if (Settings.SINCOS_LUT_ENABLED) {
       return sinLUT(x);
@@ -87,6 +101,12 @@ public class MathUtils extends PlatformMathUtils {
     }
   }
 
+  /**
+   * <p>sinLUT.</p>
+   *
+   * @param x a float
+   * @return a float
+   */
   public static final float sinLUT(float x) {
     x %= TWOPI;
 
@@ -116,6 +136,12 @@ public class MathUtils extends PlatformMathUtils {
     }
   }
 
+  /**
+   * <p>cos.</p>
+   *
+   * @param x a float
+   * @return a float
+   */
   public static final float cos(float x) {
     if (Settings.SINCOS_LUT_ENABLED) {
       return sinLUT(HALF_PI - x);
@@ -124,6 +150,12 @@ public class MathUtils extends PlatformMathUtils {
     }
   }
 
+  /**
+   * <p>abs.</p>
+   *
+   * @param x a float
+   * @return a float
+   */
   public static final float abs(final float x) {
     if (Settings.FAST_ABS) {
       return x > 0 ? x : -x;
@@ -132,15 +164,33 @@ public class MathUtils extends PlatformMathUtils {
     }
   }
 
+  /**
+   * <p>fastAbs.</p>
+   *
+   * @param x a float
+   * @return a float
+   */
   public static final float fastAbs(final float x) {
     return x > 0 ? x : -x;
   }
 
+  /**
+   * <p>abs.</p>
+   *
+   * @param x a int
+   * @return a int
+   */
   public static final int abs(int x) {
     int y = x >> 31;
     return (x ^ y) - y;
   }
 
+  /**
+   * <p>floor.</p>
+   *
+   * @param x a float
+   * @return a int
+   */
   public static final int floor(final float x) {
     if (Settings.FAST_FLOOR) {
       return fastFloor(x);
@@ -149,6 +199,12 @@ public class MathUtils extends PlatformMathUtils {
     }
   }
 
+  /**
+   * <p>fastFloor.</p>
+   *
+   * @param x a float
+   * @return a int
+   */
   public static final int fastFloor(final float x) {
     int y = (int) x;
     if (x < y) {
@@ -157,6 +213,12 @@ public class MathUtils extends PlatformMathUtils {
     return y;
   }
 
+  /**
+   * <p>ceil.</p>
+   *
+   * @param x a float
+   * @return a int
+   */
   public static final int ceil(final float x) {
     if (Settings.FAST_CEIL) {
       return fastCeil(x);
@@ -165,6 +227,12 @@ public class MathUtils extends PlatformMathUtils {
     }
   }
 
+  /**
+   * <p>fastCeil.</p>
+   *
+   * @param x a float
+   * @return a int
+   */
   public static final int fastCeil(final float x) {
     int y = (int) x;
     if (x > y) {
@@ -173,6 +241,12 @@ public class MathUtils extends PlatformMathUtils {
     return y;
   }
 
+  /**
+   * <p>round.</p>
+   *
+   * @param x a float
+   * @return a int
+   */
   public static final int round(final float x) {
     if (Settings.FAST_ROUND) {
       return floor(x + .5f);
@@ -183,8 +257,8 @@ public class MathUtils extends PlatformMathUtils {
 
   /**
    * Rounds up the value to the nearest higher power^2 value.
-   * 
-   * @param x
+   *
+   * @param x a int
    * @return power^2 value
    */
   public static final int ceilPowerOf2(int x) {
@@ -195,22 +269,60 @@ public class MathUtils extends PlatformMathUtils {
     return pow2;
   }
 
+  /**
+   * <p>max.</p>
+   *
+   * @param a a float
+   * @param b a float
+   * @return a float
+   */
   public final static float max(final float a, final float b) {
     return a > b ? a : b;
   }
 
+  /**
+   * <p>max.</p>
+   *
+   * @param a a int
+   * @param b a int
+   * @return a int
+   */
   public final static int max(final int a, final int b) {
     return a > b ? a : b;
   }
 
+  /**
+   * <p>min.</p>
+   *
+   * @param a a float
+   * @param b a float
+   * @return a float
+   */
   public final static float min(final float a, final float b) {
     return a < b ? a : b;
   }
 
+  /**
+   * <p>min.</p>
+   *
+   * @param a a int
+   * @param b a int
+   * @return a int
+   */
   public final static int min(final int a, final int b) {
     return a < b ? a : b;
   }
 
+  /**
+   * <p>map.</p>
+   *
+   * @param val a float
+   * @param fromMin a float
+   * @param fromMax a float
+   * @param toMin a float
+   * @param toMax a float
+   * @return a float
+   */
   public final static float map(final float val, final float fromMin, final float fromMax,
       final float toMin, final float toMax) {
     final float mult = (val - fromMin) / (fromMax - fromMin);
@@ -218,11 +330,26 @@ public class MathUtils extends PlatformMathUtils {
     return res;
   }
 
-  /** Returns the closest value to 'a' that is in between 'low' and 'high' */
+  /**
+   * Returns the closest value to 'a' that is in between 'low' and 'high'
+   *
+   * @param a a float
+   * @param low a float
+   * @param high a float
+   * @return a float
+   */
   public final static float clamp(final float a, final float low, final float high) {
     return max(low, min(a, high));
   }
 
+  /**
+   * <p>clamp.</p>
+   *
+   * @param a a {@link com.github.rccookie.geometry.performance.float2} object
+   * @param low a {@link com.github.rccookie.geometry.performance.float2} object
+   * @param high a {@link com.github.rccookie.geometry.performance.float2} object
+   * @return a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public final static float2 clamp(final float2 a, final float2 low, final float2 high) {
     final float2 min = new float2();
     min.x = a.x < high.x ? a.x : high.x;
@@ -232,6 +359,14 @@ public class MathUtils extends PlatformMathUtils {
     return min;
   }
 
+  /**
+   * <p>clampToOut.</p>
+   *
+   * @param a a {@link com.github.rccookie.geometry.performance.float2} object
+   * @param low a {@link com.github.rccookie.geometry.performance.float2} object
+   * @param high a {@link com.github.rccookie.geometry.performance.float2} object
+   * @param dest a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public final static void clampToOut(final float2 a, final float2 low, final float2 high, final float2 dest) {
     dest.x = a.x < high.x ? a.x : high.x;
     dest.y = a.y < high.y ? a.y : high.y;
@@ -244,6 +379,9 @@ public class MathUtils extends PlatformMathUtils {
    * computed by a SWAR algorithm that recursively "folds" the upper bits into the lower bits. This
    * process yields a bit vector with the same most significant 1 as x, but all 1's below it. Adding
    * 1 to that value yields the next largest power of 2.
+   *
+   * @param x a int
+   * @return a int
    */
   public final static int nextPowerOfTwo(int x) {
     x |= x >> 1;
@@ -254,10 +392,23 @@ public class MathUtils extends PlatformMathUtils {
     return x + 1;
   }
 
+  /**
+   * <p>isPowerOfTwo.</p>
+   *
+   * @param x a int
+   * @return a boolean
+   */
   public final static boolean isPowerOfTwo(final int x) {
     return x > 0 && (x & x - 1) == 0;
   }
 
+  /**
+   * <p>pow.</p>
+   *
+   * @param a a float
+   * @param b a float
+   * @return a float
+   */
   public static final float pow(float a, float b) {
     if (Settings.FAST_POW) {
       return fastPow(a, b);
@@ -266,6 +417,13 @@ public class MathUtils extends PlatformMathUtils {
     }
   }
 
+  /**
+   * <p>atan2.</p>
+   *
+   * @param y a float
+   * @param x a float
+   * @return a float
+   */
   public static final float atan2(final float y, final float x) {
     if (Settings.FAST_ATAN2) {
       return fastAtan2(y, x);
@@ -274,6 +432,13 @@ public class MathUtils extends PlatformMathUtils {
     }
   }
 
+  /**
+   * <p>fastAtan2.</p>
+   *
+   * @param y a float
+   * @param x a float
+   * @return a float
+   */
   public static final float fastAtan2(float y, float x) {
     if (x == 0.0f) {
       if (y > 0.0f) return HALF_PI;
@@ -295,6 +460,12 @@ public class MathUtils extends PlatformMathUtils {
     return atan;
   }
 
+  /**
+   * <p>reduceAngle.</p>
+   *
+   * @param theta a float
+   * @return a float
+   */
   public static final float reduceAngle(float theta) {
     theta %= TWOPI;
     if (abs(theta) > PI) {
@@ -306,24 +477,59 @@ public class MathUtils extends PlatformMathUtils {
     return theta;
   }
 
+  /**
+   * <p>randomFloat.</p>
+   *
+   * @param argLow a float
+   * @param argHigh a float
+   * @return a float
+   */
   public static final float randomFloat(float argLow, float argHigh) {
     return (float) Math.random() * (argHigh - argLow) + argLow;
   }
 
+  /**
+   * <p>randomFloat.</p>
+   *
+   * @param r a {@link java.util.Random} object
+   * @param argLow a float
+   * @param argHigh a float
+   * @return a float
+   */
   public static final float randomFloat(Random r, float argLow, float argHigh) {
     return r.nextFloat() * (argHigh - argLow) + argLow;
   }
 
+  /**
+   * <p>sqrt.</p>
+   *
+   * @param x a float
+   * @return a float
+   */
   public static final float sqrt(float x) {
     return (float) StrictMath.sqrt(x);
   }
 
+  /**
+   * <p>distanceSquared.</p>
+   *
+   * @param v1 a {@link com.github.rccookie.geometry.performance.float2} object
+   * @param v2 a {@link com.github.rccookie.geometry.performance.float2} object
+   * @return a float
+   */
   public final static float distanceSquared(float2 v1, float2 v2) {
     float dx = (v1.x - v2.x);
     float dy = (v1.y - v2.y);
     return dx * dx + dy * dy;
   }
 
+  /**
+   * <p>distance.</p>
+   *
+   * @param v1 a {@link com.github.rccookie.geometry.performance.float2} object
+   * @param v2 a {@link com.github.rccookie.geometry.performance.float2} object
+   * @return a float
+   */
   public final static float distance(float2 v1, float2 v2) {
     return sqrt(distanceSquared(v1, v2));
   }

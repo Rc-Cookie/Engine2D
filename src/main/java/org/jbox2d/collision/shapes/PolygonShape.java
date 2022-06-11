@@ -37,6 +37,7 @@ import org.jbox2d.pooling.arrays.Vec2Array;
 /**
  * A convex polygon shape. Polygons have a maximum number of vertices equal to _maxPolygonVertices.
  * In most cases you should not need many vertices for a convex polygon.
+ *
  */
 public class PolygonShape extends Shape {
   /** Dump lots of debug information. */
@@ -71,6 +72,9 @@ public class PolygonShape extends Shape {
   private final float2 pool4 = new float2();
   private Transform poolt1 = new Transform();
 
+  /**
+   * <p>Constructor for PolygonShape.</p>
+   */
   public PolygonShape() {
     super(ShapeType.POLYGON);
 
@@ -87,6 +91,11 @@ public class PolygonShape extends Shape {
     m_centroid.setZero();
   }
 
+  /**
+   * <p>clone.</p>
+   *
+   * @return a {@link org.jbox2d.collision.shapes.Shape} object
+   */
   public final Shape clone() {
     PolygonShape shape = new PolygonShape();
     shape.m_centroid.set(this.m_centroid);
@@ -102,9 +111,11 @@ public class PolygonShape extends Shape {
   /**
    * Create a convex hull from the given array of points. The count must be in the range [3,
    * Settings.maxPolygonVertices].
-   * 
-   * @warning the points may be re-ordered, even if they form a convex polygon.
-   * @warning collinear points are removed.
+   *
+   *
+   *
+   * @param vertices an array of {@link com.github.rccookie.geometry.performance.float2} objects
+   * @param count a int
    */
   public final void set(final float2[] vertices, final int count) {
     set(vertices, count, null, null);
@@ -113,9 +124,13 @@ public class PolygonShape extends Shape {
   /**
    * Create a convex hull from the given array of points. The count must be in the range [3,
    * Settings.maxPolygonVertices]. This method takes an arraypool for pooling.
-   * 
-   * @warning the points may be re-ordered, even if they form a convex polygon.
-   * @warning collinear points are removed.
+   *
+   *
+   *
+   * @param verts an array of {@link com.github.rccookie.geometry.performance.float2} objects
+   * @param num a int
+   * @param vecPool a {@link org.jbox2d.pooling.arrays.Vec2Array} object
+   * @param intPool a {@link org.jbox2d.pooling.arrays.IntArray} object
    */
   public final void set(final float2[] verts, final int num, final Vec2Array vecPool,
                         final IntArray intPool) {
@@ -237,7 +252,7 @@ public class PolygonShape extends Shape {
 
   /**
    * Build vertices to represent an axis-aligned box.
-   * 
+   *
    * @param hx the half-width.
    * @param hy the half-height.
    */
@@ -256,7 +271,7 @@ public class PolygonShape extends Shape {
 
   /**
    * Build vertices to represent an oriented box.
-   * 
+   *
    * @param hx the half-width.
    * @param hy the half-height.
    * @param center the center of the box in local coordinates.
@@ -285,10 +300,16 @@ public class PolygonShape extends Shape {
     }
   }
 
+  /**
+   * <p>getChildCount.</p>
+   *
+   * @return a int
+   */
   public int getChildCount() {
     return 1;
   }
 
+  /** {@inheritDoc} */
   @Override
   public final boolean testPoint(final Transform xf, final float2 p) {
     float tempx, tempy;
@@ -322,6 +343,7 @@ public class PolygonShape extends Shape {
     return true;
   }
 
+  /** {@inheritDoc} */
   @Override
   public final void computeAABB(final AABB aabb, final Transform xf, int childIndex) {
     final float2 lower = aabb.lowerBound;
@@ -355,8 +377,8 @@ public class PolygonShape extends Shape {
 
   /**
    * Get the vertex count.
-   * 
-   * @return
+   *
+   * @return a int
    */
   public final int getVertexCount() {
     return m_count;
@@ -364,15 +386,16 @@ public class PolygonShape extends Shape {
 
   /**
    * Get a vertex by index.
-   * 
-   * @param index
-   * @return
+   *
+   * @param index a int
+   * @return a {@link com.github.rccookie.geometry.performance.float2} object
    */
   public final float2 getVertex(final int index) {
     assert (0 <= index && index < m_count);
     return m_vertices[index];
   }
 
+  /** {@inheritDoc} */
   @Override
   public float computeDistanceToOut(Transform xf, float2 p, int childIndex, float2 normalOut) {
     float xfqc = xf.q.c;
@@ -428,6 +451,7 @@ public class PolygonShape extends Shape {
     return distance;
   }
 
+  /** {@inheritDoc} */
   @Override
   public final boolean raycast(RayCastOutput output, RayCastInput input, Transform xf,
       int childIndex) {
@@ -506,6 +530,13 @@ public class PolygonShape extends Shape {
     return false;
   }
 
+  /**
+   * <p>computeCentroidToOut.</p>
+   *
+   * @param vs an array of {@link com.github.rccookie.geometry.performance.float2} objects
+   * @param count a int
+   * @param out a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public final void computeCentroidToOut(final float2[] vs, final int count, final float2 out) {
     assert (count >= 3);
 
@@ -546,6 +577,7 @@ public class PolygonShape extends Shape {
     out.scale(1.0f / area);
   }
 
+  /** {@inheritDoc} */
   public void computeMass(final MassData massData, float density) {
     // Polygon mass, centroid, and inertia.
     // Let rho be the polygon density in mass per unit area.
@@ -633,8 +665,8 @@ public class PolygonShape extends Shape {
 
   /**
    * Validate convexity. This is a very time consuming operation.
-   * 
-   * @return
+   *
+   * @return a boolean
    */
   public boolean validate() {
     for (int i = 0; i < m_count; ++i) {
@@ -659,22 +691,41 @@ public class PolygonShape extends Shape {
     return true;
   }
 
-  /** Get the vertices in local coordinates. */
+  /**
+   * Get the vertices in local coordinates.
+   *
+   * @return an array of {@link com.github.rccookie.geometry.performance.float2} objects
+   */
   public float2[] getVertices() {
     return m_vertices;
   }
 
-  /** Get the edge normal vectors. There is one for each vertex. */
+  /**
+   * Get the edge normal vectors. There is one for each vertex.
+   *
+   * @return an array of {@link com.github.rccookie.geometry.performance.float2} objects
+   */
   public float2[] getNormals() {
     return m_normals;
   }
 
-  /** Get the centroid and apply the supplied transform. */
+  /**
+   * Get the centroid and apply the supplied transform.
+   *
+   * @param xf a {@link org.jbox2d.common.Transform} object
+   * @return a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public float2 centroid(final Transform xf) {
     return Transform.mul(xf, m_centroid);
   }
 
-  /** Get the centroid and apply the supplied transform. */
+  /**
+   * Get the centroid and apply the supplied transform.
+   *
+   * @param xf a {@link org.jbox2d.common.Transform} object
+   * @param out a {@link com.github.rccookie.geometry.performance.float2} object
+   * @return a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public float2 centroidToOut(final Transform xf, final float2 out) {
     Transform.mulToOutUnsafe(xf, m_centroid, out);
     return out;

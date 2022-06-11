@@ -52,8 +52,9 @@ import org.jbox2d.pooling.IWorldPool;
 /**
  * Provides object pooling for all objects used in the engine. Objects retrieved from here should
  * only be used temporarily, and then pushed back (with the exception of arrays).
- * 
+ *
  * @author Daniel Murphy
+ * @version $Id: $Id
  */
 public class DefaultWorldPool implements IWorldPool {
 
@@ -116,6 +117,12 @@ public class DefaultWorldPool implements IWorldPool {
   private final TimeOfImpact toi;
   private final Distance dist;
 
+  /**
+   * <p>Constructor for DefaultWorldPool.</p>
+   *
+   * @param argSize a int
+   * @param argContainerSize a int
+   */
   public DefaultWorldPool(int argSize, int argContainerSize) {
     vecs = new OrderedStack<float2>(argSize, argContainerSize) {
       protected float2 newInstance() { return new float2(); }
@@ -141,114 +148,189 @@ public class DefaultWorldPool implements IWorldPool {
     toi = new TimeOfImpact(this);
   }
 
+  /**
+   * <p>getPolyContactStack.</p>
+   *
+   * @return a {@link org.jbox2d.pooling.IDynamicStack} object
+   */
   public final IDynamicStack<Contact> getPolyContactStack() {
     return pcstack;
   }
 
+  /**
+   * <p>getCircleContactStack.</p>
+   *
+   * @return a {@link org.jbox2d.pooling.IDynamicStack} object
+   */
   public final IDynamicStack<Contact> getCircleContactStack() {
     return ccstack;
   }
 
+  /**
+   * <p>getPolyCircleContactStack.</p>
+   *
+   * @return a {@link org.jbox2d.pooling.IDynamicStack} object
+   */
   public final IDynamicStack<Contact> getPolyCircleContactStack() {
     return cpstack;
   }
 
+  /** {@inheritDoc} */
   @Override
   public IDynamicStack<Contact> getEdgeCircleContactStack() {
     return ecstack;
   }
 
+  /** {@inheritDoc} */
   @Override
   public IDynamicStack<Contact> getEdgePolyContactStack() {
     return epstack;
   }
 
+  /** {@inheritDoc} */
   @Override
   public IDynamicStack<Contact> getChainCircleContactStack() {
     return chcstack;
   }
 
+  /** {@inheritDoc} */
   @Override
   public IDynamicStack<Contact> getChainPolyContactStack() {
     return chpstack;
   }
 
+  /**
+   * <p>popVec2.</p>
+   *
+   * @return a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public final float2 popVec2() {
     return vecs.pop();
   }
 
+  /** {@inheritDoc} */
   public final float2[] popVec2(int argNum) {
     return vecs.pop(argNum);
   }
 
+  /** {@inheritDoc} */
   public final void pushVec2(int argNum) {
     vecs.push(argNum);
   }
 
+  /**
+   * <p>popVec3.</p>
+   *
+   * @return a {@link com.github.rccookie.geometry.performance.float3} object
+   */
   public final float3 popVec3() {
     return vec3s.pop();
   }
 
+  /** {@inheritDoc} */
   public final float3[] popVec3(int argNum) {
     return vec3s.pop(argNum);
   }
 
+  /** {@inheritDoc} */
   public final void pushVec3(int argNum) {
     vec3s.push(argNum);
   }
 
+  /**
+   * <p>popMat22.</p>
+   *
+   * @return a {@link org.jbox2d.common.Mat22} object
+   */
   public final Mat22 popMat22() {
     return mats.pop();
   }
 
+  /** {@inheritDoc} */
   public final Mat22[] popMat22(int argNum) {
     return mats.pop(argNum);
   }
 
+  /** {@inheritDoc} */
   public final void pushMat22(int argNum) {
     mats.push(argNum);
   }
 
+  /**
+   * <p>popMat33.</p>
+   *
+   * @return a {@link org.jbox2d.common.Mat33} object
+   */
   public final Mat33 popMat33() {
     return mat33s.pop();
   }
 
+  /** {@inheritDoc} */
   public final void pushMat33(int argNum) {
     mat33s.push(argNum);
   }
 
+  /**
+   * <p>popAABB.</p>
+   *
+   * @return a {@link org.jbox2d.collision.AABB} object
+   */
   public final AABB popAABB() {
     return aabbs.pop();
   }
 
+  /** {@inheritDoc} */
   public final AABB[] popAABB(int argNum) {
     return aabbs.pop(argNum);
   }
 
+  /** {@inheritDoc} */
   public final void pushAABB(int argNum) {
     aabbs.push(argNum);
   }
 
+  /**
+   * <p>popRot.</p>
+   *
+   * @return a {@link org.jbox2d.common.Rot} object
+   */
   public final Rot popRot() {
     return rots.pop();
   }
 
+  /** {@inheritDoc} */
   public final void pushRot(int num) {
     rots.push(num);
   }
 
+  /**
+   * <p>Getter for the field <code>collision</code>.</p>
+   *
+   * @return a {@link org.jbox2d.collision.Collision} object
+   */
   public final Collision getCollision() {
     return collision;
   }
 
+  /**
+   * <p>getTimeOfImpact.</p>
+   *
+   * @return a {@link org.jbox2d.collision.TimeOfImpact} object
+   */
   public final TimeOfImpact getTimeOfImpact() {
     return toi;
   }
 
+  /**
+   * <p>getDistance.</p>
+   *
+   * @return a {@link org.jbox2d.collision.Distance} object
+   */
   public final Distance getDistance() {
     return dist;
   }
 
+  /** {@inheritDoc} */
   public final float[] getFloatArray(int argLength) {
     if (!afloats.containsKey(argLength)) {
       afloats.put(argLength, new float[argLength]);
@@ -258,6 +340,7 @@ public class DefaultWorldPool implements IWorldPool {
     return afloats.get(argLength);
   }
 
+  /** {@inheritDoc} */
   public final int[] getIntArray(int argLength) {
     if (!aints.containsKey(argLength)) {
       aints.put(argLength, new int[argLength]);
@@ -267,6 +350,7 @@ public class DefaultWorldPool implements IWorldPool {
     return aints.get(argLength);
   }
 
+  /** {@inheritDoc} */
   public final float2[] getVec2Array(int argLength) {
     if (!avecs.containsKey(argLength)) {
       float2[] ray = new float2[argLength];

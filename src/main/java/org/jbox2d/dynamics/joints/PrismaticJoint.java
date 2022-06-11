@@ -105,8 +105,9 @@ import org.jbox2d.pooling.IWorldPool;
  * A prismatic joint. This joint provides one degree of freedom: translation along an axis fixed in
  * bodyA. Relative rotation is prevented. You can use a joint limit to restrict the range of motion
  * and a joint motor to drive the motion or to model joint friction.
- * 
+ *
  * @author Daniel
+ * @version $Id: $Id
  */
 public class PrismaticJoint extends Joint {
 
@@ -141,6 +142,12 @@ public class PrismaticJoint extends Joint {
   private final Mat33 m_K;
   private float m_motorMass; // effective mass for motor/limit translational constraint.
 
+  /**
+   * <p>Constructor for PrismaticJoint.</p>
+   *
+   * @param argWorld a {@link org.jbox2d.pooling.IWorldPool} object
+   * @param def a {@link org.jbox2d.dynamics.joints.PrismaticJointDef} object
+   */
   protected PrismaticJoint(IWorldPool argWorld, PrismaticJointDef def) {
     super(argWorld, def);
     m_localAnchorA = new float2(def.localAnchorA);
@@ -168,24 +175,37 @@ public class PrismaticJoint extends Joint {
     m_perp = new float2();
   }
 
+  /**
+   * <p>getLocalAnchorA.</p>
+   *
+   * @return a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public float2 getLocalAnchorA() {
     return m_localAnchorA;
   }
 
+  /**
+   * <p>getLocalAnchorB.</p>
+   *
+   * @return a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public float2 getLocalAnchorB() {
     return m_localAnchorB;
   }
 
+  /** {@inheritDoc} */
   @Override
   public void getAnchorA(float2 argOut) {
     m_bodyA.getWorldPointToOut(m_localAnchorA, argOut);
   }
 
+  /** {@inheritDoc} */
   @Override
   public void getAnchorB(float2 argOut) {
     m_bodyB.getWorldPointToOut(m_localAnchorB, argOut);
   }
 
+  /** {@inheritDoc} */
   @Override
   public void getReactionForce(float inv_dt, float2 argOut) {
     float2 temp = pool.popVec2();
@@ -194,6 +214,7 @@ public class PrismaticJoint extends Joint {
     pool.pushVec2(1);
   }
 
+  /** {@inheritDoc} */
   @Override
   public float getReactionTorque(float inv_dt) {
     return inv_dt * m_impulse.y;
@@ -201,6 +222,8 @@ public class PrismaticJoint extends Joint {
 
   /**
    * Get the current joint translation, usually in meters.
+   *
+   * @return a float
    */
   public float getJointSpeed() {
     Body bA = m_bodyA;
@@ -246,6 +269,11 @@ public class PrismaticJoint extends Joint {
     return speed;
   }
 
+  /**
+   * <p>getJointTranslation.</p>
+   *
+   * @return a float
+   */
   public float getJointTranslation() {
     float2 pA = pool.popVec2(), pB = pool.popVec2(), axis = pool.popVec2();
     m_bodyA.getWorldPointToOut(m_localAnchorA, pA);
@@ -259,8 +287,8 @@ public class PrismaticJoint extends Joint {
 
   /**
    * Is the joint limit enabled?
-   * 
-   * @return
+   *
+   * @return a boolean
    */
   public boolean isLimitEnabled() {
     return m_enableLimit;
@@ -268,8 +296,8 @@ public class PrismaticJoint extends Joint {
 
   /**
    * Enable/disable the joint limit.
-   * 
-   * @param flag
+   *
+   * @param flag a boolean
    */
   public void enableLimit(boolean flag) {
     if (flag != m_enableLimit) {
@@ -282,8 +310,8 @@ public class PrismaticJoint extends Joint {
 
   /**
    * Get the lower joint limit, usually in meters.
-   * 
-   * @return
+   *
+   * @return a float
    */
   public float getLowerLimit() {
     return m_lowerTranslation;
@@ -291,8 +319,8 @@ public class PrismaticJoint extends Joint {
 
   /**
    * Get the upper joint limit, usually in meters.
-   * 
-   * @return
+   *
+   * @return a float
    */
   public float getUpperLimit() {
     return m_upperTranslation;
@@ -300,9 +328,9 @@ public class PrismaticJoint extends Joint {
 
   /**
    * Set the joint limits, usually in meters.
-   * 
-   * @param lower
-   * @param upper
+   *
+   * @param lower a float
+   * @param upper a float
    */
   public void setLimits(float lower, float upper) {
     assert (lower <= upper);
@@ -317,8 +345,8 @@ public class PrismaticJoint extends Joint {
 
   /**
    * Is the joint motor enabled?
-   * 
-   * @return
+   *
+   * @return a boolean
    */
   public boolean isMotorEnabled() {
     return m_enableMotor;
@@ -326,8 +354,8 @@ public class PrismaticJoint extends Joint {
 
   /**
    * Enable/disable the joint motor.
-   * 
-   * @param flag
+   *
+   * @param flag a boolean
    */
   public void enableMotor(boolean flag) {
     m_bodyA.setAwake(true);
@@ -337,8 +365,8 @@ public class PrismaticJoint extends Joint {
 
   /**
    * Set the motor speed, usually in meters per second.
-   * 
-   * @param speed
+   *
+   * @param speed a float
    */
   public void setMotorSpeed(float speed) {
     m_bodyA.setAwake(true);
@@ -348,8 +376,8 @@ public class PrismaticJoint extends Joint {
 
   /**
    * Get the motor speed, usually in meters per second.
-   * 
-   * @return
+   *
+   * @return a float
    */
   public float getMotorSpeed() {
     return m_motorSpeed;
@@ -357,8 +385,8 @@ public class PrismaticJoint extends Joint {
 
   /**
    * Set the maximum motor force, usually in N.
-   * 
-   * @param force
+   *
+   * @param force a float
    */
   public void setMaxMotorForce(float force) {
     m_bodyA.setAwake(true);
@@ -368,26 +396,42 @@ public class PrismaticJoint extends Joint {
 
   /**
    * Get the current motor force, usually in N.
-   * 
-   * @param inv_dt
-   * @return
+   *
+   * @param inv_dt a float
+   * @return a float
    */
   public float getMotorForce(float inv_dt) {
     return m_motorImpulse * inv_dt;
   }
 
+  /**
+   * <p>getMaxMotorForce.</p>
+   *
+   * @return a float
+   */
   public float getMaxMotorForce() {
     return m_maxMotorForce;
   }
 
+  /**
+   * <p>getReferenceAngle.</p>
+   *
+   * @return a float
+   */
   public float getReferenceAngle() {
     return m_referenceAngle;
   }
 
+  /**
+   * <p>getLocalAxisA.</p>
+   *
+   * @return a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public float2 getLocalAxisA() {
     return m_localXAxisA;
   }
 
+  /** {@inheritDoc} */
   @Override
   public void initVelocityConstraints(final SolverData data) {
     m_indexA = m_bodyA.m_islandIndex;
@@ -528,6 +572,7 @@ public class PrismaticJoint extends Joint {
     pool.pushVec2(4);
   }
 
+  /** {@inheritDoc} */
   @Override
   public void solveVelocityConstraints(final SolverData data) {
     float2 vA = data.velocities[m_indexA].v;
@@ -661,6 +706,7 @@ public class PrismaticJoint extends Joint {
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public boolean solvePositionConstraints(final SolverData data) {
 

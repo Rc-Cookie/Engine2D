@@ -27,7 +27,9 @@ import com.github.rccookie.geometry.performance.float2;
 
 /**
  * Output for Distance.
+ *
  * @author Daniel
+ * @version $Id: $Id
  */
 public class DistanceOutput {
 	/** Closest point on shapeA */

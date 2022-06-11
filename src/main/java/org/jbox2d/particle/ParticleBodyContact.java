@@ -3,6 +3,10 @@ package org.jbox2d.particle;
 import com.github.rccookie.geometry.performance.float2;
 import org.jbox2d.dynamics.Body;
 
+/**
+ * <p>ParticleBodyContact class.</p>
+ *
+ */
 public class ParticleBodyContact {
   /** Index of the particle making contact. */
   public int index;

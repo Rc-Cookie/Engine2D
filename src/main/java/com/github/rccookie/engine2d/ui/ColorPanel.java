@@ -1,12 +1,14 @@
 package com.github.rccookie.engine2d.ui;
 
-import com.github.rccookie.engine2d.Color;
-import com.github.rccookie.engine2d.Image;
 import com.github.rccookie.engine2d.UIObject;
+import com.github.rccookie.engine2d.image.Color;
+import com.github.rccookie.engine2d.image.Image;
+import com.github.rccookie.engine2d.image.ThemeColor;
+import com.github.rccookie.engine2d.util.ColorProperty;
 import com.github.rccookie.geometry.performance.int2;
 import com.github.rccookie.util.Arguments;
+
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * A simple rectangular panel with adjustable size and a solid color.
@@ -21,8 +23,7 @@ public class ColorPanel extends UIObject {
     /**
      * The color of the panel.
      */
-    @NotNull
-    private ThemeColor color;
+    public final ColorProperty color = new ColorProperty(this, ThemeColor.FIRST);
 
 
     /**
@@ -57,7 +58,8 @@ public class ColorPanel extends UIObject {
     public ColorPanel(UIObject parent, int2 size, ThemeColor color) {
         super(parent);
         this.size = size.clone();
-        this.color = Arguments.checkNull(color);
+        this.color.set(color);
+        setFocusable(false);
     }
 
     @Override
@@ -74,26 +76,6 @@ public class ColorPanel extends UIObject {
     @Override
     public int2 getSize() {
         return size;
-    }
-
-    /**
-     * Sets the color to be the specified color.
-     *
-     * @param color The color to use. {@code null} will use
-     *              the main theme color
-     */
-    public void setColor(@Nullable Color color) {
-        setColor(color != null ? ThemeColor.of(color) : ThemeColor.FIRST);
-    }
-
-    /**
-     * Sets the color to be the specified theme color.
-     *
-     * @param color The theme color to use
-     */
-    public void setColor(@NotNull ThemeColor color) {
-        this.color = Arguments.checkNull(color);
-        modified();
     }
 
     /**

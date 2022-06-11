@@ -2,7 +2,7 @@ package com.github.rccookie.engine2d;
 
 import com.github.rccookie.engine2d.core.LocalExecutionManager;
 import com.github.rccookie.engine2d.core.LocalInputManager;
-import com.github.rccookie.engine2d.util.NamedCaughtEvent;
+import com.github.rccookie.engine2d.util.NamedLazyEvent;
 import com.github.rccookie.event.Event;
 import com.github.rccookie.util.Arguments;
 
@@ -33,15 +33,15 @@ public abstract class Component {
     /**
      * Called once per frame before the attached gameobject's update event.
      */
-    public final Event earlyUpdate = new NamedCaughtEvent(false, () -> "Component.earlyUpdate on " + this);
+    public final Event earlyUpdate;
     /**
      * Called once per frame after the attached gameobject's update event.
      */
-    public final Event update      = new NamedCaughtEvent(false, () -> "Component.update on "      + this);
+    public final Event update;
     /**
      * Called once per frame after the attached gameobject's lateUpdate event.
      */
-    public final Event lateUpdate  = new NamedCaughtEvent(false, () -> "Component.lateUpdate on "  + this);
+    public final Event lateUpdate;
 
 
     /**
@@ -56,6 +56,11 @@ public abstract class Component {
      */
     public Component(GameObject gameObject) {
         this.gameObject = Arguments.checkNull(gameObject);
+
+        earlyUpdate = new NamedLazyEvent(gameObject.componentEarlyUpdate, false, () -> "Component.earlyUpdate on " + this);
+        update = new NamedLazyEvent(gameObject.componentUpdate, false, () -> "Component.update on "      + this);
+        lateUpdate = new NamedLazyEvent(gameObject.componentLateUpdate, false, () -> "Component.lateUpdate on "  + this);
+
         input = gameObject.input;
         execute = gameObject.execute; // TODO: Should probably test whether it's not removed yet
         gameObject.components.add(this);

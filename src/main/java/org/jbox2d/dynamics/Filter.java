@@ -26,8 +26,9 @@ package org.jbox2d.dynamics;
 // updated to rev 100
 /**
  * This holds contact filtering data.
- * 
+ *
  * @author daniel
+ * @version $Id: $Id
  */
 public class Filter {
 	/**
@@ -48,12 +49,20 @@ public class Filter {
 	 */
 	public int groupIndex;
 	
+	/**
+	 * <p>Constructor for Filter.</p>
+	 */
 	public Filter() {
 	  categoryBits = 0x0001;
       maskBits = 0xFFFF;
       groupIndex = 0;
     }
 	
+	/**
+	 * <p>set.</p>
+	 *
+	 * @param argOther a {@link org.jbox2d.dynamics.Filter} object
+	 */
 	public void set(Filter argOther) {
 		categoryBits = argOther.categoryBits;
 		maskBits = argOther.maskBits;

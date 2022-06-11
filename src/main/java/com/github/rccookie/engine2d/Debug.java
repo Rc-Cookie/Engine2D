@@ -34,7 +34,7 @@ public enum Debug {
         UI ui = Camera.getActive().getUI();
         if(ui != null)
             printUI(ui);
-        else Console.info("No UI attached to current camera");
+        else Console.log("No UI attached to current camera");
     }
 
     /**

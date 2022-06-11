@@ -1,6 +1,6 @@
 package com.github.rccookie.engine2d.impl;
 
-import com.github.rccookie.engine2d.Color;
+import com.github.rccookie.engine2d.image.Color;
 import com.github.rccookie.engine2d.core.DrawObject;
 import com.github.rccookie.geometry.performance.int2;
 

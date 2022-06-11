@@ -37,16 +37,24 @@ import org.jbox2d.dynamics.joints.JointEdge;
 
 /**
  * A rigid body. These are created via World.createBody.
- * 
+ *
  * @author Daniel Murphy
+ * @version $Id: $Id
  */
 public class Body {
+  /** Constant <code>e_islandFlag=0x0001</code> */
   public static final int e_islandFlag = 0x0001;
+  /** Constant <code>e_awakeFlag=0x0002</code> */
   public static final int e_awakeFlag = 0x0002;
+  /** Constant <code>e_autoSleepFlag=0x0004</code> */
   public static final int e_autoSleepFlag = 0x0004;
+  /** Constant <code>e_bulletFlag=0x0008</code> */
   public static final int e_bulletFlag = 0x0008;
+  /** Constant <code>e_fixedRotationFlag=0x0010</code> */
   public static final int e_fixedRotationFlag = 0x0010;
+  /** Constant <code>e_activeFlag=0x0020</code> */
   public static final int e_activeFlag = 0x0020;
+  /** Constant <code>e_toiFlag=0x0040</code> */
   public static final int e_toiFlag = 0x0040;
 
   public BodyType m_type;
@@ -99,6 +107,12 @@ public class Body {
   public Object m_userData;
 
 
+  /**
+   * <p>Constructor for Body.</p>
+   *
+   * @param bd a {@link org.jbox2d.dynamics.BodyDef} object
+   * @param world a {@link org.jbox2d.dynamics.World} object
+   */
   public Body(final BodyDef bd, World world) {
     assert (bd.position.isValid());
     assert (bd.linearVelocity.isValid());
@@ -177,9 +191,10 @@ public class Body {
    * parameters, like friction. Otherwise you can create the fixture directly from a shape. If the
    * density is non-zero, this function automatically updates the mass of the body. Contacts are not
    * created until the next time step.
-   * 
+   *
    * @param def the fixture definition.
-   * @warning This function is locked during callbacks.
+   *
+   * @return a {@link org.jbox2d.dynamics.Fixture} object
    */
   public final Fixture createFixture(FixtureDef def) {
     assert (!m_world.isLocked());
@@ -220,10 +235,11 @@ public class Body {
    * Creates a fixture from a shape and attach it to this body. This is a convenience function. Use
    * FixtureDef if you need to set parameters like friction, restitution, user data, or filtering.
    * If the density is non-zero, this function automatically updates the mass of the body.
-   * 
+   *
    * @param shape the shape to be cloned.
    * @param density the shape density (set to zero for static bodies).
-   * @warning This function is locked during callbacks.
+   *
+   * @return a {@link org.jbox2d.dynamics.Fixture} object
    */
   public final Fixture createFixture(Shape shape, float density) {
     fixDef.shape = shape;
@@ -237,9 +253,9 @@ public class Body {
    * associated with this fixture. This will automatically adjust the mass of the body if the body
    * is dynamic and the fixture has positive density. All fixtures attached to a body are implicitly
    * destroyed when the body is destroyed.
-   * 
+   *
    * @param fixture the fixture to be removed.
-   * @warning This function is locked during callbacks.
+   *
    */
   public final void destroyFixture(Fixture fixture) {
     assert (!m_world.isLocked());
@@ -310,7 +326,7 @@ public class Body {
    * Set the position of the body's origin and rotation. This breaks any contacts and wakes the
    * other bodies. Manipulating a body's transform may cause non-physical behavior. Note: contacts
    * are updated on the next call to World.step().
-   * 
+   *
    * @param position the world position of the body's local origin.
    * @param angle the world rotation in radians.
    */
@@ -338,7 +354,7 @@ public class Body {
 
   /**
    * Get the body transform for the body's origin.
-   * 
+   *
    * @return the world transform of the body's origin.
    */
   public final Transform getTransform() {
@@ -347,7 +363,7 @@ public class Body {
 
   /**
    * Get the world body origin position. Do not modify.
-   * 
+   *
    * @return the world position of the body's origin.
    */
   public final float2 getPosition() {
@@ -356,7 +372,7 @@ public class Body {
 
   /**
    * Get the angle in radians.
-   * 
+   *
    * @return the current world rotation angle in radians.
    */
   public final float getAngle() {
@@ -365,6 +381,8 @@ public class Body {
 
   /**
    * Get the world position of the center of mass. Do not modify.
+   *
+   * @return a {@link com.github.rccookie.geometry.performance.float2} object
    */
   public final float2 getWorldCenter() {
     return m_sweep.c;
@@ -372,6 +390,8 @@ public class Body {
 
   /**
    * Get the local position of the center of mass. Do not modify.
+   *
+   * @return a {@link com.github.rccookie.geometry.performance.float2} object
    */
   public final float2 getLocalCenter() {
     return m_sweep.localCenter;
@@ -379,7 +399,7 @@ public class Body {
 
   /**
    * Set the linear velocity of the center of mass.
-   * 
+   *
    * @param v the new linear velocity of the center of mass.
    */
   public final void setLinearVelocity(float2 v) {
@@ -397,7 +417,7 @@ public class Body {
   /**
    * Get the linear velocity of the center of mass. Do not modify, instead use
    * {@link #setLinearVelocity(float2)}.
-   * 
+   *
    * @return the linear velocity of the center of mass.
    */
   public final float2 getLinearVelocity() {
@@ -406,8 +426,8 @@ public class Body {
 
   /**
    * Set the angular velocity.
-   * 
-   * @param omega the new angular velocity in radians/second.
+   *
+   * @param w a float
    */
   public final void setAngularVelocity(float w) {
     if (m_type == BodyType.STATIC) {
@@ -423,7 +443,7 @@ public class Body {
 
   /**
    * Get the angular velocity.
-   * 
+   *
    * @return the angular velocity in radians/second.
    */
   public final float getAngularVelocity() {
@@ -432,8 +452,8 @@ public class Body {
 
   /**
    * Get the gravity scale of the body.
-   * 
-   * @return
+   *
+   * @return a float
    */
   public float getGravityScale() {
     return m_gravityScale;
@@ -441,8 +461,8 @@ public class Body {
 
   /**
    * Set the gravity scale of the body.
-   * 
-   * @param gravityScale
+   *
+   * @param gravityScale a float
    */
   public void setGravityScale(float gravityScale) {
     this.m_gravityScale = gravityScale;
@@ -451,7 +471,7 @@ public class Body {
   /**
    * Apply a force at a world point. If the force is not applied at the center of mass, it will
    * generate a torque and affect the angular velocity. This wakes up the body.
-   * 
+   *
    * @param force the world force vector, usually in Newtons (N).
    * @param point the world position of the point of application.
    */
@@ -477,7 +497,7 @@ public class Body {
 
   /**
    * Apply a force to the center of mass. This wakes up the body.
-   * 
+   *
    * @param force the world force vector, usually in Newtons (N).
    */
   public final void applyForceToCenter(float2 force) {
@@ -496,7 +516,7 @@ public class Body {
   /**
    * Apply a torque. This affects the angular velocity without affecting the linear velocity of the
    * center of mass. This wakes up the body.
-   * 
+   *
    * @param torque about the z-axis (out of the screen), usually in N-m.
    */
   public final void applyTorque(float torque) {
@@ -516,7 +536,7 @@ public class Body {
    * angular velocity if the point of application is not at the center of mass. This wakes up the
    * body if 'wake' is set to true. If the body is sleeping and 'wake' is false, then there is no
    * effect.
-   * 
+   *
    * @param impulse the world impulse vector, usually in N-seconds or kg-m/s.
    * @param point the world position of the point of application.
    * @param wake also wake up the body
@@ -543,7 +563,7 @@ public class Body {
 
   /**
    * Apply an angular impulse.
-   * 
+   *
    * @param impulse the angular impulse in units of kg*m*m/s
    */
   public void applyAngularImpulse(float impulse) {
@@ -559,7 +579,7 @@ public class Body {
 
   /**
    * Get the total mass of the body.
-   * 
+   *
    * @return the mass, usually in kilograms (kg).
    */
   public final float getMass() {
@@ -568,7 +588,7 @@ public class Body {
 
   /**
    * Get the central rotational inertia of the body.
-   * 
+   *
    * @return the rotational inertia, usually in kg-m^2.
    */
   public final float getInertia() {
@@ -580,8 +600,8 @@ public class Body {
 
   /**
    * Get the mass data of the body. The rotational inertia is relative to the center of mass.
-   * 
-   * @return a struct containing the mass, inertia and center of the body.
+   *
+   * @param data a {@link org.jbox2d.collision.shapes.MassData} object
    */
   public final void getMassData(MassData data) {
     // data.mass = m_mass;
@@ -602,7 +622,7 @@ public class Body {
    * Set the mass properties to override the mass properties of the fixtures. Note that this changes
    * the center of mass position. Note that creating or destroying fixtures can also alter the mass.
    * This function has no effect if the body isn't dynamic.
-   * 
+   *
    * @param massData the mass properties.
    */
   public final void setMassData(MassData massData) {
@@ -735,7 +755,7 @@ public class Body {
 
   /**
    * Get the world coordinates of a point given the local coordinates.
-   * 
+   *
    * @param localPoint a point on the body measured relative the the body's origin.
    * @return the same point expressed in world coordinates.
    */
@@ -745,13 +765,19 @@ public class Body {
     return v;
   }
 
+  /**
+   * <p>getWorldPointToOut.</p>
+   *
+   * @param localPoint a {@link com.github.rccookie.geometry.performance.float2} object
+   * @param out a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public final void getWorldPointToOut(float2 localPoint, float2 out) {
     Transform.mulToOut(m_xf, localPoint, out);
   }
 
   /**
    * Get the world coordinates of a vector given the local coordinates.
-   * 
+   *
    * @param localVector a vector fixed in the body.
    * @return the same vector expressed in world coordinates.
    */
@@ -761,19 +787,31 @@ public class Body {
     return out;
   }
 
+  /**
+   * <p>getWorldVectorToOut.</p>
+   *
+   * @param localVector a {@link com.github.rccookie.geometry.performance.float2} object
+   * @param out a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public final void getWorldVectorToOut(float2 localVector, float2 out) {
     Rot.mulToOut(m_xf.q, localVector, out);
   }
 
+  /**
+   * <p>getWorldVectorToOutUnsafe.</p>
+   *
+   * @param localVector a {@link com.github.rccookie.geometry.performance.float2} object
+   * @param out a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public final void getWorldVectorToOutUnsafe(float2 localVector, float2 out) {
     Rot.mulToOutUnsafe(m_xf.q, localVector, out);
   }
 
   /**
    * Gets a local point relative to the body's origin given a world point.
-   * 
-   * @param a point in world coordinates.
+   *
    * @return the corresponding local point relative to the body's origin.
+   * @param worldPoint a {@link com.github.rccookie.geometry.performance.float2} object
    */
   public final float2 getLocalPoint(float2 worldPoint) {
     float2 out = new float2();
@@ -781,15 +819,21 @@ public class Body {
     return out;
   }
 
+  /**
+   * <p>getLocalPointToOut.</p>
+   *
+   * @param worldPoint a {@link com.github.rccookie.geometry.performance.float2} object
+   * @param out a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public final void getLocalPointToOut(float2 worldPoint, float2 out) {
     Transform.mulTransToOut(m_xf, worldPoint, out);
   }
 
   /**
    * Gets a local vector given a world vector.
-   * 
-   * @param a vector in world coordinates.
+   *
    * @return the corresponding local vector.
+   * @param worldVector a {@link com.github.rccookie.geometry.performance.float2} object
    */
   public final float2 getLocalVector(float2 worldVector) {
     float2 out = new float2();
@@ -797,19 +841,31 @@ public class Body {
     return out;
   }
 
+  /**
+   * <p>getLocalVectorToOut.</p>
+   *
+   * @param worldVector a {@link com.github.rccookie.geometry.performance.float2} object
+   * @param out a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public final void getLocalVectorToOut(float2 worldVector, float2 out) {
     Rot.mulTrans(m_xf.q, worldVector, out);
   }
 
+  /**
+   * <p>getLocalVectorToOutUnsafe.</p>
+   *
+   * @param worldVector a {@link com.github.rccookie.geometry.performance.float2} object
+   * @param out a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public final void getLocalVectorToOutUnsafe(float2 worldVector, float2 out) {
     Rot.mulTransUnsafe(m_xf.q, worldVector, out);
   }
 
   /**
    * Get the world linear velocity of a world point attached to this body.
-   * 
-   * @param a point in world coordinates.
+   *
    * @return the world velocity of a point.
+   * @param worldPoint a {@link com.github.rccookie.geometry.performance.float2} object
    */
   public final float2 getLinearVelocityFromWorldPoint(float2 worldPoint) {
     float2 out = new float2();
@@ -817,6 +873,12 @@ public class Body {
     return out;
   }
 
+  /**
+   * <p>getLinearVelocityFromWorldPointToOut.</p>
+   *
+   * @param worldPoint a {@link com.github.rccookie.geometry.performance.float2} object
+   * @param out a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public final void getLinearVelocityFromWorldPointToOut(float2 worldPoint, float2 out) {
     final float tempX = worldPoint.x - m_sweep.c.x;
     final float tempY = worldPoint.y - m_sweep.c.y;
@@ -826,9 +888,9 @@ public class Body {
 
   /**
    * Get the world velocity of a local point.
-   * 
-   * @param a point in local coordinates.
+   *
    * @return the world velocity of a point.
+   * @param localPoint a {@link com.github.rccookie.geometry.performance.float2} object
    */
   public final float2 getLinearVelocityFromLocalPoint(float2 localPoint) {
     float2 out = new float2();
@@ -836,39 +898,66 @@ public class Body {
     return out;
   }
 
+  /**
+   * <p>getLinearVelocityFromLocalPointToOut.</p>
+   *
+   * @param localPoint a {@link com.github.rccookie.geometry.performance.float2} object
+   * @param out a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public final void getLinearVelocityFromLocalPointToOut(float2 localPoint, float2 out) {
     getWorldPointToOut(localPoint, out);
     getLinearVelocityFromWorldPointToOut(out, out);
   }
 
-  /** Get the linear damping of the body. */
+  /**
+   * Get the linear damping of the body.
+   *
+   * @return a float
+   */
   public final float getLinearDamping() {
     return m_linearDamping;
   }
 
-  /** Set the linear damping of the body. */
+  /**
+   * Set the linear damping of the body.
+   *
+   * @param linearDamping a float
+   */
   public final void setLinearDamping(float linearDamping) {
     m_linearDamping = linearDamping;
   }
 
-  /** Get the angular damping of the body. */
+  /**
+   * Get the angular damping of the body.
+   *
+   * @return a float
+   */
   public final float getAngularDamping() {
     return m_angularDamping;
   }
 
-  /** Set the angular damping of the body. */
+  /**
+   * Set the angular damping of the body.
+   *
+   * @param angularDamping a float
+   */
   public final void setAngularDamping(float angularDamping) {
     m_angularDamping = angularDamping;
   }
 
+  /**
+   * <p>getType.</p>
+   *
+   * @return a {@link org.jbox2d.dynamics.BodyType} object
+   */
   public BodyType getType() {
     return m_type;
   }
 
   /**
    * Set the type of this body. This may alter the mass and velocity.
-   * 
-   * @param type
+   *
+   * @param type a {@link org.jbox2d.dynamics.BodyType} object
    */
   public void setType(BodyType type) {
     assert (!m_world.isLocked());
@@ -916,12 +1005,20 @@ public class Body {
     }
   }
 
-  /** Is this body treated like a bullet for continuous collision detection? */
+  /**
+   * Is this body treated like a bullet for continuous collision detection?
+   *
+   * @return a boolean
+   */
   public final boolean isBullet() {
     return (m_flags & e_bulletFlag) == e_bulletFlag;
   }
 
-  /** Should this body be treated like a bullet for continuous collision detection? */
+  /**
+   * Should this body be treated like a bullet for continuous collision detection?
+   *
+   * @param flag a boolean
+   */
   public final void setBullet(boolean flag) {
     if (flag) {
       m_flags |= e_bulletFlag;
@@ -932,8 +1029,8 @@ public class Body {
 
   /**
    * You can disable sleeping on this body. If you disable sleeping, the body will be woken.
-   * 
-   * @param flag
+   *
+   * @param flag a boolean
    */
   public void setSleepingAllowed(boolean flag) {
     if (flag) {
@@ -946,8 +1043,8 @@ public class Body {
 
   /**
    * Is this body allowed to sleep
-   * 
-   * @return
+   *
+   * @return a boolean
    */
   public boolean isSleepingAllowed() {
     return (m_flags & e_autoSleepFlag) == e_autoSleepFlag;
@@ -956,7 +1053,7 @@ public class Body {
   /**
    * Set the sleep state of the body. A sleeping body has very low CPU cost.
    * Note that putting it to sleep will set its velocities and forces to zero.
-   * 
+   *
    * @param flag set to true to wake the body, false to put it to sleep
    */
   public void setAwake(boolean flag) {
@@ -977,7 +1074,7 @@ public class Body {
 
   /**
    * Get the sleeping state of this body.
-   * 
+   *
    * @return true if the body is awake.
    */
   public boolean isAwake() {
@@ -993,8 +1090,8 @@ public class Body {
    * and will not participate in collisions, ray-casts, or queries. Joints connected to an inactive
    * body are implicitly inactive. An inactive body is still owned by a World object and remains in
    * the body list.
-   * 
-   * @param flag
+   *
+   * @param flag a boolean
    */
   public void setActive(boolean flag) {
     assert (!m_world.isLocked());
@@ -1035,8 +1132,8 @@ public class Body {
 
   /**
    * Get the active state of the body.
-   * 
-   * @return
+   *
+   * @return a boolean
    */
   public boolean isActive() {
     return (m_flags & e_activeFlag) == e_activeFlag;
@@ -1044,8 +1141,8 @@ public class Body {
 
   /**
    * Set this body to have fixed rotation. This causes the mass to be reset.
-   * 
-   * @param flag
+   *
+   * @param flag a boolean
    */
   public void setFixedRotation(boolean flag) {
     if (flag) {
@@ -1059,45 +1156,64 @@ public class Body {
 
   /**
    * Does this body have fixed rotation?
-   * 
-   * @return
+   *
+   * @return a boolean
    */
   public boolean isFixedRotation() {
     return (m_flags & e_fixedRotationFlag) == e_fixedRotationFlag;
   }
 
-  /** Get the list of all fixtures attached to this body. */
+  /**
+   * Get the list of all fixtures attached to this body.
+   *
+   * @return a {@link org.jbox2d.dynamics.Fixture} object
+   */
   public final Fixture getFixtureList() {
     return m_fixtureList;
   }
 
-  /** Get the list of all joints attached to this body. */
+  /**
+   * Get the list of all joints attached to this body.
+   *
+   * @return a {@link org.jbox2d.dynamics.joints.JointEdge} object
+   */
   public final JointEdge getJointList() {
     return m_jointList;
   }
 
   /**
    * Get the list of all contacts attached to this body.
-   * 
-   * @warning this list changes during the time step and you may miss some collisions if you don't
+   *
+   *
    *          use ContactListener.
+   * @return a {@link org.jbox2d.dynamics.contacts.ContactEdge} object
    */
   public final ContactEdge getContactList() {
     return m_contactList;
   }
 
-  /** Get the next body in the world's body list. */
+  /**
+   * Get the next body in the world's body list.
+   *
+   * @return a {@link org.jbox2d.dynamics.Body} object
+   */
   public final Body getNext() {
     return m_next;
   }
 
-  /** Get the user data pointer that was provided in the body definition. */
+  /**
+   * Get the user data pointer that was provided in the body definition.
+   *
+   * @return a {@link java.lang.Object} object
+   */
   public final Object getUserData() {
     return m_userData;
   }
 
   /**
    * Set the user data. Use this to store your application specific data.
+   *
+   * @param data a {@link java.lang.Object} object
    */
   public final void setUserData(Object data) {
     m_userData = data;
@@ -1105,6 +1221,8 @@ public class Body {
 
   /**
    * Get the parent world of this body.
+   *
+   * @return a {@link org.jbox2d.dynamics.World} object
    */
   public final World getWorld() {
     return m_world;
@@ -1113,6 +1231,9 @@ public class Body {
   // djm pooling
   private final Transform pxf = new Transform();
 
+  /**
+   * <p>synchronizeFixtures.</p>
+   */
   protected final void synchronizeFixtures() {
     final Transform xf1 = pxf;
     // xf1.position = m_sweep.c0 - Mul(xf1.R, m_sweep.localCenter);
@@ -1132,6 +1253,9 @@ public class Body {
     }
   }
 
+  /**
+   * <p>synchronizeTransform.</p>
+   */
   public final void synchronizeTransform() {
     // m_xf.q.set(m_sweep.a);
     //
@@ -1150,9 +1274,9 @@ public class Body {
   /**
    * This is used to prevent connected bodies from colliding. It may lie, depending on the
    * collideConnected flag.
-   * 
-   * @param other
-   * @return
+   *
+   * @param other a {@link org.jbox2d.dynamics.Body} object
+   * @return a boolean
    */
   public boolean shouldCollide(Body other) {
     // At least one body should be dynamic.
@@ -1172,6 +1296,11 @@ public class Body {
     return true;
   }
 
+  /**
+   * <p>advance.</p>
+   *
+   * @param t a float
+   */
   protected final void advance(float t) {
     // Advance to the new safe time. This doesn't sync the broad-phase.
     m_sweep.advance(t);

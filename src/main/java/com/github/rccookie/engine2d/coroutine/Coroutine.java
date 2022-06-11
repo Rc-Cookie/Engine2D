@@ -6,11 +6,12 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
-import com.github.rccookie.engine2d.util.FutureImpl;
+import com.github.rccookie.util.FutureImpl;
+import com.github.rccookie.util.NoWaitFutureImpl;
 
 public abstract class Coroutine<T> {
 
-    private final FutureImpl<T> result = new FutureImpl<>();
+    private final FutureImpl<T> result = new NoWaitFutureImpl<>();
 
     protected abstract Wait getNextChunk();
 
@@ -24,13 +25,13 @@ public abstract class Coroutine<T> {
             System.err.println("Exception occurred in coroutine execution:");
             e.printStackTrace();
             if(!result.isDone())
-                result.cancel();
+                result.fail(e);
             return null;
         }
     }
 
     protected void setResult(T result) {
-        this.result.setValue(result);
+        this.result.complete(result);
     }
 
     public FutureImpl<T> getResult() {

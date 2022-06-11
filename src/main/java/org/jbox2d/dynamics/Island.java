@@ -158,8 +158,9 @@ import org.jbox2d.dynamics.joints.Joint;
 
 /**
  * This is an internal class.
- * 
+ *
  * @author Daniel Murphy
+ * @version $Id: $Id
  */
 public class Island {
 
@@ -180,10 +181,21 @@ public class Island {
   public int m_contactCapacity;
   public int m_jointCapacity;
 
+  /**
+   * <p>Constructor for Island.</p>
+   */
   public Island() {
 
   }
 
+  /**
+   * <p>init.</p>
+   *
+   * @param bodyCapacity a int
+   * @param contactCapacity a int
+   * @param jointCapacity a int
+   * @param listener a {@link org.jbox2d.callbacks.ContactListener} object
+   */
   public void init(int bodyCapacity, int contactCapacity, int jointCapacity,
       ContactListener listener) {
     // System.out.println("Initializing Island");
@@ -227,6 +239,9 @@ public class Island {
     }
   }
 
+  /**
+   * <p>clear.</p>
+   */
   public void clear() {
     m_bodyCount = 0;
     m_contactCount = 0;
@@ -238,6 +253,14 @@ public class Island {
   private final SolverData solverData = new SolverData();
   private final ContactSolverDef solverDef = new ContactSolverDef();
 
+  /**
+   * <p>solve.</p>
+   *
+   * @param profile a Profile object
+   * @param step a {@link org.jbox2d.dynamics.TimeStep} object
+   * @param gravity a {@link com.github.rccookie.geometry.performance.float2} object
+   * @param allowSleep a boolean
+   */
   public void solve(Profile profile, TimeStep step, float2 gravity, boolean allowSleep) {
 
     // System.out.println("Solving Island");
@@ -431,6 +454,13 @@ public class Island {
   private final ContactSolver toiContactSolver = new ContactSolver();
   private final ContactSolverDef toiSolverDef = new ContactSolverDef();
 
+  /**
+   * <p>solveTOI.</p>
+   *
+   * @param subStep a {@link org.jbox2d.dynamics.TimeStep} object
+   * @param toiIndexA a int
+   * @param toiIndexB a int
+   */
   public void solveTOI(TimeStep subStep, int toiIndexA, int toiIndexB) {
     assert (toiIndexA < m_bodyCount);
     assert (toiIndexB < m_bodyCount);
@@ -562,6 +592,11 @@ public class Island {
     report(toiContactSolver.m_velocityConstraints);
   }
 
+  /**
+   * <p>add.</p>
+   *
+   * @param body a {@link org.jbox2d.dynamics.Body} object
+   */
   public void add(Body body) {
     assert (m_bodyCount < m_bodyCapacity);
     body.m_islandIndex = m_bodyCount;
@@ -569,11 +604,21 @@ public class Island {
     ++m_bodyCount;
   }
 
+  /**
+   * <p>add.</p>
+   *
+   * @param contact a {@link org.jbox2d.dynamics.contacts.Contact} object
+   */
   public void add(Contact contact) {
     assert (m_contactCount < m_contactCapacity);
     m_contacts[m_contactCount++] = contact;
   }
 
+  /**
+   * <p>add.</p>
+   *
+   * @param joint a {@link org.jbox2d.dynamics.joints.Joint} object
+   */
   public void add(Joint joint) {
     assert (m_jointCount < m_jointCapacity);
     m_joints[m_jointCount++] = joint;
@@ -581,6 +626,11 @@ public class Island {
 
   private final ContactImpulse impulse = new ContactImpulse();
 
+  /**
+   * <p>report.</p>
+   *
+   * @param constraints an array of {@link org.jbox2d.dynamics.contacts.ContactVelocityConstraint} objects
+   */
   public void report(ContactVelocityConstraint[] constraints) {
     if (m_listener == null) {
       return;

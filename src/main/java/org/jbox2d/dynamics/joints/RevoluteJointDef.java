@@ -54,11 +54,12 @@ import org.jbox2d.dynamics.Body;
  * The definition uses local anchor points so that the initial configuration can violate the
  * constraint slightly. You also need to specify the initial relative angle for joint limits. This
  * helps when saving and loading a game. The local anchor points are measured from the body's origin
- * rather than the center of mass because:<br/>
+ * rather than the center of mass because:
  * <ul>
  * <li>you might not know where the center of mass will be.</li>
  * <li>if you add/remove shapes from a body and recompute the mass, the joints will be broken.</li>
  * </ul>
+ *
  */
 public class RevoluteJointDef extends JointDef {
 
@@ -107,6 +108,9 @@ public class RevoluteJointDef extends JointDef {
    */
   public float maxMotorTorque;
 
+  /**
+   * <p>Constructor for RevoluteJointDef.</p>
+   */
   public RevoluteJointDef() {
     super(JointType.REVOLUTE);
     localAnchorA = new float2(0.0f, 0.0f);
@@ -122,10 +126,10 @@ public class RevoluteJointDef extends JointDef {
 
   /**
    * Initialize the bodies, anchors, and reference angle using the world anchor.
-   * 
-   * @param b1
-   * @param b2
-   * @param anchor
+   *
+   * @param b1 a {@link org.jbox2d.dynamics.Body} object
+   * @param b2 a {@link org.jbox2d.dynamics.Body} object
+   * @param anchor a {@link com.github.rccookie.geometry.performance.float2} object
    */
   public void initialize(final Body b1, final Body b2, final float2 anchor) {
     bodyA = b1;

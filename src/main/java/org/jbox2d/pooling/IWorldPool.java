@@ -36,66 +36,219 @@ import org.jbox2d.dynamics.contacts.Contact;
 
 /**
  * World pool interface
- * @author Daniel
  *
+ * @author Daniel
+ * @version $Id: $Id
  */
 public interface IWorldPool {
 
+	/**
+	 * <p>getPolyContactStack.</p>
+	 *
+	 * @return a {@link org.jbox2d.pooling.IDynamicStack} object
+	 */
 	public IDynamicStack<Contact> getPolyContactStack();
 
+	/**
+	 * <p>getCircleContactStack.</p>
+	 *
+	 * @return a {@link org.jbox2d.pooling.IDynamicStack} object
+	 */
 	public IDynamicStack<Contact> getCircleContactStack();
 
+	/**
+	 * <p>getPolyCircleContactStack.</p>
+	 *
+	 * @return a {@link org.jbox2d.pooling.IDynamicStack} object
+	 */
 	public IDynamicStack<Contact> getPolyCircleContactStack();
 	
+    /**
+     * <p>getEdgeCircleContactStack.</p>
+     *
+     * @return a {@link org.jbox2d.pooling.IDynamicStack} object
+     */
     public IDynamicStack<Contact> getEdgeCircleContactStack();
     
+    /**
+     * <p>getEdgePolyContactStack.</p>
+     *
+     * @return a {@link org.jbox2d.pooling.IDynamicStack} object
+     */
     public IDynamicStack<Contact> getEdgePolyContactStack();
 
+    /**
+     * <p>getChainCircleContactStack.</p>
+     *
+     * @return a {@link org.jbox2d.pooling.IDynamicStack} object
+     */
     public IDynamicStack<Contact> getChainCircleContactStack();
     
+    /**
+     * <p>getChainPolyContactStack.</p>
+     *
+     * @return a {@link org.jbox2d.pooling.IDynamicStack} object
+     */
     public IDynamicStack<Contact> getChainPolyContactStack();
     
+	/**
+	 * <p>popVec2.</p>
+	 *
+	 * @return a {@link com.github.rccookie.geometry.performance.float2} object
+	 */
 	public float2 popVec2();
 
+	/**
+	 * <p>popVec2.</p>
+	 *
+	 * @param num a int
+	 * @return an array of {@link com.github.rccookie.geometry.performance.float2} objects
+	 */
 	public float2[] popVec2(int num);
 
+	/**
+	 * <p>pushVec2.</p>
+	 *
+	 * @param num a int
+	 */
 	public void pushVec2(int num);
 
+	/**
+	 * <p>popVec3.</p>
+	 *
+	 * @return a {@link com.github.rccookie.geometry.performance.float3} object
+	 */
 	public float3 popVec3();
 
+	/**
+	 * <p>popVec3.</p>
+	 *
+	 * @param num a int
+	 * @return an array of {@link com.github.rccookie.geometry.performance.float3} objects
+	 */
 	public float3[] popVec3(int num);
 
+	/**
+	 * <p>pushVec3.</p>
+	 *
+	 * @param num a int
+	 */
 	public void pushVec3(int num);
 
+	/**
+	 * <p>popMat22.</p>
+	 *
+	 * @return a {@link org.jbox2d.common.Mat22} object
+	 */
 	public Mat22 popMat22();
 
+	/**
+	 * <p>popMat22.</p>
+	 *
+	 * @param num a int
+	 * @return an array of {@link org.jbox2d.common.Mat22} objects
+	 */
 	public Mat22[] popMat22(int num);
 
+	/**
+	 * <p>pushMat22.</p>
+	 *
+	 * @param num a int
+	 */
 	public void pushMat22(int num);
 	
+	/**
+	 * <p>popMat33.</p>
+	 *
+	 * @return a {@link org.jbox2d.common.Mat33} object
+	 */
 	public Mat33 popMat33();
 	
+	/**
+	 * <p>pushMat33.</p>
+	 *
+	 * @param num a int
+	 */
 	public void pushMat33(int num);
 
+	/**
+	 * <p>popAABB.</p>
+	 *
+	 * @return a {@link org.jbox2d.collision.AABB} object
+	 */
 	public AABB popAABB();
 
+	/**
+	 * <p>popAABB.</p>
+	 *
+	 * @param num a int
+	 * @return an array of {@link org.jbox2d.collision.AABB} objects
+	 */
 	public AABB[] popAABB(int num);
 
+	/**
+	 * <p>pushAABB.</p>
+	 *
+	 * @param num a int
+	 */
 	public void pushAABB(int num);
 	
+	/**
+	 * <p>popRot.</p>
+	 *
+	 * @return a {@link org.jbox2d.common.Rot} object
+	 */
 	public Rot popRot();
 
+	/**
+	 * <p>pushRot.</p>
+	 *
+	 * @param num a int
+	 */
 	public void pushRot(int num);
 	
+	/**
+	 * <p>getCollision.</p>
+	 *
+	 * @return a {@link org.jbox2d.collision.Collision} object
+	 */
 	public Collision getCollision();
 
+	/**
+	 * <p>getTimeOfImpact.</p>
+	 *
+	 * @return a {@link org.jbox2d.collision.TimeOfImpact} object
+	 */
 	public TimeOfImpact getTimeOfImpact();
 
+	/**
+	 * <p>getDistance.</p>
+	 *
+	 * @return a {@link org.jbox2d.collision.Distance} object
+	 */
 	public Distance getDistance();
 
+	/**
+	 * <p>getFloatArray.</p>
+	 *
+	 * @param argLength a int
+	 * @return an array of {@link float} objects
+	 */
 	public float[] getFloatArray(int argLength);
 
+	/**
+	 * <p>getIntArray.</p>
+	 *
+	 * @param argLength a int
+	 * @return an array of {@link int} objects
+	 */
 	public int[] getIntArray(int argLength);
 
+	/**
+	 * <p>getVec2Array.</p>
+	 *
+	 * @param argLength a int
+	 * @return an array of {@link com.github.rccookie.geometry.performance.float2} objects
+	 */
 	public float2[] getVec2Array(int argLength);
 }

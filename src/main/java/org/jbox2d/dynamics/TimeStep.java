@@ -26,6 +26,7 @@ package org.jbox2d.dynamics;
 //updated to rev 100
 /**
  * This is an internal structure.
+ *
  */
 public class TimeStep {
 	

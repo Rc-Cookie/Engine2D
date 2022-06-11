@@ -53,8 +53,9 @@ import org.jbox2d.pooling.IWorldPool;
  * the relative rotation with a joint limit that specifies a lower and upper angle. You can use a
  * motor to drive the relative rotation about the shared point. A maximum motor torque is provided
  * so that infinite forces are not generated.
- * 
+ *
  * @author Daniel Murphy
+ * @version $Id: $Id
  */
 public class RevoluteJoint extends Joint {
 
@@ -88,6 +89,12 @@ public class RevoluteJoint extends Joint {
   private float m_motorMass; // effective mass for motor/limit angular constraint.
   private LimitState m_limitState;
 
+  /**
+   * <p>Constructor for RevoluteJoint.</p>
+   *
+   * @param argWorld a {@link org.jbox2d.pooling.IWorldPool} object
+   * @param def a {@link org.jbox2d.dynamics.joints.RevoluteJointDef} object
+   */
   protected RevoluteJoint(IWorldPool argWorld, RevoluteJointDef def) {
     super(argWorld, def);
     m_localAnchorA.set(def.localAnchorA);
@@ -105,6 +112,7 @@ public class RevoluteJoint extends Joint {
     m_limitState = LimitState.INACTIVE;
   }
 
+  /** {@inheritDoc} */
   @Override
   public void initVelocityConstraints(final SolverData data) {
     m_indexA = m_bodyA.m_islandIndex;
@@ -222,6 +230,7 @@ public class RevoluteJoint extends Joint {
     pool.pushRot(2);
   }
 
+  /** {@inheritDoc} */
   @Override
   public void solveVelocityConstraints(final SolverData data) {
     float2 vA = data.velocities[m_indexA].v;
@@ -347,6 +356,7 @@ public class RevoluteJoint extends Joint {
     pool.pushVec2(1);
   }
 
+  /** {@inheritDoc} */
   @Override
   public boolean solvePositionConstraints(final SolverData data) {
     final Rot qA = pool.popRot();
@@ -442,88 +452,163 @@ public class RevoluteJoint extends Joint {
     return positionError <= Settings.linearSlop && angularError <= Settings.angularSlop;
   }
   
+  /**
+   * <p>getLocalAnchorA.</p>
+   *
+   * @return a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public float2 getLocalAnchorA() {
     return m_localAnchorA;
   }
   
+  /**
+   * <p>getLocalAnchorB.</p>
+   *
+   * @return a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public float2 getLocalAnchorB() {
     return m_localAnchorB;
   }
   
+  /**
+   * <p>getReferenceAngle.</p>
+   *
+   * @return a float
+   */
   public float getReferenceAngle() {
     return m_referenceAngle;
   }
 
+  /** {@inheritDoc} */
   @Override
   public void getAnchorA(float2 argOut) {
     m_bodyA.getWorldPointToOut(m_localAnchorA, argOut);
   }
 
+  /** {@inheritDoc} */
   @Override
   public void getAnchorB(float2 argOut) {
     m_bodyB.getWorldPointToOut(m_localAnchorB, argOut);
   }
 
+  /** {@inheritDoc} */
   @Override
   public void getReactionForce(float inv_dt, float2 argOut) {
     argOut.set(m_impulse.x, m_impulse.y).scale(inv_dt);
   }
 
+  /** {@inheritDoc} */
   @Override
   public float getReactionTorque(float inv_dt) {
     return inv_dt * m_impulse.z;
   }
 
+  /**
+   * <p>getJointAngle.</p>
+   *
+   * @return a float
+   */
   public float getJointAngle() {
     final Body b1 = m_bodyA;
     final Body b2 = m_bodyB;
     return b2.m_sweep.a - b1.m_sweep.a - m_referenceAngle;
   }
 
+  /**
+   * <p>getJointSpeed.</p>
+   *
+   * @return a float
+   */
   public float getJointSpeed() {
     final Body b1 = m_bodyA;
     final Body b2 = m_bodyB;
     return b2.m_angularVelocity - b1.m_angularVelocity;
   }
 
+  /**
+   * <p>isMotorEnabled.</p>
+   *
+   * @return a boolean
+   */
   public boolean isMotorEnabled() {
     return m_enableMotor;
   }
 
+  /**
+   * <p>enableMotor.</p>
+   *
+   * @param flag a boolean
+   */
   public void enableMotor(boolean flag) {
     m_bodyA.setAwake(true);
     m_bodyB.setAwake(true);
     m_enableMotor = flag;
   }
 
+  /**
+   * <p>getMotorTorque.</p>
+   *
+   * @param inv_dt a float
+   * @return a float
+   */
   public float getMotorTorque(float inv_dt) {
     return m_motorImpulse * inv_dt;
   }
 
+  /**
+   * <p>setMotorSpeed.</p>
+   *
+   * @param speed a float
+   */
   public void setMotorSpeed(final float speed) {
     m_bodyA.setAwake(true);
     m_bodyB.setAwake(true);
     m_motorSpeed = speed;
   }
 
+  /**
+   * <p>setMaxMotorTorque.</p>
+   *
+   * @param torque a float
+   */
   public void setMaxMotorTorque(final float torque) {
     m_bodyA.setAwake(true);
     m_bodyB.setAwake(true);
     m_maxMotorTorque = torque;
   }
 
+  /**
+   * <p>getMotorSpeed.</p>
+   *
+   * @return a float
+   */
   public float getMotorSpeed() {
     return m_motorSpeed;
   }
 
+  /**
+   * <p>getMaxMotorTorque.</p>
+   *
+   * @return a float
+   */
   public float getMaxMotorTorque() {
     return m_maxMotorTorque;
   }
 
+  /**
+   * <p>isLimitEnabled.</p>
+   *
+   * @return a boolean
+   */
   public boolean isLimitEnabled() {
     return m_enableLimit;
   }
 
+  /**
+   * <p>enableLimit.</p>
+   *
+   * @param flag a boolean
+   */
   public void enableLimit(final boolean flag) {
     if (flag != m_enableLimit) {
       m_bodyA.setAwake(true);
@@ -533,14 +618,30 @@ public class RevoluteJoint extends Joint {
     }
   }
 
+  /**
+   * <p>getLowerLimit.</p>
+   *
+   * @return a float
+   */
   public float getLowerLimit() {
     return m_lowerAngle;
   }
 
+  /**
+   * <p>getUpperLimit.</p>
+   *
+   * @return a float
+   */
   public float getUpperLimit() {
     return m_upperAngle;
   }
 
+  /**
+   * <p>setLimits.</p>
+   *
+   * @param lower a float
+   * @param upper a float
+   */
   public void setLimits(final float lower, final float upper) {
     assert (lower <= upper);
     if (lower != m_lowerAngle || upper != m_upperAngle) {

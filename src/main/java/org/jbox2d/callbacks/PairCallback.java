@@ -24,6 +24,16 @@
 package org.jbox2d.callbacks;
 
 // updated to rev 100
+/**
+ * <p>PairCallback interface.</p>
+ *
+ */
 public interface PairCallback {
+	/**
+	 * <p>addPair.</p>
+	 *
+	 * @param userDataA a {@link java.lang.Object} object
+	 * @param userDataB a {@link java.lang.Object} object
+	 */
 	public void addPair(Object userDataA, Object userDataB);
 }

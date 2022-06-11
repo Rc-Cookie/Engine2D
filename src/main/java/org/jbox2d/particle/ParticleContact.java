@@ -2,6 +2,10 @@ package org.jbox2d.particle;
 
 import com.github.rccookie.geometry.performance.float2;
 
+/**
+ * <p>ParticleContact class.</p>
+ *
+ */
 public class ParticleContact {
   /** Indices of the respective particles making contact. */
   public int indexA, indexB;

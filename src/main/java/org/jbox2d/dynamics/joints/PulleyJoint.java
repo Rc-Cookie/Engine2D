@@ -21,29 +21,32 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
-/**
+/*
  * Created at 12:12:02 PM Jan 23, 2011
  */
 package org.jbox2d.dynamics.joints;
 
+import com.github.rccookie.geometry.performance.float2;
+
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Rot;
 import org.jbox2d.common.Settings;
-import com.github.rccookie.geometry.performance.float2;
 import org.jbox2d.dynamics.SolverData;
 import org.jbox2d.pooling.IWorldPool;
 
 /**
  * The pulley joint is connected to two bodies and two fixed ground points. The pulley supports a
- * ratio such that: length1 + ratio * length2 <= constant Yes, the force transmitted is scaled by
+ * ratio such that: length1 + ratio * length2 &lt;= constant Yes, the force transmitted is scaled by
  * the ratio. Warning: the pulley joint can get a bit squirrelly by itself. They often work better
  * when combined with prismatic joints. You should also cover the the anchor points with static
  * shapes to prevent one side from going to zero length.
- * 
+ *
  * @author Daniel Murphy
+ * @version $Id: $Id
  */
 public class PulleyJoint extends Joint {
 
+  /** Constant <code>MIN_PULLEY_LENGTH=2.0f</code> */
   public static final float MIN_PULLEY_LENGTH = 2.0f;
 
   private final float2 m_groundAnchorA = new float2();
@@ -73,6 +76,12 @@ public class PulleyJoint extends Joint {
   private float m_invIB;
   private float m_mass;
 
+  /**
+   * <p>Constructor for PulleyJoint.</p>
+   *
+   * @param argWorldPool a {@link org.jbox2d.pooling.IWorldPool} object
+   * @param def a {@link org.jbox2d.dynamics.joints.PulleyJointDef} object
+   */
   protected PulleyJoint(IWorldPool argWorldPool, PulleyJointDef def) {
     super(argWorldPool, def);
     m_groundAnchorA.set(def.groundAnchorA);
@@ -90,14 +99,29 @@ public class PulleyJoint extends Joint {
     m_impulse = 0.0f;
   }
 
+  /**
+   * <p>getLengthA.</p>
+   *
+   * @return a float
+   */
   public float getLengthA() {
     return m_lengthA;
   }
 
+  /**
+   * <p>getLengthB.</p>
+   *
+   * @return a float
+   */
   public float getLengthB() {
     return m_lengthB;
   }
 
+  /**
+   * <p>getCurrentLengthA.</p>
+   *
+   * @return a float
+   */
   public float getCurrentLengthA() {
     final float2 p = pool.popVec2();
     m_bodyA.getWorldPointToOut(m_localAnchorA, p);
@@ -107,6 +131,11 @@ public class PulleyJoint extends Joint {
     return length;
   }
 
+  /**
+   * <p>getCurrentLengthB.</p>
+   *
+   * @return a float
+   */
   public float getCurrentLengthB() {
     final float2 p = pool.popVec2();
     m_bodyB.getWorldPointToOut(m_localAnchorB, p);
@@ -117,43 +146,72 @@ public class PulleyJoint extends Joint {
   }
 
 
+  /**
+   * <p>getLocalAnchorA.</p>
+   *
+   * @return a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public float2 getLocalAnchorA() {
     return m_localAnchorA;
   }
 
+  /**
+   * <p>getLocalAnchorB.</p>
+   *
+   * @return a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public float2 getLocalAnchorB() {
     return m_localAnchorB;
   }
 
 
+  /** {@inheritDoc} */
   @Override
   public void getAnchorA(float2 argOut) {
     m_bodyA.getWorldPointToOut(m_localAnchorA, argOut);
   }
 
+  /** {@inheritDoc} */
   @Override
   public void getAnchorB(float2 argOut) {
     m_bodyB.getWorldPointToOut(m_localAnchorB, argOut);
   }
 
+  /** {@inheritDoc} */
   @Override
   public void getReactionForce(float inv_dt, float2 argOut) {
     argOut.set(m_uB).scale(m_impulse).scale(inv_dt);
   }
 
+  /** {@inheritDoc} */
   @Override
   public float getReactionTorque(float inv_dt) {
     return 0f;
   }
 
+  /**
+   * <p>getGroundAnchorA.</p>
+   *
+   * @return a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public float2 getGroundAnchorA() {
     return m_groundAnchorA;
   }
 
+  /**
+   * <p>getGroundAnchorB.</p>
+   *
+   * @return a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public float2 getGroundAnchorB() {
     return m_groundAnchorB;
   }
 
+  /**
+   * <p>getLength1.</p>
+   *
+   * @return a float
+   */
   public float getLength1() {
     final float2 p = pool.popVec2();
     m_bodyA.getWorldPointToOut(m_localAnchorA, p);
@@ -164,6 +222,11 @@ public class PulleyJoint extends Joint {
     return len;
   }
 
+  /**
+   * <p>getLength2.</p>
+   *
+   * @return a float
+   */
   public float getLength2() {
     final float2 p = pool.popVec2();
     m_bodyB.getWorldPointToOut(m_localAnchorB, p);
@@ -174,10 +237,16 @@ public class PulleyJoint extends Joint {
     return len;
   }
 
+  /**
+   * <p>getRatio.</p>
+   *
+   * @return a float
+   */
   public float getRatio() {
     return m_ratio;
   }
 
+  /** {@inheritDoc} */
   @Override
   public void initVelocityConstraints(final SolverData data) {
     m_indexA = m_bodyA.m_islandIndex;
@@ -273,6 +342,7 @@ public class PulleyJoint extends Joint {
     pool.pushRot(2);
   }
 
+  /** {@inheritDoc} */
   @Override
   public void solveVelocityConstraints(final SolverData data) {
     float2 vA = data.velocities[m_indexA].v;
@@ -311,6 +381,7 @@ public class PulleyJoint extends Joint {
     pool.pushVec2(4);
   }
 
+  /** {@inheritDoc} */
   @Override
   public boolean solvePositionConstraints(final SolverData data) {
     final Rot qA = pool.popRot();

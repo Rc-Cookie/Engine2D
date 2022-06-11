@@ -2,6 +2,10 @@ package org.jbox2d.particle;
 
 import com.github.rccookie.geometry.performance.float2;
 
+/**
+ * <p>ParticleDef class.</p>
+ *
+ */
 public class ParticleDef {
   /**
    * Specifies the type of particle. A particle may be more than one type. Multiple types are

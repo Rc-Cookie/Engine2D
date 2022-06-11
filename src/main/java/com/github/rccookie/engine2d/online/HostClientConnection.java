@@ -1,6 +1,7 @@
 package com.github.rccookie.engine2d.online;
 
 import com.github.rccookie.engine2d.Application;
+
 import org.jetbrains.annotations.NotNull;
 
 /**

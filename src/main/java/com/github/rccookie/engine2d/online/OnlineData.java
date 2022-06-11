@@ -30,9 +30,18 @@ public class OnlineData {
      * @param delay The message delay
      * @param type The message type
      */
-    OnlineData(@NotNull JsonElement json, float delay, @NotNull MessageType type) {
+    public OnlineData(@NotNull JsonElement json, float delay, @NotNull MessageType type) {
         this.json = Arguments.checkNull(json, "json");
         this.delay = delay;
         this.type = Arguments.checkNull(type, "type");
+    }
+
+    @Override
+    public String toString() {
+        return "OnlineData{" +
+                "json=" + json +
+                ", delay=" + delay +
+                ", type=" + type +
+                '}';
     }
 }

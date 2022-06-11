@@ -32,6 +32,10 @@ import org.jbox2d.dynamics.World;
 import org.jbox2d.dynamics.contacts.Position;
 import org.jbox2d.dynamics.contacts.Velocity;
 
+/**
+ * <p>ConstantVolumeJoint class.</p>
+ *
+ */
 public class ConstantVolumeJoint extends Joint {
 
   private final Body[] bodies;
@@ -45,18 +49,39 @@ public class ConstantVolumeJoint extends Joint {
 
   private DistanceJoint[] distanceJoints;
 
+  /**
+   * <p>Getter for the field <code>bodies</code>.</p>
+   *
+   * @return an array of {@link org.jbox2d.dynamics.Body} objects
+   */
   public Body[] getBodies() {
     return bodies;
   }
 
+  /**
+   * <p>getJoints.</p>
+   *
+   * @return an array of {@link org.jbox2d.dynamics.joints.DistanceJoint} objects
+   */
   public DistanceJoint[] getJoints() {
     return distanceJoints;
   }
 
+  /**
+   * <p>inflate.</p>
+   *
+   * @param factor a float
+   */
   public void inflate(float factor) {
     targetVolume *= factor;
   }
 
+  /**
+   * <p>Constructor for ConstantVolumeJoint.</p>
+   *
+   * @param argWorld a {@link org.jbox2d.dynamics.World} object
+   * @param def a {@link org.jbox2d.dynamics.joints.ConstantVolumeJointDef} object
+   */
   public ConstantVolumeJoint(World argWorld, ConstantVolumeJointDef def) {
     super(argWorld.getPool(), def);
     world = argWorld;
@@ -100,6 +125,7 @@ public class ConstantVolumeJoint extends Joint {
     }
   }
 
+  /** {@inheritDoc} */
   @Override
   public void destructor() {
     for (int i = 0; i < distanceJoints.length; ++i) {
@@ -175,6 +201,7 @@ public class ConstantVolumeJoint extends Joint {
     return done;
   }
 
+  /** {@inheritDoc} */
   @Override
   public void initVelocityConstraints(final SolverData step) {
     Velocity[] velocities = step.velocities;
@@ -204,11 +231,13 @@ public class ConstantVolumeJoint extends Joint {
     }
   }
 
+  /** {@inheritDoc} */
   @Override
   public boolean solvePositionConstraints(SolverData step) {
     return constrainEdges(step.positions);
   }
 
+  /** {@inheritDoc} */
   @Override
   public void solveVelocityConstraints(final SolverData step) {
     float crossMassSum = 0.0f;
@@ -238,19 +267,35 @@ public class ConstantVolumeJoint extends Joint {
     }
   }
 
-  /** No-op */
+  /**
+   * {@inheritDoc}
+   *
+   * No-op
+   */
   @Override
   public void getAnchorA(float2 argOut) {}
 
-  /** No-op */
+  /**
+   * {@inheritDoc}
+   *
+   * No-op
+   */
   @Override
   public void getAnchorB(float2 argOut) {}
 
-  /** No-op */
+  /**
+   * {@inheritDoc}
+   *
+   * No-op
+   */
   @Override
   public void getReactionForce(float inv_dt, float2 argOut) {}
 
-  /** No-op */
+  /**
+   * {@inheritDoc}
+   *
+   * No-op
+   */
   @Override
   public float getReactionTorque(float inv_dt) {
     return 0;

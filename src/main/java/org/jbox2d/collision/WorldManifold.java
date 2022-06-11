@@ -31,8 +31,9 @@ import com.github.rccookie.geometry.performance.float2;
 
 /**
  * This is used to compute the current state of a contact manifold.
- * 
+ *
  * @author daniel
+ * @version $Id: $Id
  */
 public class WorldManifold {
   /**
@@ -50,6 +51,9 @@ public class WorldManifold {
    */
   public final float[] separations;
 
+  /**
+   * <p>Constructor for WorldManifold.</p>
+   */
   public WorldManifold() {
     normal = new float2();
     points = new float2[Settings.maxManifoldPoints];
@@ -62,6 +66,15 @@ public class WorldManifold {
   private final float2 pool3 = new float2();
   private final float2 pool4 = new float2();
 
+  /**
+   * <p>initialize.</p>
+   *
+   * @param manifold a {@link org.jbox2d.collision.Manifold} object
+   * @param xfA a {@link org.jbox2d.common.Transform} object
+   * @param radiusA a float
+   * @param xfB a {@link org.jbox2d.common.Transform} object
+   * @param radiusB a float
+   */
   public final void initialize(final Manifold manifold, final Transform xfA, float radiusA,
       final Transform xfB, float radiusB) {
     if (manifold.pointCount == 0) {

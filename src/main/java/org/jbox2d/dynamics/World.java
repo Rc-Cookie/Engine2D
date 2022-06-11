@@ -80,15 +80,21 @@ import org.jbox2d.pooling.normal.DefaultWorldPool;
 /**
  * The world class manages all physics entities, dynamic simulation, and asynchronous queries. The
  * world also contains efficient memory management facilities.
- * 
+ *
  * @author Daniel Murphy
+ * @version $Id: $Id
  */
 public class World {
+  /** Constant <code>WORLD_POOL_SIZE=100</code> */
   public static final int WORLD_POOL_SIZE = 100;
+  /** Constant <code>WORLD_POOL_CONTAINER_SIZE=10</code> */
   public static final int WORLD_POOL_CONTAINER_SIZE = 10;
 
+  /** Constant <code>NEW_FIXTURE=0x0001</code> */
   public static final int NEW_FIXTURE = 0x0001;
+  /** Constant <code>LOCKED=0x0002</code> */
   public static final int LOCKED = 0x0002;
+  /** Constant <code>CLEAR_FORCES=0x0004</code> */
   public static final int CLEAR_FORCES = 0x0004;
 
 
@@ -139,7 +145,7 @@ public class World {
 
   /**
    * Construct a world object.
-   * 
+   *
    * @param gravity the world gravity vector.
    */
   public World(float2 gravity) {
@@ -148,17 +154,32 @@ public class World {
 
   /**
    * Construct a world object.
-   * 
+   *
    * @param gravity the world gravity vector.
+   * @param pool a {@link org.jbox2d.pooling.IWorldPool} object
    */
   public World(float2 gravity, IWorldPool pool) {
     this(gravity, pool, new DynamicTree());
   }
 
+  /**
+   * <p>Constructor for World.</p>
+   *
+   * @param gravity a {@link com.github.rccookie.geometry.performance.float2} object
+   * @param pool a {@link org.jbox2d.pooling.IWorldPool} object
+   * @param strategy a {@link org.jbox2d.collision.broadphase.BroadPhaseStrategy} object
+   */
   public World(float2 gravity, IWorldPool pool, BroadPhaseStrategy strategy) {
     this(gravity, pool, new DefaultBroadPhaseBuffer(strategy));
   }
 
+  /**
+   * <p>Constructor for World.</p>
+   *
+   * @param gravity a {@link com.github.rccookie.geometry.performance.float2} object
+   * @param pool a {@link org.jbox2d.pooling.IWorldPool} object
+   * @param broadPhase a {@link org.jbox2d.collision.broadphase.BroadPhase} object
+   */
   public World(float2 gravity, IWorldPool pool, BroadPhase broadPhase) {
     this.pool = pool;
     m_destructionListener = null;
@@ -190,6 +211,11 @@ public class World {
     initializeRegisters();
   }
 
+  /**
+   * <p>setAllowSleep.</p>
+   *
+   * @param flag a boolean
+   */
   public void setAllowSleep(boolean flag) {
     if (flag == m_allowSleep) {
       return;
@@ -203,14 +229,29 @@ public class World {
     }
   }
 
+  /**
+   * <p>setSubStepping.</p>
+   *
+   * @param subStepping a boolean
+   */
   public void setSubStepping(boolean subStepping) {
     this.m_subStepping = subStepping;
   }
 
+  /**
+   * <p>isSubStepping.</p>
+   *
+   * @return a boolean
+   */
   public boolean isSubStepping() {
     return m_subStepping;
   }
 
+  /**
+   * <p>isAllowSleep.</p>
+   *
+   * @return a boolean
+   */
   public boolean isAllowSleep() {
     return m_allowSleep;
   }
@@ -239,18 +280,42 @@ public class World {
     addType(pool.getChainPolyContactStack(), ShapeType.CHAIN, ShapeType.POLYGON);
   }
 
+  /**
+   * <p>getDestructionListener.</p>
+   *
+   * @return a {@link org.jbox2d.callbacks.DestructionListener} object
+   */
   public DestructionListener getDestructionListener() {
     return m_destructionListener;
   }
 
+  /**
+   * <p>getParticleDestructionListener.</p>
+   *
+   * @return a {@link org.jbox2d.callbacks.ParticleDestructionListener} object
+   */
   public ParticleDestructionListener getParticleDestructionListener() {
     return m_particleDestructionListener;
   }
 
+  /**
+   * <p>setParticleDestructionListener.</p>
+   *
+   * @param listener a {@link org.jbox2d.callbacks.ParticleDestructionListener} object
+   */
   public void setParticleDestructionListener(ParticleDestructionListener listener) {
     m_particleDestructionListener = listener;
   }
 
+  /**
+   * <p>popContact.</p>
+   *
+   * @param fixtureA a {@link org.jbox2d.dynamics.Fixture} object
+   * @param indexA a int
+   * @param fixtureB a {@link org.jbox2d.dynamics.Fixture} object
+   * @param indexB a int
+   * @return a {@link org.jbox2d.dynamics.contacts.Contact} object
+   */
   public Contact popContact(Fixture fixtureA, int indexA, Fixture fixtureB, int indexB) {
     final ShapeType type1 = fixtureA.getType();
     final ShapeType type2 = fixtureB.getType();
@@ -271,6 +336,11 @@ public class World {
     }
   }
 
+  /**
+   * <p>pushContact.</p>
+   *
+   * @param contact a {@link org.jbox2d.dynamics.contacts.Contact} object
+   */
   public void pushContact(Contact contact) {
     Fixture fixtureA = contact.getFixtureA();
     Fixture fixtureB = contact.getFixtureB();
@@ -287,14 +357,19 @@ public class World {
     creator.push(contact);
   }
 
+  /**
+   * <p>Getter for the field <code>pool</code>.</p>
+   *
+   * @return a {@link org.jbox2d.pooling.IWorldPool} object
+   */
   public IWorldPool getPool() {
     return pool;
   }
 
   /**
    * Register a destruction listener. The listener is owned by you and must remain in scope.
-   * 
-   * @param listener
+   *
+   * @param listener a {@link org.jbox2d.callbacks.DestructionListener} object
    */
   public void setDestructionListener(DestructionListener listener) {
     m_destructionListener = listener;
@@ -303,8 +378,8 @@ public class World {
   /**
    * Register a contact filter to provide specific control over collision. Otherwise the default
    * filter is used (_defaultFilter). The listener is owned by you and must remain in scope.
-   * 
-   * @param filter
+   *
+   * @param filter a {@link org.jbox2d.callbacks.ContactFilter} object
    */
   public void setContactFilter(ContactFilter filter) {
     m_contactManager.m_contactFilter = filter;
@@ -312,8 +387,8 @@ public class World {
 
   /**
    * Register a contact event listener. The listener is owned by you and must remain in scope.
-   * 
-   * @param listener
+   *
+   * @param listener a {@link org.jbox2d.callbacks.ContactListener} object
    */
   public void setContactListener(ContactListener listener) {
     m_contactManager.m_contactListener = listener;
@@ -322,8 +397,8 @@ public class World {
   /**
    * Register a routine for debug drawing. The debug draw functions are called inside with
    * World.DrawDebugData method. The debug draw object is owned by you and must remain in scope.
-   * 
-   * @param debugDraw
+   *
+   * @param debugDraw a {@link org.jbox2d.callbacks.DebugDraw} object
    */
   public void setDebugDraw(DebugDraw debugDraw) {
     m_debugDraw = debugDraw;
@@ -331,10 +406,10 @@ public class World {
 
   /**
    * create a rigid body given a definition. No reference to the definition is retained.
-   * 
-   * @warning This function is locked during callbacks.
-   * @param def
-   * @return
+   *
+   *
+   * @param def a {@link org.jbox2d.dynamics.BodyDef} object
+   * @return a {@link org.jbox2d.dynamics.Body} object
    */
   public Body createBody(BodyDef def) {
     assert (isLocked() == false);
@@ -359,10 +434,10 @@ public class World {
   /**
    * destroy a rigid body given a definition. No reference to the definition is retained. This
    * function is locked during callbacks.
-   * 
-   * @warning This automatically deletes all associated shapes and joints.
-   * @warning This function is locked during callbacks.
-   * @param body
+   *
+   *
+   *
+   * @param body a {@link org.jbox2d.dynamics.Body} object
    */
   public void destroyBody(Body body) {
     assert (m_bodyCount > 0);
@@ -433,10 +508,10 @@ public class World {
   /**
    * create a joint to constrain bodies together. No reference to the definition is retained. This
    * may cause the connected bodies to cease colliding.
-   * 
-   * @warning This function is locked during callbacks.
-   * @param def
-   * @return
+   *
+   *
+   * @param def a {@link org.jbox2d.dynamics.joints.JointDef} object
+   * @return a {@link org.jbox2d.dynamics.joints.Joint} object
    */
   public Joint createJoint(JointDef def) {
     assert (isLocked() == false);
@@ -498,9 +573,9 @@ public class World {
 
   /**
    * destroy a joint. This may cause the connected bodies to begin colliding.
-   * 
-   * @warning This function is locked during callbacks.
-   * @param joint
+   *
+   *
+   * @param j a {@link org.jbox2d.dynamics.joints.Joint} object
    */
   public void destroyJoint(Joint j) {
     assert (isLocked() == false);
@@ -590,10 +665,10 @@ public class World {
 
   /**
    * Take a time step. This performs collision detection, integration, and constraint solution.
-   * 
-   * @param timeStep the amount of time to simulate, this should not vary.
+   *
    * @param velocityIterations for the velocity constraint solver.
    * @param positionIterations for the position constraint solver.
+   * @param dt a float
    */
   public void step(float dt, int velocityIterations, int positionIterations) {
     stepTimer.reset();
@@ -662,8 +737,8 @@ public class World {
    * Call this after you are done with time steps to clear the forces. You normally call this after
    * each call to Step, unless you are performing sub-steps. By default, forces will be
    * automatically cleared, so you don't need to call this function.
-   * 
-   * @see setAutoClearForces
+   *
+   * @see #setAutoClearForces(boolean)
    */
   public void clearForces() {
     for (Body body = m_bodyList; body != null; body = body.getNext()) {
@@ -776,7 +851,7 @@ public class World {
 
   /**
    * Query the world for all fixtures that potentially overlap the provided AABB.
-   * 
+   *
    * @param callback a user implemented callback class.
    * @param aabb the query box.
    */
@@ -788,7 +863,7 @@ public class World {
 
   /**
    * Query the world for all fixtures and particles that potentially overlap the provided AABB.
-   * 
+   *
    * @param callback a user implemented callback class.
    * @param particleCallback callback for particles.
    * @param aabb the query box.
@@ -802,7 +877,7 @@ public class World {
 
   /**
    * Query the world for all particles that potentially overlap the provided AABB.
-   * 
+   *
    * @param particleCallback callback for particles.
    * @param aabb the query box.
    */
@@ -817,7 +892,7 @@ public class World {
    * Ray-cast the world for all fixtures in the path of the ray. Your callback controls whether you
    * get the closest point, any point, or n-points. The ray-cast ignores shapes that contain the
    * starting point.
-   * 
+   *
    * @param callback a user implemented callback class.
    * @param point1 the ray starting point
    * @param point2 the ray ending point
@@ -835,7 +910,7 @@ public class World {
    * Ray-cast the world for all fixtures and particles in the path of the ray. Your callback
    * controls whether you get the closest point, any point, or n-points. The ray-cast ignores shapes
    * that contain the starting point.
-   * 
+   *
    * @param callback a user implemented callback class.
    * @param particleCallback the particle callback class.
    * @param point1 the ray starting point
@@ -855,7 +930,7 @@ public class World {
   /**
    * Ray-cast the world for all particles in the path of the ray. Your callback controls whether you
    * get the closest point, any point, or n-points.
-   * 
+   *
    * @param particleCallback the particle callback class.
    * @param point1 the ray starting point
    * @param point2 the ray ending point
@@ -867,7 +942,7 @@ public class World {
   /**
    * Get the world body list. With the returned body, use Body.getNext to get the next body in the
    * world list. A null body indicates the end of the list.
-   * 
+   *
    * @return the head of the world body list.
    */
   public Body getBodyList() {
@@ -877,7 +952,7 @@ public class World {
   /**
    * Get the world joint list. With the returned joint, use Joint.getNext to get the next joint in
    * the world list. A null joint indicates the end of the list.
-   * 
+   *
    * @return the head of the world joint list.
    */
   public Joint getJointList() {
@@ -887,45 +962,65 @@ public class World {
   /**
    * Get the world contact list. With the returned contact, use Contact.getNext to get the next
    * contact in the world list. A null contact indicates the end of the list.
-   * 
+   *
    * @return the head of the world contact list.
-   * @warning contacts are created and destroyed in the middle of a time step. Use ContactListener
+   *
    *          to avoid missing contacts.
    */
   public Contact getContactList() {
     return m_contactManager.m_contactList;
   }
 
+  /**
+   * <p>isSleepingAllowed.</p>
+   *
+   * @return a boolean
+   */
   public boolean isSleepingAllowed() {
     return m_allowSleep;
   }
 
+  /**
+   * <p>setSleepingAllowed.</p>
+   *
+   * @param sleepingAllowed a boolean
+   */
   public void setSleepingAllowed(boolean sleepingAllowed) {
     m_allowSleep = sleepingAllowed;
   }
 
   /**
    * Enable/disable warm starting. For testing.
-   * 
-   * @param flag
+   *
+   * @param flag a boolean
    */
   public void setWarmStarting(boolean flag) {
     m_warmStarting = flag;
   }
 
+  /**
+   * <p>isWarmStarting.</p>
+   *
+   * @return a boolean
+   */
   public boolean isWarmStarting() {
     return m_warmStarting;
   }
 
   /**
    * Enable/disable continuous physics. For testing.
-   * 
-   * @param flag
+   *
+   * @param flag a boolean
    */
   public void setContinuousPhysics(boolean flag) {
     m_continuousPhysics = flag;
   }
 
+  /**
+   * <p>isContinuousPhysics.</p>
+   *
+   * @return a boolean
+   */
   public boolean isContinuousPhysics() {
     return m_continuousPhysics;
   }
@@ -934,8 +1029,8 @@ public class World {
 
   /**
    * Get the number of broad-phase proxies.
-   * 
-   * @return
+   *
+   * @return a int
    */
   public int getProxyCount() {
     return m_contactManager.m_broadPhase.getProxyCount();
@@ -943,8 +1038,8 @@ public class World {
 
   /**
    * Get the number of bodies.
-   * 
-   * @return
+   *
+   * @return a int
    */
   public int getBodyCount() {
     return m_bodyCount;
@@ -952,8 +1047,8 @@ public class World {
 
   /**
    * Get the number of joints.
-   * 
-   * @return
+   *
+   * @return a int
    */
   public int getJointCount() {
     return m_jointCount;
@@ -961,8 +1056,8 @@ public class World {
 
   /**
    * Get the number of contacts (each may have 0 or more contact points).
-   * 
-   * @return
+   *
+   * @return a int
    */
   public int getContactCount() {
     return m_contactManager.m_contactCount;
@@ -970,8 +1065,8 @@ public class World {
 
   /**
    * Gets the height of the dynamic tree
-   * 
-   * @return
+   *
+   * @return a int
    */
   public int getTreeHeight() {
     return m_contactManager.m_broadPhase.getTreeHeight();
@@ -979,8 +1074,8 @@ public class World {
 
   /**
    * Gets the balance of the dynamic tree
-   * 
-   * @return
+   *
+   * @return a int
    */
   public int getTreeBalance() {
     return m_contactManager.m_broadPhase.getTreeBalance();
@@ -988,8 +1083,8 @@ public class World {
 
   /**
    * Gets the quality of the dynamic tree
-   * 
-   * @return
+   *
+   * @return a float
    */
   public float getTreeQuality() {
     return m_contactManager.m_broadPhase.getTreeQuality();
@@ -997,8 +1092,8 @@ public class World {
 
   /**
    * Change the global gravity vector.
-   * 
-   * @param gravity
+   *
+   * @param gravity a {@link com.github.rccookie.geometry.performance.float2} object
    */
   public void setGravity(float2 gravity) {
     m_gravity.set(gravity);
@@ -1006,8 +1101,8 @@ public class World {
 
   /**
    * Get the global gravity vector.
-   * 
-   * @return
+   *
+   * @return a {@link com.github.rccookie.geometry.performance.float2} object
    */
   public float2 getGravity() {
     return m_gravity;
@@ -1015,8 +1110,8 @@ public class World {
 
   /**
    * Is the world locked (in the middle of a time step).
-   * 
-   * @return
+   *
+   * @return a boolean
    */
   public boolean isLocked() {
     return (m_flags & LOCKED) == LOCKED;
@@ -1024,8 +1119,8 @@ public class World {
 
   /**
    * Set flag to control automatic clearing of forces after each time step.
-   * 
-   * @param flag
+   *
+   * @param flag a boolean
    */
   public void setAutoClearForces(boolean flag) {
     if (flag) {
@@ -1037,8 +1132,8 @@ public class World {
 
   /**
    * Get the flag that controls automatic clearing of forces after each time step.
-   * 
-   * @return
+   *
+   * @return a boolean
    */
   public boolean getAutoClearForces() {
     return (m_flags & CLEAR_FORCES) == CLEAR_FORCES;
@@ -1046,13 +1141,18 @@ public class World {
 
   /**
    * Get the contact manager for testing purposes
-   * 
-   * @return
+   *
+   * @return a {@link org.jbox2d.dynamics.ContactManager} object
    */
   public ContactManager getContactManager() {
     return m_contactManager;
   }
 
+  /**
+   * <p>getProfile.</p>
+   *
+   * @return a Profile object
+   */
   public Profile getProfile() {
     return m_profile;
   }
@@ -1669,9 +1769,10 @@ public class World {
    * retained. A simulation step must occur before it's possible to interact with a newly created
    * particle. For example, DestroyParticleInShape() will not destroy a particle until Step() has
    * been called.
-   * 
-   * @warning This function is locked during callbacks.
+   *
+   *
    * @return the index of the particle.
+   * @param def a {@link org.jbox2d.particle.ParticleDef} object
    */
   public int createParticle(ParticleDef def) {
     assert (isLocked() == false);
@@ -1684,8 +1785,8 @@ public class World {
 
   /**
    * Destroy a particle. The particle is removed after the next step.
-   * 
-   * @param index
+   *
+   * @param index a int
    */
   public void destroyParticle(int index) {
     destroyParticle(index, false);
@@ -1693,9 +1794,9 @@ public class World {
 
   /**
    * Destroy a particle. The particle is removed after the next step.
-   * 
-   * @param Index of the particle to destroy.
-   * @param Whether to call the destruction listener just before the particle is destroyed.
+   *
+   * @param index a int
+   * @param callDestructionListener a boolean
    */
   public void destroyParticle(int index, boolean callDestructionListener) {
     m_particleSystem.destroyParticle(index, callDestructionListener);
@@ -1704,12 +1805,12 @@ public class World {
   /**
    * Destroy particles inside a shape without enabling the destruction callback for destroyed
    * particles. This function is locked during callbacks. For more information see
-   * DestroyParticleInShape(Shape&, Transform&,bool).
-   * 
-   * @param Shape which encloses particles that should be destroyed.
-   * @param Transform applied to the shape.
-   * @warning This function is locked during callbacks.
+   * DestroyParticleInShape(Shape, Transform,bool).
+   *
+   *
    * @return Number of particles destroyed.
+   * @param shape a {@link org.jbox2d.collision.shapes.Shape} object
+   * @param xf a {@link org.jbox2d.common.Transform} object
    */
   public int destroyParticlesInShape(Shape shape, Transform xf) {
     return destroyParticlesInShape(shape, xf, false);
@@ -1719,12 +1820,12 @@ public class World {
    * Destroy particles inside a shape. This function is locked during callbacks. In addition, this
    * function immediately destroys particles in the shape in contrast to DestroyParticle() which
    * defers the destruction until the next simulation step.
-   * 
-   * @param Shape which encloses particles that should be destroyed.
-   * @param Transform applied to the shape.
-   * @param Whether to call the world b2DestructionListener for each particle destroyed.
-   * @warning This function is locked during callbacks.
+   *
+   *
    * @return Number of particles destroyed.
+   * @param shape a {@link org.jbox2d.collision.shapes.Shape} object
+   * @param xf a {@link org.jbox2d.common.Transform} object
+   * @param callDestructionListener a boolean
    */
   public int destroyParticlesInShape(Shape shape, Transform xf, boolean callDestructionListener) {
     assert (isLocked() == false);
@@ -1737,8 +1838,10 @@ public class World {
   /**
    * Create a particle group whose properties have been defined. No reference to the definition is
    * retained.
-   * 
-   * @warning This function is locked during callbacks.
+   *
+   *
+   * @param def a {@link org.jbox2d.particle.ParticleGroupDef} object
+   * @return a {@link org.jbox2d.particle.ParticleGroup} object
    */
   public ParticleGroup createParticleGroup(ParticleGroupDef def) {
     assert (isLocked() == false);
@@ -1751,10 +1854,10 @@ public class World {
 
   /**
    * Join two particle groups.
-   * 
-   * @param the first group. Expands to encompass the second group.
-   * @param the second group. It is destroyed.
-   * @warning This function is locked during callbacks.
+   *
+   *
+   * @param groupA a {@link org.jbox2d.particle.ParticleGroup} object
+   * @param groupB a {@link org.jbox2d.particle.ParticleGroup} object
    */
   public void joinParticleGroups(ParticleGroup groupA, ParticleGroup groupB) {
     assert (isLocked() == false);
@@ -1766,10 +1869,10 @@ public class World {
 
   /**
    * Destroy particles in a group. This function is locked during callbacks.
-   * 
-   * @param The particle group to destroy.
-   * @param Whether to call the world b2DestructionListener for each particle is destroyed.
-   * @warning This function is locked during callbacks.
+   *
+   *
+   * @param group a {@link org.jbox2d.particle.ParticleGroup} object
+   * @param callDestructionListener a boolean
    */
   public void destroyParticlesInGroup(ParticleGroup group, boolean callDestructionListener) {
     assert (isLocked() == false);
@@ -1782,9 +1885,9 @@ public class World {
   /**
    * Destroy particles in a group without enabling the destruction callback for destroyed particles.
    * This function is locked during callbacks.
-   * 
-   * @param The particle group to destroy.
-   * @warning This function is locked during callbacks.
+   *
+   *
+   * @param group a {@link org.jbox2d.particle.ParticleGroup} object
    */
   public void destroyParticlesInGroup(ParticleGroup group) {
     destroyParticlesInGroup(group, false);
@@ -1793,7 +1896,7 @@ public class World {
   /**
    * Get the world particle group list. With the returned group, use ParticleGroup::GetNext to get
    * the next group in the world list. A NULL group indicates the end of the list.
-   * 
+   *
    * @return the head of the world particle group list.
    */
   public ParticleGroup[] getParticleGroupList() {
@@ -1802,8 +1905,8 @@ public class World {
 
   /**
    * Get the number of particle groups.
-   * 
-   * @return
+   *
+   * @return a int
    */
   public int getParticleGroupCount() {
     return m_particleSystem.getParticleGroupCount();
@@ -1811,8 +1914,8 @@ public class World {
 
   /**
    * Get the number of particles.
-   * 
-   * @return
+   *
+   * @return a int
    */
   public int getParticleCount() {
     return m_particleSystem.getParticleCount();
@@ -1820,8 +1923,8 @@ public class World {
 
   /**
    * Get the maximum number of particles.
-   * 
-   * @return
+   *
+   * @return a int
    */
   public int getParticleMaxCount() {
     return m_particleSystem.getParticleMaxCount();
@@ -1829,8 +1932,8 @@ public class World {
 
   /**
    * Set the maximum number of particles.
-   * 
-   * @param count
+   *
+   * @param count a int
    */
   public void setParticleMaxCount(int count) {
     m_particleSystem.setParticleMaxCount(count);
@@ -1838,8 +1941,8 @@ public class World {
 
   /**
    * Change the particle density.
-   * 
-   * @param density
+   *
+   * @param density a float
    */
   public void setParticleDensity(float density) {
     m_particleSystem.setParticleDensity(density);
@@ -1847,8 +1950,8 @@ public class World {
 
   /**
    * Get the particle density.
-   * 
-   * @return
+   *
+   * @return a float
    */
   public float getParticleDensity() {
     return m_particleSystem.getParticleDensity();
@@ -1857,8 +1960,8 @@ public class World {
   /**
    * Change the particle gravity scale. Adjusts the effect of the global gravity vector on
    * particles. Default value is 1.0f.
-   * 
-   * @param gravityScale
+   *
+   * @param gravityScale a float
    */
   public void setParticleGravityScale(float gravityScale) {
     m_particleSystem.setParticleGravityScale(gravityScale);
@@ -1867,8 +1970,8 @@ public class World {
 
   /**
    * Get the particle gravity scale.
-   * 
-   * @return
+   *
+   * @return a float
    */
   public float getParticleGravityScale() {
     return m_particleSystem.getParticleGravityScale();
@@ -1878,8 +1981,8 @@ public class World {
    * Damping is used to reduce the velocity of particles. The damping parameter can be larger than
    * 1.0f but the damping effect becomes sensitive to the time step when the damping parameter is
    * large.
-   * 
-   * @param damping
+   *
+   * @param damping a float
    */
   public void setParticleDamping(float damping) {
     m_particleSystem.setParticleDamping(damping);
@@ -1887,8 +1990,8 @@ public class World {
 
   /**
    * Get damping for particles
-   * 
-   * @return
+   *
+   * @return a float
    */
   public float getParticleDamping() {
     return m_particleSystem.getParticleDamping();
@@ -1897,8 +2000,8 @@ public class World {
   /**
    * Change the particle radius. You should set this only once, on world start. If you change the
    * radius during execution, existing particles may explode, shrink, or behave unexpectedly.
-   * 
-   * @param radius
+   *
+   * @param radius a float
    */
   public void setParticleRadius(float radius) {
     m_particleSystem.setParticleRadius(radius);
@@ -1906,8 +2009,8 @@ public class World {
 
   /**
    * Get the particle radius.
-   * 
-   * @return
+   *
+   * @return a float
    */
   public float getParticleRadius() {
     return m_particleSystem.getParticleRadius();
@@ -1915,92 +2018,151 @@ public class World {
 
   /**
    * Get the particle data. @return the pointer to the head of the particle data.
-   * 
-   * @return
+   *
+   * @return an array of {@link int} objects
    */
   public int[] getParticleFlagsBuffer() {
     return m_particleSystem.getParticleFlagsBuffer();
   }
 
+  /**
+   * <p>getParticlePositionBuffer.</p>
+   *
+   * @return an array of {@link com.github.rccookie.geometry.performance.float2} objects
+   */
   public float2[] getParticlePositionBuffer() {
     return m_particleSystem.getParticlePositionBuffer();
   }
 
+  /**
+   * <p>getParticleVelocityBuffer.</p>
+   *
+   * @return an array of {@link com.github.rccookie.geometry.performance.float2} objects
+   */
   public float2[] getParticleVelocityBuffer() {
     return m_particleSystem.getParticleVelocityBuffer();
   }
 
+  /**
+   * <p>getParticleColorBuffer.</p>
+   *
+   * @return an array of {@link org.jbox2d.particle.ParticleColor} objects
+   */
   public ParticleColor[] getParticleColorBuffer() {
     return m_particleSystem.getParticleColorBuffer();
   }
 
+  /**
+   * <p>getParticleGroupBuffer.</p>
+   *
+   * @return an array of {@link org.jbox2d.particle.ParticleGroup} objects
+   */
   public ParticleGroup[] getParticleGroupBuffer() {
     return m_particleSystem.getParticleGroupBuffer();
   }
 
+  /**
+   * <p>getParticleUserDataBuffer.</p>
+   *
+   * @return an array of {@link java.lang.Object} objects
+   */
   public Object[] getParticleUserDataBuffer() {
     return m_particleSystem.getParticleUserDataBuffer();
   }
 
   /**
    * Set a buffer for particle data.
-   * 
+   *
    * @param buffer is a pointer to a block of memory.
-   * @param size is the number of values in the block.
+   * @param capacity a int
    */
   public void setParticleFlagsBuffer(int[] buffer, int capacity) {
     m_particleSystem.setParticleFlagsBuffer(buffer, capacity);
   }
 
+  /**
+   * <p>setParticlePositionBuffer.</p>
+   *
+   * @param buffer an array of {@link com.github.rccookie.geometry.performance.float2} objects
+   * @param capacity a int
+   */
   public void setParticlePositionBuffer(float2[] buffer, int capacity) {
     m_particleSystem.setParticlePositionBuffer(buffer, capacity);
 
   }
 
+  /**
+   * <p>setParticleVelocityBuffer.</p>
+   *
+   * @param buffer an array of {@link com.github.rccookie.geometry.performance.float2} objects
+   * @param capacity a int
+   */
   public void setParticleVelocityBuffer(float2[] buffer, int capacity) {
     m_particleSystem.setParticleVelocityBuffer(buffer, capacity);
 
   }
 
+  /**
+   * <p>setParticleColorBuffer.</p>
+   *
+   * @param buffer an array of {@link org.jbox2d.particle.ParticleColor} objects
+   * @param capacity a int
+   */
   public void setParticleColorBuffer(ParticleColor[] buffer, int capacity) {
     m_particleSystem.setParticleColorBuffer(buffer, capacity);
 
   }
 
+  /**
+   * <p>setParticleUserDataBuffer.</p>
+   *
+   * @param buffer an array of {@link java.lang.Object} objects
+   * @param capacity a int
+   */
   public void setParticleUserDataBuffer(Object[] buffer, int capacity) {
     m_particleSystem.setParticleUserDataBuffer(buffer, capacity);
   }
 
   /**
    * Get contacts between particles
-   * 
-   * @return
+   *
+   * @return an array of {@link org.jbox2d.particle.ParticleContact} objects
    */
   public ParticleContact[] getParticleContacts() {
     return m_particleSystem.m_contactBuffer;
   }
 
+  /**
+   * <p>getParticleContactCount.</p>
+   *
+   * @return a int
+   */
   public int getParticleContactCount() {
     return m_particleSystem.m_contactCount;
   }
 
   /**
    * Get contacts between particles and bodies
-   * 
-   * @return
+   *
+   * @return an array of {@link org.jbox2d.particle.ParticleBodyContact} objects
    */
   public ParticleBodyContact[] getParticleBodyContacts() {
     return m_particleSystem.m_bodyContactBuffer;
   }
 
+  /**
+   * <p>getParticleBodyContactCount.</p>
+   *
+   * @return a int
+   */
   public int getParticleBodyContactCount() {
     return m_particleSystem.m_bodyContactCount;
   }
 
   /**
    * Compute the kinetic energy that can be lost by damping force
-   * 
-   * @return
+   *
+   * @return a float
    */
   public float computeParticleCollisionEnergy() {
     return m_particleSystem.computeParticleCollisionEnergy();

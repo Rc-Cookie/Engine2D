@@ -39,11 +39,16 @@ import org.jbox2d.dynamics.TimeStep;
 import org.jbox2d.dynamics.contacts.ContactVelocityConstraint.VelocityConstraintPoint;
 
 /**
+ * <p>ContactSolver class.</p>
+ *
  * @author Daniel
+ * @version $Id: $Id
  */
 public class ContactSolver {
 
+  /** Constant <code>DEBUG_SOLVER=false</code> */
   public static final boolean DEBUG_SOLVER = false;
+  /** Constant <code>k_errorTol=1e-3f</code> */
   public static final float k_errorTol = 1e-3f;
   /**
    * For each solver, this is the initial number of constraints in the array, which expands as
@@ -64,6 +69,9 @@ public class ContactSolver {
   public Contact[] m_contacts;
   public int m_count;
 
+  /**
+   * <p>Constructor for ContactSolver.</p>
+   */
   public ContactSolver() {
     m_positionConstraints = new ContactPositionConstraint[INITIAL_NUM_CONSTRAINTS];
     m_velocityConstraints = new ContactVelocityConstraint[INITIAL_NUM_CONSTRAINTS];
@@ -73,6 +81,11 @@ public class ContactSolver {
     }
   }
 
+  /**
+   * <p>init.</p>
+   *
+   * @param def a {@link org.jbox2d.dynamics.contacts.ContactSolver.ContactSolverDef} object
+   */
   public final void init(ContactSolverDef def) {
     // System.out.println("Initializing contact solver");
     m_step = def.step;
@@ -174,6 +187,9 @@ public class ContactSolver {
     }
   }
 
+  /**
+   * <p>warmStart.</p>
+   */
   public void warmStart() {
     // Warm start.
     for (int i = 0; i < m_count; ++i) {
@@ -218,6 +234,9 @@ public class ContactSolver {
   private final Transform xfB = new Transform();
   private final WorldManifold worldManifold = new WorldManifold();
 
+  /**
+   * <p>initializeVelocityConstraints.</p>
+   */
   public final void initializeVelocityConstraints() {
 
     // Warm start.
@@ -333,6 +352,9 @@ public class ContactSolver {
   }
 
 
+  /**
+   * <p>solveVelocityConstraints.</p>
+   */
   public final void solveVelocityConstraints() {
     for (int i = 0; i < m_count; ++i) {
       final ContactVelocityConstraint vc = m_velocityConstraints[i];
@@ -750,6 +772,9 @@ public class ContactSolver {
     }
   }
 
+  /**
+   * <p>storeImpulses.</p>
+   */
   public void storeImpulses() {
     for (int i = 0; i < m_count; i++) {
       final ContactVelocityConstraint vc = m_velocityConstraints[i];
@@ -806,6 +831,8 @@ public class ContactSolver {
 
   /**
    * Sequential solver.
+   *
+   * @return a boolean
    */
   public final boolean solvePositionConstraints() {
     float minSeparation = 0.0f;
@@ -896,6 +923,13 @@ public class ContactSolver {
   }
 
   // Sequential position solver for position constraints.
+  /**
+   * <p>solveTOIPositionConstraints.</p>
+   *
+   * @param toiIndexA a int
+   * @param toiIndexB a int
+   * @return a boolean
+   */
   public boolean solveTOIPositionConstraints(int toiIndexA, int toiIndexB) {
     float minSeparation = 0.0f;
 
@@ -977,6 +1011,14 @@ public class ContactSolver {
         cA.x -= Px * mA;
         cA.y -= Py * mA;
         aA -= iA * (rAx * Py - rAy * Px);
+/**
+ * <p>initialize.</p>
+ *
+ * @param pc a {@link org.jbox2d.dynamics.contacts.ContactPositionConstraint} object
+ * @param xfA a {@link org.jbox2d.common.Transform} object
+ * @param xfB a {@link org.jbox2d.common.Transform} object
+ * @param index a int
+ */
 
         cB.x += Px * mB;
         cB.y += Py * mB;

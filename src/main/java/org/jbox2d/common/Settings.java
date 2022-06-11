@@ -26,6 +26,7 @@ package org.jbox2d.common;
 /**
  * Global tuning constants based on MKS units and various integer maximums (vertices per shape,
  * pairs, etc.).
+ *
  */
 public class Settings {
 
@@ -36,18 +37,26 @@ public class Settings {
   public static final float PI = (float) Math.PI;
 
   // JBox2D specific settings
+  /** Constant <code>FAST_ABS=true</code> */
   public static boolean FAST_ABS = true;
+  /** Constant <code>FAST_FLOOR=true</code> */
   public static boolean FAST_FLOOR = true;
+  /** Constant <code>FAST_CEIL=true</code> */
   public static boolean FAST_CEIL = true;
+  /** Constant <code>FAST_ROUND=true</code> */
   public static boolean FAST_ROUND = true;
+  /** Constant <code>FAST_ATAN2=true</code> */
   public static boolean FAST_ATAN2 = true;
+  /** Constant <code>FAST_POW=true</code> */
   public static boolean FAST_POW = true;
+  /** Constant <code>CONTACT_STACK_INIT_SIZE=10</code> */
   public static int CONTACT_STACK_INIT_SIZE = 10;
+  /** Constant <code>SINCOS_LUT_ENABLED=true</code> */
   public static boolean SINCOS_LUT_ENABLED = true;
   /**
    * smaller the precision, the larger the table. If a small table is used (eg, precision is .006 or
    * greater), make sure you set the table to lerp it's results. Accuracy chart is in the MathUtils
-   * source. Or, run the tests yourself in {@link SinCosTest}.</br> </br> Good lerp precision
+   * source. Or, run the tests yourself in [?].<p>Good lerp precision</p>
    * values:
    * <ul>
    * <li>.0092</li>
@@ -69,11 +78,12 @@ public class Settings {
    * </ul>
    */
   public static final float SINCOS_LUT_PRECISION = .00011f;
+  /** Constant <code>SINCOS_LUT_LENGTH=(int) Math.ceil(Math.PI * 2 / SINCOS_LUT_PRECISION)</code> */
   public static final int SINCOS_LUT_LENGTH = (int) Math.ceil(Math.PI * 2 / SINCOS_LUT_PRECISION);
   /**
    * Use if the table's precision is large (eg .006 or greater). Although it is more expensive, it
    * greatly increases accuracy. Look in the MathUtils source for some test results on the accuracy
-   * and speed of lerp vs non lerp. Or, run the tests yourself in {@link SinCosTest}.
+   * and speed of lerp vs non lerp. Or, run the tests yourself in [?].
    */
   public static boolean SINCOS_LUT_LERP = false;
 
@@ -154,6 +164,7 @@ public class Settings {
    * numerical problems. You shouldn't need to adjust this.
    */
   public static float maxTranslation = 2.0f;
+  /** Constant <code>maxTranslationSquared=(maxTranslation * maxTranslation)</code> */
   public static float maxTranslationSquared = (maxTranslation * maxTranslation);
 
   /**
@@ -161,6 +172,7 @@ public class Settings {
    * numerical problems. You shouldn't need to adjust this.
    */
   public static float maxRotation = (0.5f * PI);
+  /** Constant <code>maxRotationSquared=(maxRotation * maxRotation)</code> */
   public static float maxRotationSquared = (maxRotation * maxRotation);
 
   /**
@@ -168,6 +180,7 @@ public class Settings {
    * overlap is removed in one time step. However using values close to 1 often lead to overshoot.
    */
   public static float baumgarte = 0.2f;
+  /** Constant <code>toiBaugarte=0.75f</code> */
   public static float toiBaugarte = 0.75f;
 
 
@@ -214,6 +227,7 @@ public class Settings {
    * The maximum distance between particles in a triad, divided by the particle radius.
    */
   public static final int maxTriadDistance = 2;
+  /** Constant <code>maxTriadDistanceSquared=(maxTriadDistance * maxTriadDistance)</code> */
   public static final int maxTriadDistanceSquared = (maxTriadDistance * maxTriadDistance);
 
   /**
@@ -224,10 +238,10 @@ public class Settings {
 
   /**
    * Friction mixing law. Feel free to customize this. TODO djm: add customization
-   * 
-   * @param friction1
-   * @param friction2
-   * @return
+   *
+   * @param friction1 a float
+   * @param friction2 a float
+   * @return a float
    */
   public static float mixFriction(float friction1, float friction2) {
     return MathUtils.sqrt(friction1 * friction2);
@@ -235,10 +249,10 @@ public class Settings {
 
   /**
    * Restitution mixing law. Feel free to customize this. TODO djm: add customization
-   * 
-   * @param restitution1
-   * @param restitution2
-   * @return
+   *
+   * @param restitution1 a float
+   * @param restitution2 a float
+   * @return a float
    */
   public static float mixRestitution(float restitution1, float restitution2) {
     return restitution1 > restitution2 ? restitution1 : restitution2;

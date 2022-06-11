@@ -27,6 +27,10 @@ import org.jbox2d.collision.Manifold.ManifoldType;
 import org.jbox2d.common.Settings;
 import com.github.rccookie.geometry.performance.float2;
 
+/**
+ * <p>ContactPositionConstraint class.</p>
+ *
+ */
 public class ContactPositionConstraint {
   float2[] localPoints = new float2[Settings.maxManifoldPoints];
   final float2 localNormal = new float2();
@@ -41,6 +45,9 @@ public class ContactPositionConstraint {
   float radiusA, radiusB;
   int pointCount;
 
+  /**
+   * <p>Constructor for ContactPositionConstraint.</p>
+   */
   public ContactPositionConstraint() {
     for (int i = 0; i < localPoints.length; i++) {
       localPoints[i] = new float2();

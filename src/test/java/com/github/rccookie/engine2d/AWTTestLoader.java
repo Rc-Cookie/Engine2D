@@ -1,7 +1,8 @@
 package com.github.rccookie.engine2d;
 
-import com.github.rccookie.engine2d.impl.awt.AWTApplicationLoader;
-import com.github.rccookie.engine2d.impl.awt.AWTStartupPrefs;
+import com.github.rccookie.engine2d.util.awt.AWTApplicationLoader;
+import com.github.rccookie.engine2d.util.awt.AWTStartupPrefs;
+
 import org.jetbrains.annotations.TestOnly;
 
 @TestOnly

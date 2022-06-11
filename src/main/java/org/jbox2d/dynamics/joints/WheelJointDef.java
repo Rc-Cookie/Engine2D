@@ -35,8 +35,9 @@ import org.jbox2d.dynamics.Body;
  * can violate the constraint slightly. The joint translation is zero when the local anchor points
  * coincide in world space. Using local anchors and a local axis helps when saving and loading a
  * game.
- * 
+ *
  * @author Daniel Murphy
+ * @version $Id: $Id
  */
 public class WheelJointDef extends JointDef {
 
@@ -80,6 +81,9 @@ public class WheelJointDef extends JointDef {
    */
   public float dampingRatio;
 
+  /**
+   * <p>Constructor for WheelJointDef.</p>
+   */
   public WheelJointDef() {
     super(JointType.WHEEL);
     localAxisA.set(1, 0);
@@ -88,6 +92,14 @@ public class WheelJointDef extends JointDef {
     motorSpeed = 0f;
   }
 
+  /**
+   * <p>initialize.</p>
+   *
+   * @param b1 a {@link org.jbox2d.dynamics.Body} object
+   * @param b2 a {@link org.jbox2d.dynamics.Body} object
+   * @param anchor a {@link com.github.rccookie.geometry.performance.float2} object
+   * @param axis a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public void initialize(Body b1, Body b2, float2 anchor, float2 axis) {
     bodyA = b1;
     bodyB = b2;

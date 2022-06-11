@@ -47,6 +47,7 @@ package org.jbox2d.collision;
 
 /**
  * Contact ids to facilitate warm starting. Note: the ContactFeatures class is just embedded in here
+ *
  */
 public class ContactID implements Comparable<ContactID> {
 
@@ -59,20 +60,44 @@ public class ContactID implements Comparable<ContactID> {
   public byte typeA;
   public byte typeB;
 
+  /**
+   * <p>getKey.</p>
+   *
+   * @return a int
+   */
   public int getKey() {
     return ((int) indexA) << 24 | ((int) indexB) << 16 | ((int) typeA) << 8 | ((int) typeB);
   }
 
+  /**
+   * <p>isEqual.</p>
+   *
+   * @param cid a {@link org.jbox2d.collision.ContactID} object
+   * @return a boolean
+   */
   public boolean isEqual(final ContactID cid) {
     return getKey() == cid.getKey();
   }
 
+  /**
+   * <p>Constructor for ContactID.</p>
+   */
   public ContactID() {}
 
+  /**
+   * <p>Constructor for ContactID.</p>
+   *
+   * @param c a {@link org.jbox2d.collision.ContactID} object
+   */
   public ContactID(final ContactID c) {
     set(c);
   }
 
+  /**
+   * <p>set.</p>
+   *
+   * @param c a {@link org.jbox2d.collision.ContactID} object
+   */
   public void set(final ContactID c) {
     indexA = c.indexA;
     indexB = c.indexB;
@@ -80,6 +105,9 @@ public class ContactID implements Comparable<ContactID> {
     typeB = c.typeB;
   }
 
+  /**
+   * <p>flip.</p>
+   */
   public void flip() {
     byte tempA = indexA;
     indexA = indexB;
@@ -99,6 +127,7 @@ public class ContactID implements Comparable<ContactID> {
     typeB = 0;
   }
 
+  /** {@inheritDoc} */
   @Override
   public int compareTo(ContactID o) {
     return getKey() - o.getKey();

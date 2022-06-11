@@ -32,10 +32,10 @@ import org.jbox2d.dynamics.Body;
  * can violate the constraint slightly. The joint translation is zero when the local anchor points
  * coincide in world space. Using local anchors and a local axis helps when saving and loading a
  * game.
- * 
- * @warning at least one body should by dynamic with a non-fixed rotation.
+ *
+ *
  * @author Daniel
- * 
+ * @version $Id: $Id
  */
 public class PrismaticJointDef extends JointDef {
 
@@ -90,6 +90,9 @@ public class PrismaticJointDef extends JointDef {
    */
   public float motorSpeed;
 
+  /**
+   * <p>Constructor for PrismaticJointDef.</p>
+   */
   public PrismaticJointDef() {
     super(JointType.PRISMATIC);
     localAnchorA = new float2();
@@ -108,6 +111,11 @@ public class PrismaticJointDef extends JointDef {
   /**
    * Initialize the bodies, anchors, axis, and reference angle using the world anchor and world
    * axis.
+   *
+   * @param b1 a {@link org.jbox2d.dynamics.Body} object
+   * @param b2 a {@link org.jbox2d.dynamics.Body} object
+   * @param anchor a {@link com.github.rccookie.geometry.performance.float2} object
+   * @param axis a {@link com.github.rccookie.geometry.performance.float2} object
    */
   public void initialize(Body b1, Body b2, float2 anchor, float2 axis) {
     bodyA = b1;

@@ -4,6 +4,7 @@ import java.awt.DisplayMode;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 
+import com.github.rccookie.engine2d.core.DrawObject;
 import com.github.rccookie.engine2d.core.LoopExecutor;
 import com.github.rccookie.engine2d.core.ParallelLoopExecutor;
 import com.github.rccookie.engine2d.core.SequentialLoopExecutor;
@@ -11,11 +12,11 @@ import com.github.rccookie.engine2d.core.stats.PerformanceStats;
 import com.github.rccookie.engine2d.impl.DisplayController;
 import com.github.rccookie.engine2d.impl.Implementation;
 import com.github.rccookie.engine2d.util.Coroutine;
-import com.github.rccookie.engine2d.util.Future;
 import com.github.rccookie.engine2d.util.NamedCaughtEvent;
 import com.github.rccookie.engine2d.util.VoidCoroutine;
 import com.github.rccookie.event.Event;
 import com.github.rccookie.geometry.performance.int2;
+import com.github.rccookie.util.Future;
 
 import org.jetbrains.annotations.Blocking;
 
@@ -23,6 +24,7 @@ import org.jetbrains.annotations.Blocking;
  * The main control class and entry point of the application. Also serves as
  * connection between the impl API and the actual implementation.
  */
+@SuppressWarnings("NonFinalFieldInEnum")
 public enum Application {
 
     ; // No enum instance
@@ -76,12 +78,30 @@ public enum Application {
     private static boolean running = false;
 
     /**
+     * Application-wide properties for "low-level" information.
+     */
+    private static final Properties properties = new Properties();
+
+    /**
      * Whether to force the fps cap specified by {@link #setMaxFps(float)},
      * even if the implementation does not support sleeping and waiting will
      * be done using a while-loop.
      * <p>Disabled by default.
      */
     public static boolean FORCE_FPS_CAP = false;
+
+    /**
+     * If enabled, the "output framerate" may be reduced down to as low
+     * as 1 fps, if nothing on the screen has changed. This <b>does not</b>
+     * affect the frequency of {@code update} calls, if at all it may increase
+     * it because of shorted render times.
+     * <p>Adaptive framerate can reduce cpu and gpu load significantly on ui-based
+     * applications where the screen only changed after distinct events. This
+     * feature may trick monitoring software into thinking that the application
+     * is really running at such a low framerate because of lag, even though it
+     * is running at full framerate internally.</p>
+     */
+    public static boolean ADAPTIVE_FRAMERATE = true;
 
     /**
      * Set up the application to use the specified "native" implementation.
@@ -112,6 +132,9 @@ public enum Application {
             throw new IllegalStateException();
 
         Application.implementation = implementation;
+        properties.set("implementation", implementation.getClass());
+        implementation.initProperties(properties);
+
         implementation.setDisplayController(displayController);
         executor = (parallel && implementation.supportsMultithreading()) ?
                 new ParallelLoopExecutor() : new SequentialLoopExecutor();
@@ -161,8 +184,7 @@ public enum Application {
     }
 
     private static void runUpdateLoop() {
-        if(Camera.getActive() == null)
-            Camera.setActive(NoCameraCamera.INSTANCE);
+        implementation.setMainThread();
 
         if(implementation.hasExternalUpdateLoop())
             implementation.runExternalUpdateLoop();
@@ -197,6 +219,8 @@ public enum Application {
     public static void startCoroutine(VoidCoroutine coroutine) {
         startCoroutine((Coroutine<Object>) coroutine);
     }
+
+
 
 //    public static void yield() {
 //        checkSetup();
@@ -245,8 +269,8 @@ public enum Application {
     }
 
     /**
-     * Sets the fps cap for the application. Values above 1000 will be threatened as
-     * no limit, although it is very unlikely that these targets will be hit.
+     * Sets the fps cap for the application. Non-positive values will be threatened as
+     * no limit.
      * <p>The fps cap defaults to the maximum refresh rate of the monitor, if
      * this information is available. Otherwise it will limit to 60 fps by default.</p>
      *
@@ -269,7 +293,7 @@ public enum Application {
                 camera.renderPrepDuration / 1000000000f,
                 camera.renderDuration / 1000000000f,
                 camera.drawCount,
-                camera.getPoolSize(),
+                DrawObject.getPoolSize(),
                 camera.updateDuration / 1000000000f,
                 camera.physicsDuration / 1000000000f,
                 camera.uiUpdateDuration / 1000000000f,
@@ -278,7 +302,22 @@ public enum Application {
         );
     }
 
-    static void checkSetup() {
+    /**
+     * Returns the application-wide properties.
+     *
+     * @return The application properties
+     */
+    public static Properties getProperties() {
+        checkSetup();
+        return properties;
+    }
+
+    /**
+     * Asserts that the application has been set up using {@link #setup(Implementation)}.
+     *
+     * @throws IllegalStateException If the application has not been set up
+     */
+    public static void checkSetup() {
         if(implementation == null)
             throw new IllegalStateException("The application has to be set up using using Application.setup() before any actions can be performed on it");
     }

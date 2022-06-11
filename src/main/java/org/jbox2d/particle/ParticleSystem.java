@@ -23,6 +23,10 @@ import org.jbox2d.dynamics.TimeStep;
 import org.jbox2d.dynamics.World;
 import org.jbox2d.particle.VoronoiDiagram.VoronoiDiagramCallback;
 
+/**
+ * <p>ParticleSystem class.</p>
+ *
+ */
 public class ParticleSystem {
   /** All particle types that require creating pairs */
   private static final int k_pairFlags = ParticleType.b2_springParticle;
@@ -114,6 +118,11 @@ public class ParticleSystem {
 
   World m_world;
 
+  /**
+   * <p>Constructor for ParticleSystem.</p>
+   *
+   * @param world a {@link org.jbox2d.dynamics.World} object
+   */
   public ParticleSystem(World world) {
     m_world = world;
     m_timestamp = 0;
@@ -175,6 +184,12 @@ public class ParticleSystem {
 //    }
 //  }
 
+  /**
+   * <p>createParticle.</p>
+   *
+   * @param def a {@link org.jbox2d.particle.ParticleDef} object
+   * @return a int
+   */
   public int createParticle(ParticleDef def) {
     if (m_count >= m_internalAllocatedCapacity) {
       int capacity = m_count != 0 ? 2 * m_count : Settings.minParticleBufferCapacity;
@@ -242,6 +257,12 @@ public class ParticleSystem {
     return index;
   }
 
+  /**
+   * <p>destroyParticle.</p>
+   *
+   * @param index a int
+   * @param callDestructionListener a boolean
+   */
   public void destroyParticle(int index, boolean callDestructionListener) {
     int flags = ParticleType.b2_zombieParticle;
     if (callDestructionListener) {
@@ -253,6 +274,14 @@ public class ParticleSystem {
   private final AABB temp = new AABB();
   private final DestroyParticlesInShapeCallback dpcallback = new DestroyParticlesInShapeCallback();
 
+  /**
+   * <p>destroyParticlesInShape.</p>
+   *
+   * @param shape a {@link org.jbox2d.collision.shapes.Shape} object
+   * @param xf a {@link org.jbox2d.common.Transform} object
+   * @param callDestructionListener a boolean
+   * @return a int
+   */
   public int destroyParticlesInShape(Shape shape, Transform xf, boolean callDestructionListener) {
     dpcallback.init(this, shape, xf, callDestructionListener);
     shape.computeAABB(temp, xf, 0);
@@ -260,6 +289,12 @@ public class ParticleSystem {
     return dpcallback.destroyed;
   }
 
+  /**
+   * <p>destroyParticlesInGroup.</p>
+   *
+   * @param group a {@link org.jbox2d.particle.ParticleGroup} object
+   * @param callDestructionListener a boolean
+   */
   public void destroyParticlesInGroup(ParticleGroup group, boolean callDestructionListener) {
     for (int i = group.m_firstIndex; i < group.m_lastIndex; i++) {
       destroyParticle(i, callDestructionListener);
@@ -274,6 +309,12 @@ public class ParticleSystem {
       new CreateParticleGroupCallback();
   private final ParticleDef tempParticleDef = new ParticleDef();
 
+  /**
+   * <p>createParticleGroup.</p>
+   *
+   * @param groupDef a {@link org.jbox2d.particle.ParticleGroupDef} object
+   * @return a {@link org.jbox2d.particle.ParticleGroup} object
+   */
   public ParticleGroup createParticleGroup(ParticleGroupDef groupDef) {
     float stride = getParticleStride();
     final Transform identity = tempTransform;
@@ -390,6 +431,12 @@ public class ParticleSystem {
     return group;
   }
 
+  /**
+   * <p>joinParticleGroups.</p>
+   *
+   * @param groupA a {@link org.jbox2d.particle.ParticleGroup} object
+   * @param groupB a {@link org.jbox2d.particle.ParticleGroup} object
+   */
   public void joinParticleGroups(ParticleGroup groupA, ParticleGroup groupB) {
     assert (groupA != groupB);
     RotateBuffer(groupB.m_firstIndex, groupB.m_lastIndex, m_count);
@@ -488,6 +535,11 @@ public class ParticleSystem {
     --m_groupCount;
   }
 
+  /**
+   * <p>computeDepthForGroup.</p>
+   *
+   * @param group a {@link org.jbox2d.particle.ParticleGroup} object
+   */
   public void computeDepthForGroup(ParticleGroup group) {
     for (int i = group.m_firstIndex; i < group.m_lastIndex; i++) {
       m_accumulationBuffer[i] = 0;
@@ -546,6 +598,12 @@ public class ParticleSystem {
     }
   }
 
+  /**
+   * <p>addContact.</p>
+   *
+   * @param a a int
+   * @param b a int
+   */
   public void addContact(int a, int b) {
     assert(a != b);
     float2 pa = m_positionBuffer.data[a];
@@ -576,6 +634,11 @@ public class ParticleSystem {
     }
   }
 
+  /**
+   * <p>updateContacts.</p>
+   *
+   * @param exceptZombie a boolean
+   */
   public void updateContacts(boolean exceptZombie) {
     for (int p = 0; p < m_proxyCount; p++) {
       Proxy proxy = m_proxyBuffer[p];
@@ -630,6 +693,9 @@ public class ParticleSystem {
 
   private final UpdateBodyContactsCallback ubccallback = new UpdateBodyContactsCallback();
 
+  /**
+   * <p>updateBodyContacts.</p>
+   */
   public void updateBodyContacts() {
     final AABB aabb = temp;
     aabb.lowerBound.x = Float.MAX_VALUE;
@@ -653,6 +719,11 @@ public class ParticleSystem {
 
   private SolveCollisionCallback sccallback = new SolveCollisionCallback();
 
+  /**
+   * <p>solveCollision.</p>
+   *
+   * @param step a {@link org.jbox2d.dynamics.TimeStep} object
+   */
   public void solveCollision(TimeStep step) {
     final AABB aabb = temp;
     final float2 lowerBound = aabb.lowerBound;
@@ -682,6 +753,11 @@ public class ParticleSystem {
     m_world.queryAABB(sccallback, aabb);
   }
 
+  /**
+   * <p>solve.</p>
+   *
+   * @param step a {@link org.jbox2d.dynamics.TimeStep} object
+   */
   public void solve(TimeStep step) {
     ++m_timestamp;
     if (m_count == 0) {
@@ -885,6 +961,11 @@ public class ParticleSystem {
     }
   }
 
+  /**
+   * <p>solveWall.</p>
+   *
+   * @param step a {@link org.jbox2d.dynamics.TimeStep} object
+   */
   public void solveWall(TimeStep step) {
     for (int i = 0; i < m_count; i++) {
       if ((m_flagsBuffer.data[i] & ParticleType.b2_wallParticle) != 0) {
@@ -1461,37 +1542,77 @@ public class ParticleSystem {
     }
   }
 
+  /**
+   * <p>setParticleRadius.</p>
+   *
+   * @param radius a float
+   */
   public void setParticleRadius(float radius) {
     m_particleDiameter = 2 * radius;
     m_squaredDiameter = m_particleDiameter * m_particleDiameter;
     m_inverseDiameter = 1 / m_particleDiameter;
   }
 
+  /**
+   * <p>setParticleDensity.</p>
+   *
+   * @param density a float
+   */
   public void setParticleDensity(float density) {
     m_density = density;
     m_inverseDensity = 1 / m_density;
   }
 
+  /**
+   * <p>getParticleDensity.</p>
+   *
+   * @return a float
+   */
   public float getParticleDensity() {
     return m_density;
   }
 
+  /**
+   * <p>setParticleGravityScale.</p>
+   *
+   * @param gravityScale a float
+   */
   public void setParticleGravityScale(float gravityScale) {
     m_gravityScale = gravityScale;
   }
 
+  /**
+   * <p>getParticleGravityScale.</p>
+   *
+   * @return a float
+   */
   public float getParticleGravityScale() {
     return m_gravityScale;
   }
 
+  /**
+   * <p>setParticleDamping.</p>
+   *
+   * @param damping a float
+   */
   public void setParticleDamping(float damping) {
     m_dampingStrength = damping;
   }
 
+  /**
+   * <p>getParticleDamping.</p>
+   *
+   * @return a float
+   */
   public float getParticleDamping() {
     return m_dampingStrength;
   }
 
+  /**
+   * <p>getParticleRadius.</p>
+   *
+   * @return a float
+   */
   public float getParticleRadius() {
     return m_particleDiameter / 2;
   }
@@ -1522,32 +1643,67 @@ public class ParticleSystem {
     return 1.777777f * m_inverseDensity * m_inverseDiameter * m_inverseDiameter;
   }
 
+  /**
+   * <p>getParticleFlagsBuffer.</p>
+   *
+   * @return an array of {@link int} objects
+   */
   public int[] getParticleFlagsBuffer() {
     return m_flagsBuffer.data;
   }
 
+  /**
+   * <p>getParticlePositionBuffer.</p>
+   *
+   * @return an array of {@link com.github.rccookie.geometry.performance.float2} objects
+   */
   public float2[] getParticlePositionBuffer() {
     return m_positionBuffer.data;
   }
 
+  /**
+   * <p>getParticleVelocityBuffer.</p>
+   *
+   * @return an array of {@link com.github.rccookie.geometry.performance.float2} objects
+   */
   public float2[] getParticleVelocityBuffer() {
     return m_velocityBuffer.data;
   }
 
+  /**
+   * <p>getParticleColorBuffer.</p>
+   *
+   * @return an array of {@link org.jbox2d.particle.ParticleColor} objects
+   */
   public ParticleColor[] getParticleColorBuffer() {
     m_colorBuffer.data = requestParticleBuffer(ParticleColor.class, m_colorBuffer.data);
     return m_colorBuffer.data;
   }
 
+  /**
+   * <p>getParticleUserDataBuffer.</p>
+   *
+   * @return an array of {@link java.lang.Object} objects
+   */
   public Object[] getParticleUserDataBuffer() {
     m_userDataBuffer.data = requestParticleBuffer(Object.class, m_userDataBuffer.data);
     return m_userDataBuffer.data;
   }
 
+  /**
+   * <p>getParticleMaxCount.</p>
+   *
+   * @return a int
+   */
   public int getParticleMaxCount() {
     return m_maxCount;
   }
 
+  /**
+   * <p>setParticleMaxCount.</p>
+   *
+   * @param count a int
+   */
   public void setParticleMaxCount(int count) {
     assert (m_count <= count);
     m_maxCount = count;
@@ -1571,38 +1727,88 @@ public class ParticleSystem {
     buffer.userSuppliedCapacity = newCapacity;
   }
 
+  /**
+   * <p>setParticleFlagsBuffer.</p>
+   *
+   * @param buffer an array of {@link int} objects
+   * @param capacity a int
+   */
   public void setParticleFlagsBuffer(int[] buffer, int capacity) {
     setParticleBuffer(m_flagsBuffer, buffer, capacity);
   }
 
+  /**
+   * <p>setParticlePositionBuffer.</p>
+   *
+   * @param buffer an array of {@link com.github.rccookie.geometry.performance.float2} objects
+   * @param capacity a int
+   */
   public void setParticlePositionBuffer(float2[] buffer, int capacity) {
     setParticleBuffer(m_positionBuffer, buffer, capacity);
   }
 
+  /**
+   * <p>setParticleVelocityBuffer.</p>
+   *
+   * @param buffer an array of {@link com.github.rccookie.geometry.performance.float2} objects
+   * @param capacity a int
+   */
   public void setParticleVelocityBuffer(float2[] buffer, int capacity) {
     setParticleBuffer(m_velocityBuffer, buffer, capacity);
   }
 
+  /**
+   * <p>setParticleColorBuffer.</p>
+   *
+   * @param buffer an array of {@link org.jbox2d.particle.ParticleColor} objects
+   * @param capacity a int
+   */
   public void setParticleColorBuffer(ParticleColor[] buffer, int capacity) {
     setParticleBuffer(m_colorBuffer, buffer, capacity);
   }
 
+  /**
+   * <p>getParticleGroupBuffer.</p>
+   *
+   * @return an array of {@link org.jbox2d.particle.ParticleGroup} objects
+   */
   public ParticleGroup[] getParticleGroupBuffer() {
     return m_groupBuffer;
   }
 
+  /**
+   * <p>getParticleGroupCount.</p>
+   *
+   * @return a int
+   */
   public int getParticleGroupCount() {
     return m_groupCount;
   }
 
+  /**
+   * <p>getParticleGroupList.</p>
+   *
+   * @return an array of {@link org.jbox2d.particle.ParticleGroup} objects
+   */
   public ParticleGroup[] getParticleGroupList() {
     return m_groupBuffer;
   }
 
+  /**
+   * <p>getParticleCount.</p>
+   *
+   * @return a int
+   */
   public int getParticleCount() {
     return m_count;
   }
 
+  /**
+   * <p>setParticleUserDataBuffer.</p>
+   *
+   * @param buffer an array of {@link java.lang.Object} objects
+   * @param capacity a int
+   */
   public void setParticleUserDataBuffer(Object[] buffer, int capacity) {
     setParticleBuffer(m_userDataBuffer, buffer, capacity);
   }
@@ -1639,6 +1845,12 @@ public class ParticleSystem {
     return left;
   }
 
+  /**
+   * <p>queryAABB.</p>
+   *
+   * @param callback a {@link org.jbox2d.callbacks.ParticleQueryCallback} object
+   * @param aabb a {@link org.jbox2d.collision.AABB} object
+   */
   public void queryAABB(ParticleQueryCallback callback, final AABB aabb) {
     if (m_proxyCount == 0) {
       return;
@@ -1666,9 +1878,11 @@ public class ParticleSystem {
   }
 
   /**
-   * @param callback
-   * @param point1
-   * @param point2
+   * <p>raycast.</p>
+   *
+   * @param callback a {@link org.jbox2d.callbacks.ParticleRaycastCallback} object
+   * @param point1 a {@link com.github.rccookie.geometry.performance.float2} object
+   * @param point2 a {@link com.github.rccookie.geometry.performance.float2} object
    */
   public void raycast(ParticleRaycastCallback callback, final float2 point1, final float2 point2) {
     if (m_proxyCount == 0) {
@@ -1731,6 +1945,11 @@ public class ParticleSystem {
     }
   }
 
+  /**
+   * <p>computeParticleCollisionEnergy.</p>
+   *
+   * @return a float
+   */
   public float computeParticleCollisionEnergy() {
     float sum_v2 = 0;
     for (int k = 0; k < m_contactCount; k++) {

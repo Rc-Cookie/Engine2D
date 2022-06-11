@@ -28,8 +28,9 @@ import com.github.rccookie.geometry.performance.float2;
 /**
  * A body definition holds all the data needed to construct a rigid body. You can safely re-use body
  * definitions. Shapes are added to a body after construction.
- * 
+ *
  * @author daniel
+ * @version $Id: $Id
  */
 public class BodyDef {
 
@@ -100,7 +101,7 @@ public class BodyDef {
    * Note that all bodies are prevented from tunneling through kinematic and static bodies. This
    * setting is only considered on dynamic bodies.
    * 
-   * @warning You should use this flag sparingly since it increases processing time.
+   *
    */
   public boolean bullet;
 
@@ -114,6 +115,9 @@ public class BodyDef {
    */
   public float gravityScale;
 
+  /**
+   * <p>Constructor for BodyDef.</p>
+   */
   public BodyDef() {
     userData = null;
     position = new float2();
@@ -134,6 +138,8 @@ public class BodyDef {
   /**
    * The body type: static, kinematic, or dynamic. Note: if a dynamic body would have zero mass, the
    * mass is set to one.
+   *
+   * @return a {@link org.jbox2d.dynamics.BodyType} object
    */
   public BodyType getType() {
     return type;
@@ -142,6 +148,8 @@ public class BodyDef {
   /**
    * The body type: static, kinematic, or dynamic. Note: if a dynamic body would have zero mass, the
    * mass is set to one.
+   *
+   * @param type a {@link org.jbox2d.dynamics.BodyType} object
    */
   public void setType(BodyType type) {
     this.type = type;
@@ -149,6 +157,8 @@ public class BodyDef {
 
   /**
    * Use this to store application specific body data.
+   *
+   * @return a {@link java.lang.Object} object
    */
   public Object getUserData() {
     return userData;
@@ -156,6 +166,8 @@ public class BodyDef {
 
   /**
    * Use this to store application specific body data.
+   *
+   * @param userData a {@link java.lang.Object} object
    */
   public void setUserData(Object userData) {
     this.userData = userData;
@@ -164,6 +176,8 @@ public class BodyDef {
   /**
    * The world position of the body. Avoid creating bodies at the origin since this can lead to many
    * overlapping shapes.
+   *
+   * @return a {@link com.github.rccookie.geometry.performance.float2} object
    */
   public float2 getPosition() {
     return position;
@@ -172,6 +186,8 @@ public class BodyDef {
   /**
    * The world position of the body. Avoid creating bodies at the origin since this can lead to many
    * overlapping shapes.
+   *
+   * @param position a {@link com.github.rccookie.geometry.performance.float2} object
    */
   public void setPosition(float2 position) {
     this.position = position;
@@ -179,6 +195,8 @@ public class BodyDef {
 
   /**
    * The world angle of the body in radians.
+   *
+   * @return a float
    */
   public float getAngle() {
     return angle;
@@ -186,6 +204,8 @@ public class BodyDef {
 
   /**
    * The world angle of the body in radians.
+   *
+   * @param angle a float
    */
   public void setAngle(float angle) {
     this.angle = angle;
@@ -193,6 +213,8 @@ public class BodyDef {
 
   /**
    * The linear velocity of the body in world co-ordinates.
+   *
+   * @return a {@link com.github.rccookie.geometry.performance.float2} object
    */
   public float2 getLinearVelocity() {
     return linearVelocity;
@@ -200,6 +222,8 @@ public class BodyDef {
 
   /**
    * The linear velocity of the body in world co-ordinates.
+   *
+   * @param linearVelocity a {@link com.github.rccookie.geometry.performance.float2} object
    */
   public void setLinearVelocity(float2 linearVelocity) {
     this.linearVelocity = linearVelocity;
@@ -207,6 +231,8 @@ public class BodyDef {
 
   /**
    * The angular velocity of the body.
+   *
+   * @return a float
    */
   public float getAngularVelocity() {
     return angularVelocity;
@@ -214,6 +240,8 @@ public class BodyDef {
 
   /**
    * The angular velocity of the body.
+   *
+   * @param angularVelocity a float
    */
   public void setAngularVelocity(float angularVelocity) {
     this.angularVelocity = angularVelocity;
@@ -223,6 +251,8 @@ public class BodyDef {
    * Linear damping is use to reduce the linear velocity. The damping parameter can be larger than
    * 1.0f but the damping effect becomes sensitive to the time step when the damping parameter is
    * large.
+   *
+   * @return a float
    */
   public float getLinearDamping() {
     return linearDamping;
@@ -232,6 +262,8 @@ public class BodyDef {
    * Linear damping is use to reduce the linear velocity. The damping parameter can be larger than
    * 1.0f but the damping effect becomes sensitive to the time step when the damping parameter is
    * large.
+   *
+   * @param linearDamping a float
    */
   public void setLinearDamping(float linearDamping) {
     this.linearDamping = linearDamping;
@@ -241,6 +273,8 @@ public class BodyDef {
    * Angular damping is use to reduce the angular velocity. The damping parameter can be larger than
    * 1.0f but the damping effect becomes sensitive to the time step when the damping parameter is
    * large.
+   *
+   * @return a float
    */
   public float getAngularDamping() {
     return angularDamping;
@@ -250,6 +284,8 @@ public class BodyDef {
    * Angular damping is use to reduce the angular velocity. The damping parameter can be larger than
    * 1.0f but the damping effect becomes sensitive to the time step when the damping parameter is
    * large.
+   *
+   * @param angularDamping a float
    */
   public void setAngularDamping(float angularDamping) {
     this.angularDamping = angularDamping;
@@ -258,6 +294,8 @@ public class BodyDef {
   /**
    * Set this flag to false if this body should never fall asleep. Note that this increases CPU
    * usage.
+   *
+   * @return a boolean
    */
   public boolean isAllowSleep() {
     return allowSleep;
@@ -266,6 +304,8 @@ public class BodyDef {
   /**
    * Set this flag to false if this body should never fall asleep. Note that this increases CPU
    * usage.
+   *
+   * @param allowSleep a boolean
    */
   public void setAllowSleep(boolean allowSleep) {
     this.allowSleep = allowSleep;
@@ -273,6 +313,8 @@ public class BodyDef {
 
   /**
    * Is this body initially sleeping?
+   *
+   * @return a boolean
    */
   public boolean isAwake() {
     return awake;
@@ -280,6 +322,8 @@ public class BodyDef {
 
   /**
    * Is this body initially sleeping?
+   *
+   * @param awake a boolean
    */
   public void setAwake(boolean awake) {
     this.awake = awake;
@@ -287,6 +331,8 @@ public class BodyDef {
 
   /**
    * Should this body be prevented from rotating? Useful for characters.
+   *
+   * @return a boolean
    */
   public boolean isFixedRotation() {
     return fixedRotation;
@@ -294,6 +340,8 @@ public class BodyDef {
 
   /**
    * Should this body be prevented from rotating? Useful for characters.
+   *
+   * @param fixedRotation a boolean
    */
   public void setFixedRotation(boolean fixedRotation) {
     this.fixedRotation = fixedRotation;
@@ -303,8 +351,9 @@ public class BodyDef {
    * Is this a fast moving body that should be prevented from tunneling through other moving bodies?
    * Note that all bodies are prevented from tunneling through kinematic and static bodies. This
    * setting is only considered on dynamic bodies.
-   * 
-   * @warning You should use this flag sparingly since it increases processing time.
+   *
+   *
+   * @return a boolean
    */
   public boolean isBullet() {
     return bullet;
@@ -314,8 +363,9 @@ public class BodyDef {
    * Is this a fast moving body that should be prevented from tunneling through other moving bodies?
    * Note that all bodies are prevented from tunneling through kinematic and static bodies. This
    * setting is only considered on dynamic bodies.
-   * 
-   * @warning You should use this flag sparingly since it increases processing time.
+   *
+   *
+   * @param bullet a boolean
    */
   public void setBullet(boolean bullet) {
     this.bullet = bullet;
@@ -323,6 +373,8 @@ public class BodyDef {
 
   /**
    * Does this body start out active?
+   *
+   * @return a boolean
    */
   public boolean isActive() {
     return active;
@@ -330,6 +382,8 @@ public class BodyDef {
 
   /**
    * Does this body start out active?
+   *
+   * @param active a boolean
    */
   public void setActive(boolean active) {
     this.active = active;
@@ -337,6 +391,8 @@ public class BodyDef {
 
   /**
    * Experimental: scales the inertia tensor.
+   *
+   * @return a float
    */
   public float getGravityScale() {
     return gravityScale;
@@ -344,6 +400,8 @@ public class BodyDef {
 
   /**
    * Experimental: scales the inertia tensor.
+   *
+   * @param gravityScale a float
    */
   public void setGravityScale(float gravityScale) {
     this.gravityScale = gravityScale;

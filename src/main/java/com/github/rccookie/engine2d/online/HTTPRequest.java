@@ -6,11 +6,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.github.rccookie.engine2d.Application;
-import com.github.rccookie.engine2d.Execute;
-import com.github.rccookie.engine2d.util.Future;
-import com.github.rccookie.engine2d.util.FutureImpl;
+import com.github.rccookie.engine2d.util.SynchronizedMappedFutureImpl;
 import com.github.rccookie.json.Json;
 import com.github.rccookie.util.Arguments;
+import com.github.rccookie.util.Future;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -127,10 +126,10 @@ public class HTTPRequest {
      * @return A future to the HTTP response
      */
     public Future<HTTPResponse> send(@Nullable String data) {
-        FutureImpl<HTTPResponse> result = new FutureImpl<>();
-        Application.getImplementation().getOnlineManager().sendHTTPRequest(url, method, headerView, data)
-                .then(response -> Execute.later(() -> result.setValue(new HTTPResponse(response))));
-        return result;
+        return new SynchronizedMappedFutureImpl<>(
+                Application.getImplementation().getOnlineManager().sendHTTPRequest(url, method, headerView, data),
+                HTTPResponse::new
+        );
     }
 
     /**
@@ -162,10 +161,10 @@ public class HTTPRequest {
      */
     public Future<HTTPResponse> sendParams(Map<?,?> params) {
         String paramsString = "?" + params.entrySet().stream().map(e -> e.getKey() + "=" + e.getValue()).collect(Collectors.joining("&"));
-        FutureImpl<HTTPResponse> result = new FutureImpl<>();
-        Application.getImplementation().getOnlineManager().sendHTTPRequest(url + paramsString, method, headerView, null)
-                .then(response -> Execute.later(() -> result.setValue(new HTTPResponse(response))));
-        return result;
+        return new SynchronizedMappedFutureImpl<>(
+                Application.getImplementation().getOnlineManager().sendHTTPRequest(url + paramsString, method, headerView, null),
+                HTTPResponse::new
+        );
     }
 
     /**
@@ -181,7 +180,7 @@ public class HTTPRequest {
     /**
      * HTTP request methods.
      *
-     * <p><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods">Reference</p>
+     * <p><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods">Reference</a></p>
      */
     public enum Method {
         /**

@@ -31,14 +31,17 @@ import org.jbox2d.dynamics.World;
 
 /**
  * Callback class for AABB queries.
- * See {@link World#queryAABB(QueryCallback, org.jbox2d.collision.AABB)}.
+ * See {@link org.jbox2d.dynamics.World#queryAABB(QueryCallback, org.jbox2d.collision.AABB)}.
+ *
  * @author Daniel Murphy
+ * @version $Id: $Id
  */
 public interface QueryCallback {
 
 	/**
 	 * Called for each fixture found in the query AABB.
-	 * @param fixture
+	 *
+	 * @param fixture a {@link org.jbox2d.dynamics.Fixture} object
 	 * @return false to terminate the query.
 	 */
 	public boolean reportFixture(Fixture fixture);

@@ -23,6 +23,8 @@
  ******************************************************************************/
 package org.jbox2d.collision;
 
+import com.github.rccookie.geometry.performance.float2;
+
 import org.jbox2d.collision.shapes.ChainShape;
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.EdgeShape;
@@ -31,21 +33,25 @@ import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Rot;
 import org.jbox2d.common.Settings;
-import com.github.rccookie.geometry.performance.float2;
 import org.jbox2d.common.Transform;
 
 // updated to rev 100
 /**
- * This is non-static for faster pooling. To get an instance, use the {@link SingletonPool}, don't
+ * This is non-static for faster pooling. To get an instance, use the [?], don't
  * construct a distance object.
- * 
+ *
  * @author Daniel Murphy
+ * @version $Id: $Id
  */
 public class Distance {
+  /** Constant <code>MAX_ITERS=20</code> */
   public static final int MAX_ITERS = 20;
 
+  /** Constant <code>GJK_CALLS=0</code> */
   public static int GJK_CALLS = 0;
+  /** Constant <code>GJK_ITERS=0</code> */
   public static int GJK_ITERS = 0;
+  /** Constant <code>GJK_MAX_ITERS=20</code> */
   public static int GJK_MAX_ITERS = 20;
 
   /**
@@ -611,10 +617,10 @@ public class Distance {
    * Compute the closest points between two shapes. Supports any combination of: CircleShape and
    * PolygonShape. The simplex cache is input/output. On the first call set SimplexCache.count to
    * zero.
-   * 
-   * @param output
-   * @param cache
-   * @param input
+   *
+   * @param output a {@link org.jbox2d.collision.DistanceOutput} object
+   * @param cache a {@link org.jbox2d.collision.Distance.SimplexCache} object
+   * @param input a {@link org.jbox2d.collision.DistanceInput} object
    */
   public final void distance(final DistanceOutput output, final SimplexCache cache,
       final DistanceInput input) {

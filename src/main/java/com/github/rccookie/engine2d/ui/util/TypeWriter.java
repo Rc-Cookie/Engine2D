@@ -1,18 +1,16 @@
 package com.github.rccookie.engine2d.ui.util;
 
-import java.awt.Toolkit;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.StringSelection;
-import java.awt.datatransfer.Transferable;
 import java.util.Objects;
 import java.util.function.UnaryOperator;
 
-import com.github.rccookie.engine2d.Application;
+import com.github.rccookie.engine2d.IO;
 import com.github.rccookie.engine2d.Input;
 import com.github.rccookie.event.CaughtParamEvent;
 import com.github.rccookie.event.ParamEvent;
 import com.github.rccookie.geometry.performance.int2;
 import com.github.rccookie.util.Arguments;
+
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
@@ -120,7 +118,7 @@ public class TypeWriter {
      * Sets whether submitting using enter is allowed. This may be disabled to
      * avoid having to hold shift to write a newline.
      *
-     * @param allowSubmit Whether to allow submit or not
+     * @param allowSubmit Whether to allow submitting or not
      */
     public void setAllowSubmit(boolean allowSubmit) {
         this.allowSubmit = allowSubmit;
@@ -186,6 +184,38 @@ public class TypeWriter {
     }
 
     /**
+     * Returns the cursors current position. The y coordinate describes the index
+     * of the line the cursor is in, the x coordinate the index of the character in
+     * that line that the cursor is in front of.
+     *
+     * @return The position of the cursor
+     */
+    @NotNull
+    @Contract(pure = true)
+    public int2 getCursorPos() {
+        return getPos(cursor);
+    }
+
+    /**
+     * Converts the given index position to a line/column position. The y coordinate
+     * describes the index of the line the cursor is in, the x coordinate the index
+     * of the character in that line that the cursor is in front of.
+     *
+     * @return The position of the specified index
+     */
+    public int2 getPos(int index) {
+        int2 pos = new int2();
+        for(int i=0; i<index; i++) {
+            if(string.charAt(i) == '\n') {
+                pos.x = 0;
+                pos.y++;
+            }
+            else pos.x++;
+        }
+        return pos;
+    }
+
+    /**
      * Sets the position of the cursor to the given one.
      *
      * @param cursor The position to set
@@ -205,11 +235,11 @@ public class TypeWriter {
      * @param cursorEnd The end of the selection where the cursor is
      */
     public void setSelection(int oneEnd, int cursorEnd) {
-        if(cursor == cursorEnd && selectionStart != null && selectionStart == oneEnd) return;
+        if(cursor == cursorEnd && Objects.equals(oneEnd == cursorEnd ? null : oneEnd, selectionStart)) return;
         Arguments.checkRange(cursorEnd, 0, string.length()+1);
         Arguments.checkRange(oneEnd, 0, string.length()+1);
         cursor = cursorEnd;
-        selectionStart = oneEnd;
+        selectionStart = oneEnd == cursor ? null : oneEnd;
         onChange.invoke(toString());
     }
 
@@ -244,7 +274,7 @@ public class TypeWriter {
         if(key.length() == 1) {
             char k = key.charAt(0);
             boolean ctrl = Input.getKeyState("ctrl"), alt = Input.getKeyState("alt");
-            if(!ctrl && !alt) {
+            if(ctrl == alt) { // Either none, or both, which is altgr, like shift
                 if(Input.getKeyState("shift"))
                     k = Character.toUpperCase(k);
                 write(k);
@@ -254,48 +284,60 @@ public class TypeWriter {
                 if(alt) {
                     // TODO: More commands?
                 }
-                else {
+                else { // ctrl
                     if(k == 'a') {
                         selectionStart = 0;
                         cursor = string.length();
-                    } else if(!Application.getImplementation().supportsAWT()) {
-                        return false;
                     } else if(k == 'c') {
-                        if(selectionStart == null || selectionStart == cursor) return true;
-                        StringSelection selection;
-                        if(selectionStart < cursor) selection = new StringSelection(string.substring(selectionStart, cursor));
-                        else selection = new StringSelection(string.substring(cursor, selectionStart));
-                        try {
-                            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(selection, selection);
-                        } catch(Exception e) {
-                            e.printStackTrace();
+                        if(selectionStart == null || selectionStart == cursor) {
+                            selectionStart = null;
+                            return true;
                         }
-                    }else if(k == 'x') {
-                        if(selectionStart == null || selectionStart == cursor) return true;
-                        StringSelection selection;
+                        String selection;
+                        if(selectionStart < cursor) selection = string.substring(selectionStart, cursor);
+                        else selection = string.substring(cursor, selectionStart);
+                        IO.setClipboard(selection);
+                    } else if(k == 'x') {
+                        if(selectionStart == null || selectionStart == cursor) {
+                            selectionStart = null;
+                            return true;
+                        }
+                        String selection;
                         if(selectionStart < cursor) {
-                            selection = new StringSelection(string.substring(selectionStart, cursor));
+                            selection = string.substring(selectionStart, cursor);
                             string.delete(selectionStart, cursor);
                         }
                         else {
-                            selection = new StringSelection(string.substring(cursor, selectionStart));
+                            selection = string.substring(cursor, selectionStart);
                             string.delete(cursor, selectionStart);
                         }
                         selectionStart = null;
-                        try {
-                            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(selection, selection);
-                        } catch(Exception e) {
-                            e.printStackTrace();
-                        }
+                        IO.setClipboard(selection);
                     } else if(k == 'v') {
-                        try {
-                            Transferable data = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
-                            if(!data.isDataFlavorSupported(DataFlavor.stringFlavor)) return true;
-                            String s = (String) data.getTransferData(DataFlavor.stringFlavor);
+                        IO.getClipboard().then(s -> {
+                            if(s.isEmpty()) return;
+                            String before1 = toString();
+                            int beforeCursor1 = cursor;
+                            Integer beforeSelectionStart1 = selectionStart;
                             write(s);
-                        } catch(Exception e) {
-                            e.printStackTrace();
-                        }
+                            String now = toString();
+                            if(now.equals(before1)) {
+                                // selectionStart is now always null
+                                if(cursor != beforeCursor1 || beforeSelectionStart1 != null)
+                                    onChange.invoke(now);
+                            }
+                            now = validator.apply(now);
+                            string.delete(0, string.length());
+                            string.append(now);
+                            if(now.equals(before1)) cursor = beforeCursor1;
+                            else cursor = Math.min(cursor, string.length());
+
+                            // Invoke onChange before onSubmit
+                            onChange.invoke(now);
+                        });
+                        if(selectionStart != null && selectionStart == cursor)
+                            selectionStart = null;
+                        return true;
                     } else return false;
                 }
             }
@@ -304,7 +346,7 @@ public class TypeWriter {
             cursor += 4;
             // TODO: Different behavior on selection
         } else if(key.equals("backspace")) {
-            if(selectionStart != null)
+            if(selectionStart != null && selectionStart != cursor)
                 write();
             else if(cursor > 0) {
                 string.deleteCharAt(--cursor);
@@ -313,7 +355,7 @@ public class TypeWriter {
                         string.deleteCharAt(--cursor);
             }
         } else if(key.equals("delete")) {
-            if(selectionStart != null)
+            if(selectionStart != null && selectionStart != cursor)
                 write();
             else if(cursor < string.length()) {
                 string.deleteCharAt(cursor);
@@ -368,9 +410,9 @@ public class TypeWriter {
             moveToStartOfLine();
             int dist = beforeCursor - cursor;
             moveToEndOfLine();
-            if(cursor != string.length()) {
+            if(cursor < string.length()) {
                 cursor++;
-                for(int i=0; i<dist && string.charAt(cursor) != '\n'; i++)
+                for(int i=0; i<dist && cursor != string.length() && string.charAt(cursor) != '\n'; i++)
                     cursor++;
             }
         } else if(key.equals("home")) {
@@ -384,6 +426,9 @@ public class TypeWriter {
             if(Input.getKeyState("ctrl")) cursor = string.length();
             else moveToEndOfLine();
         } else return false;
+
+        if(selectionStart != null && selectionStart == cursor)
+            selectionStart = null;
 
         String now = toString();
         if(now.equals(before)) {

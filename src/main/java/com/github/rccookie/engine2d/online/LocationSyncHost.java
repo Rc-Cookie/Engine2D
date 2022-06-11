@@ -52,6 +52,6 @@ public class LocationSyncHost extends Component {
                 "angle", gameObject.angle,
                 "rot", gameObject.rotation
         );
-        Online.submitData("locationSync" + id, content);
+        Online.share("locationSync" + id, content);
     }
 }

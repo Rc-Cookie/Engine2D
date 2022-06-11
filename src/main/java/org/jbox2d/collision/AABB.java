@@ -30,7 +30,10 @@ import org.jbox2d.common.Settings;
 import org.jbox2d.pooling.IWorldPool;
 import org.jbox2d.pooling.normal.DefaultWorldPool;
 
-/** An axis-aligned bounding box. */
+/**
+ * An axis-aligned bounding box.
+ *
+ */
 public class AABB {
   /** Bottom left vertex of bounding box. */
   public final float2 lowerBound;
@@ -47,7 +50,7 @@ public class AABB {
 
   /**
    * Copies from the given object
-   * 
+   *
    * @param copy the object to copy from
    */
   public AABB(final AABB copy) {
@@ -56,9 +59,9 @@ public class AABB {
 
   /**
    * Creates an AABB object using the given bounding vertices.
-   * 
+   *
    * @param lowerVertex the bottom left vertex of the bounding box
-   * @param maxVertex the top right vertex of the bounding box
+   * @param upperVertex a {@link com.github.rccookie.geometry.performance.float2} object
    */
   public AABB(final float2 lowerVertex, final float2 upperVertex) {
     this.lowerBound = lowerVertex.clone(); // clone to be safe
@@ -67,7 +70,7 @@ public class AABB {
 
   /**
    * Sets this object from the given object
-   * 
+   *
    * @param aabb the object to copy from
    */
   public final void set(final AABB aabb) {
@@ -79,7 +82,11 @@ public class AABB {
     upperBound.y = v1.y;
   }
 
-  /** Verify that the bounds are sorted */
+  /**
+   * Verify that the bounds are sorted
+   *
+   * @return a boolean
+   */
   public final boolean isValid() {
     final float dx = upperBound.x - lowerBound.x;
     if (dx < 0f) {
@@ -94,8 +101,8 @@ public class AABB {
 
   /**
    * Get the center of the AABB
-   * 
-   * @return
+   *
+   * @return a {@link com.github.rccookie.geometry.performance.float2} object
    */
   public final float2 getCenter() {
     final float2 center = new float2(lowerBound);
@@ -104,6 +111,11 @@ public class AABB {
     return center;
   }
 
+  /**
+   * <p>getCenterToOut.</p>
+   *
+   * @param out a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public final void getCenterToOut(final float2 out) {
     out.x = (lowerBound.x + upperBound.x) * .5f;
     out.y = (lowerBound.y + upperBound.y) * .5f;
@@ -111,8 +123,8 @@ public class AABB {
 
   /**
    * Get the extents of the AABB (half-widths).
-   * 
-   * @return
+   *
+   * @return a {@link com.github.rccookie.geometry.performance.float2} object
    */
   public final float2 getExtents() {
     final float2 center = new float2(upperBound);
@@ -121,11 +133,21 @@ public class AABB {
     return center;
   }
 
+  /**
+   * <p>getExtentsToOut.</p>
+   *
+   * @param out a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public final void getExtentsToOut(final float2 out) {
     out.x = (upperBound.x - lowerBound.x) * .5f;
     out.y = (upperBound.y - lowerBound.y) * .5f; // thanks FDN1
   }
 
+  /**
+   * <p>getVertices.</p>
+   *
+   * @param argRay an array of {@link com.github.rccookie.geometry.performance.float2} objects
+   */
   public final void getVertices(float2[] argRay) {
     argRay[0].set(lowerBound);
     argRay[1].set(lowerBound);
@@ -137,9 +159,9 @@ public class AABB {
 
   /**
    * Combine two AABBs into this one.
-   * 
-   * @param aabb1
-   * @param aab
+   *
+   * @param aabb1 a {@link org.jbox2d.collision.AABB} object
+   * @param aab a {@link org.jbox2d.collision.AABB} object
    */
   public final void combine(final AABB aabb1, final AABB aab) {
     lowerBound.x = aabb1.lowerBound.x < aab.lowerBound.x ? aabb1.lowerBound.x : aab.lowerBound.x;
@@ -150,8 +172,8 @@ public class AABB {
 
   /**
    * Gets the perimeter length
-   * 
-   * @return
+   *
+   * @return a float
    */
   public final float getPerimeter() {
     return 2.0f * (upperBound.x - lowerBound.x + upperBound.y - lowerBound.y);
@@ -159,8 +181,8 @@ public class AABB {
 
   /**
    * Combines another aabb with this one
-   * 
-   * @param aabb
+   *
+   * @param aabb a {@link org.jbox2d.collision.AABB} object
    */
   public final void combine(final AABB aabb) {
     lowerBound.x = lowerBound.x < aabb.lowerBound.x ? lowerBound.x : aabb.lowerBound.x;
@@ -171,8 +193,9 @@ public class AABB {
 
   /**
    * Does this aabb contain the provided AABB.
-   * 
-   * @return
+   *
+   * @param aabb a {@link org.jbox2d.collision.AABB} object
+   * @return a boolean
    */
   public final boolean contains(final AABB aabb) {
     /*
@@ -187,11 +210,13 @@ public class AABB {
   }
 
   /**
+   * <p>raycast.</p>
+   *
    * @deprecated please use {@link #raycast(RayCastOutput, RayCastInput, IWorldPool)} for better
    *             performance
-   * @param output
-   * @param input
-   * @return
+   * @param output a {@link org.jbox2d.collision.RayCastOutput} object
+   * @param input a {@link org.jbox2d.collision.RayCastInput} object
+   * @return a boolean
    */
   @Deprecated
   public final boolean raycast(final RayCastOutput output, final RayCastInput input) {
@@ -200,9 +225,11 @@ public class AABB {
 
   /**
    * From Real-time Collision Detection, p179.
-   * 
-   * @param output
-   * @param input
+   *
+   * @param output a {@link org.jbox2d.collision.RayCastOutput} object
+   * @param input a {@link org.jbox2d.collision.RayCastInput} object
+   * @param argPool a {@link org.jbox2d.pooling.IWorldPool} object
+   * @return a boolean
    */
   public final boolean raycast(final RayCastOutput output, final RayCastInput input,
       IWorldPool argPool) {
@@ -309,6 +336,13 @@ public class AABB {
     return true;
   }
 
+  /**
+   * <p>testOverlap.</p>
+   *
+   * @param a a {@link org.jbox2d.collision.AABB} object
+   * @param b a {@link org.jbox2d.collision.AABB} object
+   * @return a boolean
+   */
   public static final boolean testOverlap(final AABB a, final AABB b) {
     if (b.lowerBound.x - a.upperBound.x > 0.0f || b.lowerBound.y - a.upperBound.y > 0.0f) {
       return false;
@@ -321,6 +355,7 @@ public class AABB {
     return true;
   }
 
+  /** {@inheritDoc} */
   @Override
   public final String toString() {
     final String s = "AABB[" + lowerBound + " . " + upperBound + "]";

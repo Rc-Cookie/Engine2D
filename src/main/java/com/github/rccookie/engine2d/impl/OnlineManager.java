@@ -3,7 +3,7 @@ package com.github.rccookie.engine2d.impl;
 import java.util.Map;
 
 import com.github.rccookie.engine2d.online.HTTPRequest;
-import com.github.rccookie.engine2d.util.Future;
+import com.github.rccookie.util.Future;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

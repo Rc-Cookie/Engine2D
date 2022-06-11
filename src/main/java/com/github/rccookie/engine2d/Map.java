@@ -12,6 +12,7 @@ import com.github.rccookie.engine2d.physics.Raycast;
 import com.github.rccookie.engine2d.physics.RaycastFilter;
 import com.github.rccookie.engine2d.util.NamedCaughtEvent;
 import com.github.rccookie.event.Event;
+import com.github.rccookie.event.SimpleEvent;
 import com.github.rccookie.geometry.performance.float2;
 import com.github.rccookie.util.Arguments;
 import com.github.rccookie.util.ModIterableArrayList;
@@ -76,6 +77,9 @@ public class Map {
      */
     public final Event lateUpdate = new NamedCaughtEvent(false, "Map.lateUpdate");
 
+    final Event gameobjectUpdate = new SimpleEvent();
+    final Event gameobjectLateUpdate = new SimpleEvent();
+
 
 
     /**
@@ -120,8 +124,9 @@ public class Map {
     void update() {
         long start = System.nanoTime();
         this.earlyUpdate.invoke();
-        for(int i=0; i<objects.size(); i++)
-            objects.get(i).update.invoke();
+//        for(int i=0; i<objects.size(); i++)
+//            objects.get(i).update.invoke();
+        this.gameobjectUpdate.invoke();
         this.update.invoke();
         long updateDuration = System.nanoTime() - start;
 
@@ -132,11 +137,14 @@ public class Map {
         physicsDuration = System.nanoTime() - start;
 
         start = System.nanoTime();
-        for(int i=0; i<objects.size(); i++)
-            objects.get(i).lateUpdate.invoke();
+//        for(int i=0; i<objects.size(); i++)
+//            objects.get(i).lateUpdate.invoke();
+        this.gameobjectLateUpdate.invoke();
         this.lateUpdate.invoke();
         updateDuration += System.nanoTime() - start;
         this.updateDuration = updateDuration;
+
+//        Console.log(gameobjectUpdate.getActions().size(), "/", gameobjectLateUpdate.getActions().size(), "of", objects.size(), "update events connected");
     }
 
 

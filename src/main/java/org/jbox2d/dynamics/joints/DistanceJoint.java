@@ -63,6 +63,7 @@ import org.jbox2d.pooling.IWorldPool;
 /**
  * A distance joint constrains two points on two bodies to remain at a fixed distance from each
  * other. You can view this as a massless, rigid rod.
+ *
  */
 public class DistanceJoint extends Joint {
 
@@ -91,6 +92,12 @@ public class DistanceJoint extends Joint {
   private float m_invIB;
   private float m_mass;
 
+  /**
+   * <p>Constructor for DistanceJoint.</p>
+   *
+   * @param argWorld a {@link org.jbox2d.pooling.IWorldPool} object
+   * @param def a {@link org.jbox2d.dynamics.joints.DistanceJointDef} object
+   */
   protected DistanceJoint(IWorldPool argWorld, final DistanceJointDef def) {
     super(argWorld, def);
     m_localAnchorA = def.localAnchorA.clone();
@@ -103,49 +110,93 @@ public class DistanceJoint extends Joint {
     m_bias = 0.0f;
   }
 
+  /**
+   * <p>setFrequency.</p>
+   *
+   * @param hz a float
+   */
   public void setFrequency(float hz) {
     m_frequencyHz = hz;
   }
 
+  /**
+   * <p>getFrequency.</p>
+   *
+   * @return a float
+   */
   public float getFrequency() {
     return m_frequencyHz;
   }
 
+  /**
+   * <p>getLength.</p>
+   *
+   * @return a float
+   */
   public float getLength() {
     return m_length;
   }
 
+  /**
+   * <p>setLength.</p>
+   *
+   * @param argLength a float
+   */
   public void setLength(float argLength) {
     m_length = argLength;
   }
 
+  /**
+   * <p>setDampingRatio.</p>
+   *
+   * @param damp a float
+   */
   public void setDampingRatio(float damp) {
     m_dampingRatio = damp;
   }
 
+  /**
+   * <p>getDampingRatio.</p>
+   *
+   * @return a float
+   */
   public float getDampingRatio() {
     return m_dampingRatio;
   }
 
+  /** {@inheritDoc} */
   @Override
   public void getAnchorA(float2 argOut) {
     m_bodyA.getWorldPointToOut(m_localAnchorA, argOut);
   }
 
+  /** {@inheritDoc} */
   @Override
   public void getAnchorB(float2 argOut) {
     m_bodyB.getWorldPointToOut(m_localAnchorB, argOut);
   }
 
+  /**
+   * <p>getLocalAnchorA.</p>
+   *
+   * @return a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public float2 getLocalAnchorA() {
     return m_localAnchorA;
   }
 
+  /**
+   * <p>getLocalAnchorB.</p>
+   *
+   * @return a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public float2 getLocalAnchorB() {
     return m_localAnchorB;
   }
 
   /**
+   * {@inheritDoc}
+   *
    * Get the reaction force given the inverse time step. Unit is N.
    */
   @Override
@@ -155,6 +206,8 @@ public class DistanceJoint extends Joint {
   }
 
   /**
+   * {@inheritDoc}
+   *
    * Get the reaction torque given the inverse time step. Unit is N*m. This is always zero for a
    * distance joint.
    */
@@ -163,6 +216,7 @@ public class DistanceJoint extends Joint {
     return 0.0f;
   }
 
+  /** {@inheritDoc} */
   @Override
   public void initVelocityConstraints(final SolverData data) {
 
@@ -265,6 +319,7 @@ public class DistanceJoint extends Joint {
     data.velocities[m_indexB].w = wB;
   }
 
+  /** {@inheritDoc} */
   @Override
   public void solveVelocityConstraints(final SolverData data) {
     float2 vA = data.velocities[m_indexA].v;
@@ -304,6 +359,7 @@ public class DistanceJoint extends Joint {
     pool.pushVec2(2);
   }
 
+  /** {@inheritDoc} */
   @Override
   public boolean solvePositionConstraints(final SolverData data) {
     if (m_frequencyHz > 0.0f) {

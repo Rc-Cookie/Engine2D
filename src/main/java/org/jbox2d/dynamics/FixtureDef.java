@@ -28,8 +28,9 @@ import org.jbox2d.collision.shapes.Shape;
 /**
  * A fixture definition is used to create a fixture. This class defines an abstract fixture
  * definition. You can reuse fixture definitions safely.
- * 
+ *
  * @author daniel
+ * @version $Id: $Id
  */
 public class FixtureDef {
   /**
@@ -68,6 +69,9 @@ public class FixtureDef {
    */
   public Filter filter;
 
+  /**
+   * <p>Constructor for FixtureDef.</p>
+   */
   public FixtureDef() {
     shape = null;
     userData = null;
@@ -81,6 +85,8 @@ public class FixtureDef {
   /**
    * The shape, this must be set. The shape will be cloned, so you can create the shape on the
    * stack.
+   *
+   * @return a {@link org.jbox2d.collision.shapes.Shape} object
    */
   public Shape getShape() {
     return shape;
@@ -89,6 +95,8 @@ public class FixtureDef {
   /**
    * The shape, this must be set. The shape will be cloned, so you can create the shape on the
    * stack.
+   *
+   * @param shape a {@link org.jbox2d.collision.shapes.Shape} object
    */
   public void setShape(Shape shape) {
     this.shape = shape;
@@ -96,6 +104,8 @@ public class FixtureDef {
 
   /**
    * Use this to store application specific fixture data.
+   *
+   * @return a {@link java.lang.Object} object
    */
   public Object getUserData() {
     return userData;
@@ -103,6 +113,8 @@ public class FixtureDef {
 
   /**
    * Use this to store application specific fixture data.
+   *
+   * @param userData a {@link java.lang.Object} object
    */
   public void setUserData(Object userData) {
     this.userData = userData;
@@ -110,6 +122,8 @@ public class FixtureDef {
 
   /**
    * The friction coefficient, usually in the range [0,1].
+   *
+   * @return a float
    */
   public float getFriction() {
     return friction;
@@ -117,6 +131,8 @@ public class FixtureDef {
 
   /**
    * The friction coefficient, usually in the range [0,1].
+   *
+   * @param friction a float
    */
   public void setFriction(float friction) {
     this.friction = friction;
@@ -124,6 +140,8 @@ public class FixtureDef {
 
   /**
    * The restitution (elasticity) usually in the range [0,1].
+   *
+   * @return a float
    */
   public float getRestitution() {
     return restitution;
@@ -131,6 +149,8 @@ public class FixtureDef {
 
   /**
    * The restitution (elasticity) usually in the range [0,1].
+   *
+   * @param restitution a float
    */
   public void setRestitution(float restitution) {
     this.restitution = restitution;
@@ -138,6 +158,8 @@ public class FixtureDef {
 
   /**
    * The density, usually in kg/m^2
+   *
+   * @return a float
    */
   public float getDensity() {
     return density;
@@ -145,6 +167,8 @@ public class FixtureDef {
 
   /**
    * The density, usually in kg/m^2
+   *
+   * @param density a float
    */
   public void setDensity(float density) {
     this.density = density;
@@ -152,6 +176,8 @@ public class FixtureDef {
 
   /**
    * A sensor shape collects contact information but never generates a collision response.
+   *
+   * @return a boolean
    */
   public boolean isSensor() {
     return isSensor;
@@ -159,6 +185,8 @@ public class FixtureDef {
 
   /**
    * A sensor shape collects contact information but never generates a collision response.
+   *
+   * @param isSensor a boolean
    */
   public void setSensor(boolean isSensor) {
     this.isSensor = isSensor;
@@ -166,6 +194,8 @@ public class FixtureDef {
 
   /**
    * Contact filtering data;
+   *
+   * @return a {@link org.jbox2d.dynamics.Filter} object
    */
   public Filter getFilter() {
     return filter;
@@ -173,6 +203,8 @@ public class FixtureDef {
 
   /**
    * Contact filtering data;
+   *
+   * @param filter a {@link org.jbox2d.dynamics.Filter} object
    */
   public void setFilter(Filter filter) {
     this.filter = filter;

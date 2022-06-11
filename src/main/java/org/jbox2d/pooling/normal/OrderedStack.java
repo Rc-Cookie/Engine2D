@@ -27,7 +27,10 @@
 package org.jbox2d.pooling.normal;
 
 /**
+ * <p>Abstract OrderedStack class.</p>
+ *
  * @author Daniel Murphy
+ * @version $Id: $Id
  */
 public abstract class OrderedStack<E> {
 
@@ -36,6 +39,12 @@ public abstract class OrderedStack<E> {
   private final int size;
   private final Object[] container;
 
+  /**
+   * <p>Constructor for OrderedStack.</p>
+   *
+   * @param argStackSize a int
+   * @param argContainerSize a int
+   */
   public OrderedStack(int argStackSize, int argContainerSize) {
     size = argStackSize;
     pool = new Object[argStackSize];
@@ -46,12 +55,23 @@ public abstract class OrderedStack<E> {
     container = new Object[argContainerSize];
   }
 
+  /**
+   * <p>pop.</p>
+   *
+   * @return a E object
+   */
   @SuppressWarnings("unchecked")
   public final E pop() {
     assert (index < size) : "End of stack reached, there is probably a leak somewhere";
     return (E) pool[index++];
   }
 
+  /**
+   * <p>pop.</p>
+   *
+   * @param argNum a int
+   * @return an array of E[] objects
+   */
   @SuppressWarnings("unchecked")
   public final E[] pop(int argNum) {
     assert (index + argNum < size) : "End of stack reached, there is probably a leak somewhere";
@@ -61,11 +81,20 @@ public abstract class OrderedStack<E> {
     return (E[]) container;
   }
 
+  /**
+   * <p>push.</p>
+   *
+   * @param argNum a int
+   */
   public final void push(int argNum) {
     index -= argNum;
     assert (index >= 0) : "Beginning of stack reached, push/pops are unmatched";
   }
 
-  /** Creates a new instance of the object contained by this stack. */
+  /**
+   * Creates a new instance of the object contained by this stack.
+   *
+   * @return a E object
+   */
   protected abstract E newInstance();
 }

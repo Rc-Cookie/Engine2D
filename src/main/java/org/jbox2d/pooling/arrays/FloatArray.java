@@ -27,12 +27,20 @@ import java.util.HashMap;
 
 /**
  * Not thread safe float[] pooling.
+ *
  * @author Daniel
+ * @version $Id: $Id
  */
 public class FloatArray {
 	
 	private final HashMap<Integer, float[]> map = new HashMap<Integer, float[]>();
 	
+	/**
+	 * <p>get.</p>
+	 *
+	 * @param argLength a int
+	 * @return an array of {@link float} objects
+	 */
 	public float[] get( int argLength){
 		assert(argLength > 0);
 				
@@ -44,6 +52,12 @@ public class FloatArray {
 		return map.get(argLength);
 	}
 	
+	/**
+	 * <p>getInitializedArray.</p>
+	 *
+	 * @param argLength a int
+	 * @return an array of {@link float} objects
+	 */
 	protected float[] getInitializedArray(int argLength){
 		return new float[argLength];
 	}

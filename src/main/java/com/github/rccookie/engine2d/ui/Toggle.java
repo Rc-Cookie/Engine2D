@@ -1,6 +1,6 @@
 package com.github.rccookie.engine2d.ui;
 
-import com.github.rccookie.engine2d.Image;
+import com.github.rccookie.engine2d.image.Image;
 import com.github.rccookie.engine2d.UIObject;
 import com.github.rccookie.event.CaughtParamEvent;
 import com.github.rccookie.event.ParamEvent;
@@ -130,14 +130,14 @@ public abstract class Toggle extends Button {
     Image getHoveredImage() {
         if(on) {
             if(!hoveredReadyOn) {
-                hoveredImageOn = generateHoveredImage(getPlainImage());
+                hoveredImageOn = generateHoveredImage(getPlainImage(), on);
                 hoveredReadyOn = true;
             }
             return hoveredImageOn;
         }
         else {
             if(!hoveredReadyOff) {
-                hoveredImageOff = generateHoveredImage(getPlainImage());
+                hoveredImageOff = generateHoveredImage(getPlainImage(), on);
                 hoveredReadyOff = true;
             }
             return hoveredImageOff;
@@ -148,14 +148,14 @@ public abstract class Toggle extends Button {
     Image getPressedImage() {
         if(on) {
             if(!pressedReadyOn) {
-                pressedImageOn = generatePressedImage(getPlainImage());
+                pressedImageOn = generatePressedImage(getPlainImage(), on);
                 pressedReadyOn = true;
             }
             return pressedImageOn;
         }
         else {
             if(!pressedReadyOff) {
-                pressedImageOff = generatePressedImage(getPlainImage());
+                pressedImageOff = generatePressedImage(getPlainImage(), on);
                 pressedReadyOff = true;
             }
             return pressedImageOff;
@@ -166,14 +166,14 @@ public abstract class Toggle extends Button {
     Image getDisabledImage() {
         if(on) {
             if(!disabledReadyOn) {
-                disabledImageOn = generateDisabledImage(getPlainImage());
+                disabledImageOn = generateDisabledImage(getPlainImage(), on);
                 disabledReadyOn = true;
             }
             return disabledImageOn;
         }
         else {
             if(!disabledReadyOff) {
-                disabledImageOff = generateDisabledImage(getPlainImage());
+                disabledImageOff = generateDisabledImage(getPlainImage(), on);
                 disabledReadyOff = true;
             }
             return disabledImageOff;

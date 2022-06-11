@@ -25,6 +25,10 @@ package org.jbox2d.collision.broadphase;
 
 import org.jbox2d.collision.AABB;
 
+/**
+ * <p>DynamicTreeNode class.</p>
+ *
+ */
 public class DynamicTreeNode {
   /**
    * Enlarged AABB
@@ -40,14 +44,29 @@ public class DynamicTreeNode {
   protected final int id;
   protected int height;
 
+  /**
+   * <p>Getter for the field <code>userData</code>.</p>
+   *
+   * @return a {@link java.lang.Object} object
+   */
   public Object getUserData() {
     return userData;
   }
 
+  /**
+   * <p>Setter for the field <code>userData</code>.</p>
+   *
+   * @param argData a {@link java.lang.Object} object
+   */
   public void setUserData(Object argData) {
     userData = argData;
   }
 
+  /**
+   * <p>Constructor for DynamicTreeNode.</p>
+   *
+   * @param id a int
+   */
   protected DynamicTreeNode(int id) {
     this.id = id;
   }

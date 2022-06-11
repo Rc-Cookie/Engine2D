@@ -2,9 +2,11 @@ package com.github.rccookie.engine2d.ui;
 
 import java.util.Objects;
 
-import com.github.rccookie.engine2d.Color;
-import com.github.rccookie.engine2d.Image;
+import com.github.rccookie.engine2d.image.Color;
+import com.github.rccookie.engine2d.image.Image;
 import com.github.rccookie.engine2d.UIObject;
+import com.github.rccookie.engine2d.image.ThemeColor;
+import com.github.rccookie.engine2d.util.ColorProperty;
 import com.github.rccookie.geometry.performance.int2;
 
 import org.jetbrains.annotations.NotNull;
@@ -13,20 +15,20 @@ import org.jetbrains.annotations.NotNull;
  * Abstract definition of an animated button that created different
  * animation stages on demand and caches them.
  */
-public abstract class Button extends UIObject {
+public abstract class Button extends Interactable {
 
     /**
-     * Default color overlay when the button is hovered.
+     * Color overlay when the button is hovered.
      */
-    public static final Color HOVER_COLOR = new Color(1f, 0.1f);
+    public final ColorProperty hoverColor   = new ColorProperty(this, ThemeColor.of(new Color(1f, 0.1f)));
     /**
-     * Default color overlay when the button is pressed.
+     * Color overlay when the button is pressed.
      */
-    public static final Color PRESS_COLOR = new Color(0f, 0.1f);
+    public final ColorProperty pressedColor = new ColorProperty(this, ThemeColor.of(new Color(0f, 0.1f)));
     /**
-     * Default color overlay when the button is disabled.
+     * Color overlay when the button is disabled.
      */
-    public static final Color DISABLE_COLOR = new Color(0f, 0.1f);
+    public final ColorProperty disabledColor = new ColorProperty(this, ThemeColor.of(new Color(0f, 0.1f)));
 
 
     /**
@@ -141,7 +143,7 @@ public abstract class Button extends UIObject {
      */
     protected Image generateHoveredImage(Image plain) {
         Image image = plain.clone();
-        image.fillRect(int2.ZERO, image.size, HOVER_COLOR);
+        image.fillRect(int2.zero, image.size, hoverColor.get());
         return image;
     }
 
@@ -154,7 +156,7 @@ public abstract class Button extends UIObject {
      */
     protected Image generatePressedImage(Image plain) {
         Image image = plain.clone();
-        image.fillRect(int2.ZERO, image.size, PRESS_COLOR);
+        image.fillRect(int2.zero, image.size, pressedColor.get());
         return image;
     }
 
@@ -167,7 +169,7 @@ public abstract class Button extends UIObject {
      */
     protected Image generateDisabledImage(Image plain) {
         Image image = plain.clone();
-        image.fillRect(int2.ZERO, image.size, DISABLE_COLOR);
+        image.fillRect(int2.zero, image.size, disabledColor.get());
         return image;
     }
 

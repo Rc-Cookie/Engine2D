@@ -23,6 +23,10 @@
  ******************************************************************************/
 package org.jbox2d.dynamics.joints;
 
+/**
+ * <p>LimitState class.</p>
+ *
+ */
 public enum LimitState {
 	INACTIVE, AT_LOWER, AT_UPPER, EQUAL
 }

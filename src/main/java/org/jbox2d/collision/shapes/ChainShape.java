@@ -38,8 +38,9 @@ import com.github.rccookie.geometry.performance.float2;
  * can use inside and outside collision. Therefore, you may use any winding order. Connectivity
  * information is used to create smooth collisions. WARNING: The chain will not collide properly if
  * there are self-intersections.
- * 
+ *
  * @author Daniel
+ * @version $Id: $Id
  */
 public class ChainShape extends Shape {
 
@@ -50,6 +51,9 @@ public class ChainShape extends Shape {
 
   private final EdgeShape pool0 = new EdgeShape();
 
+  /**
+   * <p>Constructor for ChainShape.</p>
+   */
   public ChainShape() {
     super(ShapeType.CHAIN);
     m_vertices = null;
@@ -57,11 +61,15 @@ public class ChainShape extends Shape {
     m_count = 0;
   }
 
+  /**
+   * <p>clear.</p>
+   */
   public void clear() {
     m_vertices = null;
     m_count = 0;
   }
 
+  /** {@inheritDoc} */
   @Override
   public int getChildCount() {
     return m_count - 1;
@@ -69,6 +77,9 @@ public class ChainShape extends Shape {
 
   /**
    * Get a child edge.
+   *
+   * @param edge a {@link org.jbox2d.collision.shapes.EdgeShape} object
+   * @param index a int
    */
   public void getChildEdge(EdgeShape edge, int index) {
     assert (0 <= index && index < m_count - 1);
@@ -104,6 +115,7 @@ public class ChainShape extends Shape {
     }
   }
 
+  /** {@inheritDoc} */
   @Override
   public float computeDistanceToOut(Transform xf, float2 p, int childIndex, float2 normalOut) {
     final EdgeShape edge = pool0;
@@ -111,11 +123,13 @@ public class ChainShape extends Shape {
     return edge.computeDistanceToOut(xf, p, 0, normalOut);
   }
 
+  /** {@inheritDoc} */
   @Override
   public boolean testPoint(Transform xf, float2 p) {
     return false;
   }
 
+  /** {@inheritDoc} */
   @Override
   public boolean raycast(RayCastOutput output, RayCastInput input, Transform xf, int childIndex) {
     assert (childIndex < m_count);
@@ -137,6 +151,7 @@ public class ChainShape extends Shape {
     return edgeShape.raycast(output, input, xf, 0);
   }
 
+  /** {@inheritDoc} */
   @Override
   public void computeAABB(AABB aabb, Transform xf, int childIndex) {
     assert (childIndex < m_count);
@@ -164,6 +179,7 @@ public class ChainShape extends Shape {
     upper.y = v1y > v2y ? v1y : v2y;
   }
 
+  /** {@inheritDoc} */
   @Override
   public void computeMass(MassData massData, float density) {
     massData.mass = 0.0f;
@@ -171,6 +187,7 @@ public class ChainShape extends Shape {
     massData.I = 0.0f;
   }
 
+  /** {@inheritDoc} */
   @Override
   public Shape clone() {
     ChainShape clone = new ChainShape();
@@ -184,7 +201,7 @@ public class ChainShape extends Shape {
 
   /**
    * Create a loop. This automatically adjusts connectivity.
-   * 
+   *
    * @param vertices an array of vertices, these are copied
    * @param count the vertex count
    */
@@ -213,7 +230,7 @@ public class ChainShape extends Shape {
 
   /**
    * Create a chain with isolated end vertices.
-   * 
+   *
    * @param vertices an array of vertices, these are copied
    * @param count the vertex count
    */
@@ -242,8 +259,8 @@ public class ChainShape extends Shape {
 
   /**
    * Establish connectivity to a vertex that precedes the first vertex. Don't call this for loops.
-   * 
-   * @param prevVertex
+   *
+   * @param prevVertex a {@link com.github.rccookie.geometry.performance.float2} object
    */
   public void setPrevVertex(final float2 prevVertex) {
     m_prevVertex.set(prevVertex);
@@ -252,8 +269,8 @@ public class ChainShape extends Shape {
 
   /**
    * Establish connectivity to a vertex that follows the last vertex. Don't call this for loops.
-   * 
-   * @param nextVertex
+   *
+   * @param nextVertex a {@link com.github.rccookie.geometry.performance.float2} object
    */
   public void setNextVertex(final float2 nextVertex) {
     m_nextVertex.set(nextVertex);

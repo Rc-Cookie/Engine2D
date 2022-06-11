@@ -58,7 +58,8 @@ public enum Input {
     /**
      * Last captured mouse state, to be used if no mouse info can be optained.
      */
-    private static Mouse lastMouse = Mouse.getEmulated(int2.ZERO, 0);
+    private static Mouse lastMouse = Mouse.getEmulated(int2.zero, 0);
+    private static long lastMouseFrame = -1;
 
     /**
      * Set of all keys currently pressed down.
@@ -95,10 +96,11 @@ public enum Input {
     @NotNull
     public static Mouse getMouse() {
         int2 mouseLoc;
-        if(!isMouseDataAvailable() || (mouseLoc = Application.getImplementation().getInputAdapter().getMousePos()) == null)
+        if(Time.frame() == lastMouseFrame || !isMouseDataAvailable() || (mouseLoc = Application.getImplementation().getInputAdapter().getMousePos()) == null)
             return lastMouse;
         Mouse mouse = new Mouse(new MouseData(mouseLoc, lastMouse.button));
         lastMouse = mouse;
+        lastMouseFrame = Time.frame();
         return mouse;
     }
 

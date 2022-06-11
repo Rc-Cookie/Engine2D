@@ -58,11 +58,12 @@ import org.jbox2d.pooling.IWorldPool;
  * joint. You specify a gear ratio to bind the motions together: coordinate1 + ratio * coordinate2 =
  * constant The ratio can be negative or positive. If one joint is a revolute joint and the other
  * joint is a prismatic joint, then the ratio will have units of length or units of 1/length.
- * 
- * @warning The revolute and prismatic joints must be attached to fixed bodies (which must be body1
+ *
+ *
  *          on those joints).
- * @warning You have to manually destroy the gear joint if joint1 or joint2 is destroyed.
+ *
  * @author Daniel Murphy
+ * @version $Id: $Id
  */
 public class GearJoint extends Joint {
 
@@ -104,6 +105,12 @@ public class GearJoint extends Joint {
   private float m_JwA, m_JwB, m_JwC, m_JwD;
   private float m_mass;
 
+  /**
+   * <p>Constructor for GearJoint.</p>
+   *
+   * @param argWorldPool a {@link org.jbox2d.pooling.IWorldPool} object
+   * @param def a {@link org.jbox2d.dynamics.joints.GearJointDef} object
+   */
   protected GearJoint(IWorldPool argWorldPool, GearJointDef def) {
     super(argWorldPool, def);
 
@@ -195,36 +202,51 @@ public class GearJoint extends Joint {
     m_impulse = 0.0f;
   }
 
+  /** {@inheritDoc} */
   @Override
   public void getAnchorA(float2 argOut) {
     m_bodyA.getWorldPointToOut(m_localAnchorA, argOut);
   }
 
+  /** {@inheritDoc} */
   @Override
   public void getAnchorB(float2 argOut) {
     m_bodyB.getWorldPointToOut(m_localAnchorB, argOut);
   }
 
+  /** {@inheritDoc} */
   @Override
   public void getReactionForce(float inv_dt, float2 argOut) {
     argOut.set(m_JvAC).scale(m_impulse);
     argOut.scale(inv_dt);
   }
 
+  /** {@inheritDoc} */
   @Override
   public float getReactionTorque(float inv_dt) {
     float L = m_impulse * m_JwA;
     return inv_dt * L;
   }
 
+  /**
+   * <p>setRatio.</p>
+   *
+   * @param argRatio a float
+   */
   public void setRatio(float argRatio) {
     m_ratio = argRatio;
   }
 
+  /**
+   * <p>getRatio.</p>
+   *
+   * @return a float
+   */
   public float getRatio() {
     return m_ratio;
   }
 
+  /** {@inheritDoc} */
   @Override
   public void initVelocityConstraints(SolverData data) {
     m_indexA = m_bodyA.m_islandIndex;
@@ -345,6 +367,7 @@ public class GearJoint extends Joint {
     data.velocities[m_indexD].w = wD;
   }
 
+  /** {@inheritDoc} */
   @Override
   public void solveVelocityConstraints(SolverData data) {
     float2 vA = data.velocities[m_indexA].v;
@@ -393,14 +416,25 @@ public class GearJoint extends Joint {
     data.velocities[m_indexD].w = wD;
   }
 
+  /**
+   * <p>getJoint1.</p>
+   *
+   * @return a {@link org.jbox2d.dynamics.joints.Joint} object
+   */
   public Joint getJoint1() {
     return m_joint1;
   }
 
+  /**
+   * <p>getJoint2.</p>
+   *
+   * @return a {@link org.jbox2d.dynamics.joints.Joint} object
+   */
   public Joint getJoint2() {
     return m_joint2;
   }
 
+  /** {@inheritDoc} */
   @Override
   public boolean solvePositionConstraints(SolverData data) {
     float2 cA = data.positions[m_indexA].c;

@@ -18,7 +18,7 @@ public class LocationSyncApplier extends Component {
      */
     public LocationSyncApplier(GameObject gameObject, int id) {
         super(gameObject);
-        Online.registerProcessor("locationSync" + id, this::update);
+        Online.registerShareProcessor("locationSync" + id, this::update);
     }
 
     /**

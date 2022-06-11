@@ -23,6 +23,8 @@
  ******************************************************************************/
 package org.jbox2d.collision;
 
+import com.github.rccookie.geometry.performance.float2;
+
 import org.jbox2d.collision.Distance.SimplexCache;
 import org.jbox2d.collision.Manifold.ManifoldType;
 import org.jbox2d.collision.shapes.CircleShape;
@@ -33,21 +35,27 @@ import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Rot;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Transform;
-import com.github.rccookie.geometry.performance.float2;
 import org.jbox2d.pooling.IWorldPool;
 
 /**
  * Functions used for computing contact points, distance queries, and TOI queries. Collision methods
- * are non-static for pooling speed, retrieve a collision object from the {@link SingletonPool}.
+ * are non-static for pooling speed, retrieve a collision object from the [?].
  * Should not be finalructed.
- * 
+ *
  * @author Daniel Murphy
+ * @version $Id: $Id
  */
 public class Collision {
+  /** Constant <code>NULL_FEATURE=Integer.MAX_VALUE</code> */
   public static final int NULL_FEATURE = Integer.MAX_VALUE;
 
   private final IWorldPool pool;
 
+  /**
+   * <p>Constructor for Collision.</p>
+   *
+   * @param argPool a {@link org.jbox2d.pooling.IWorldPool} object
+   */
   public Collision(IWorldPool argPool) {
     incidentEdge[0] = new ClipVertex();
     incidentEdge[1] = new ClipVertex();
@@ -64,12 +72,14 @@ public class Collision {
 
   /**
    * Determine if two generic shapes overlap.
-   * 
-   * @param shapeA
-   * @param shapeB
-   * @param xfA
-   * @param xfB
-   * @return
+   *
+   * @param shapeA a {@link org.jbox2d.collision.shapes.Shape} object
+   * @param shapeB a {@link org.jbox2d.collision.shapes.Shape} object
+   * @param xfA a {@link org.jbox2d.common.Transform} object
+   * @param xfB a {@link org.jbox2d.common.Transform} object
+   * @param indexA a int
+   * @param indexB a int
+   * @return a boolean
    */
   public final boolean testOverlap(Shape shapeA, int indexA, Shape shapeB, int indexB,
       Transform xfA, Transform xfB) {
@@ -90,11 +100,11 @@ public class Collision {
    * Compute the point states given two manifolds. The states pertain to the transition from
    * manifold1 to manifold2. So state1 is either persist or remove while state2 is either add or
    * persist.
-   * 
-   * @param state1
-   * @param state2
-   * @param manifold1
-   * @param manifold2
+   *
+   * @param state1 an array of {@link org.jbox2d.collision.Collision.PointState} objects
+   * @param state2 an array of {@link org.jbox2d.collision.Collision.PointState} objects
+   * @param manifold1 a {@link org.jbox2d.collision.Manifold} object
+   * @param manifold2 a {@link org.jbox2d.collision.Manifold} object
    */
   public static final void getPointStates(final PointState[] state1, final PointState[] state2,
       final Manifold manifold1, final Manifold manifold2) {
@@ -135,12 +145,13 @@ public class Collision {
 
   /**
    * Clipping for contact manifolds. Sutherland-Hodgman clipping.
-   * 
-   * @param vOut
-   * @param vIn
-   * @param normal
-   * @param offset
-   * @return
+   *
+   * @param vOut an array of {@link org.jbox2d.collision.Collision.ClipVertex} objects
+   * @param vIn an array of {@link org.jbox2d.collision.Collision.ClipVertex} objects
+   * @param normal a {@link com.github.rccookie.geometry.performance.float2} object
+   * @param offset a float
+   * @param vertexIndexA a int
+   * @return a int
    */
   public static final int clipSegmentToLine(final ClipVertex[] vOut, final ClipVertex[] vIn,
                                             final float2 normal, float offset, int vertexIndexA) {
@@ -192,12 +203,12 @@ public class Collision {
 
   /**
    * Compute the collision manifold between two circles.
-   * 
-   * @param manifold
-   * @param circle1
-   * @param xfA
-   * @param circle2
-   * @param xfB
+   *
+   * @param manifold a {@link org.jbox2d.collision.Manifold} object
+   * @param circle1 a {@link org.jbox2d.collision.shapes.CircleShape} object
+   * @param xfA a {@link org.jbox2d.common.Transform} object
+   * @param circle2 a {@link org.jbox2d.collision.shapes.CircleShape} object
+   * @param xfB a {@link org.jbox2d.common.Transform} object
    */
   public final void collideCircles(Manifold manifold, final CircleShape circle1,
       final Transform xfA, final CircleShape circle2, final Transform xfB) {
@@ -238,12 +249,12 @@ public class Collision {
 
   /**
    * Compute the collision manifold between a polygon and a circle.
-   * 
-   * @param manifold
-   * @param polygon
-   * @param xfA
-   * @param circle
-   * @param xfB
+   *
+   * @param manifold a {@link org.jbox2d.collision.Manifold} object
+   * @param polygon a {@link org.jbox2d.collision.shapes.PolygonShape} object
+   * @param xfA a {@link org.jbox2d.common.Transform} object
+   * @param circle a {@link org.jbox2d.collision.shapes.CircleShape} object
+   * @param xfB a {@link org.jbox2d.common.Transform} object
    */
   public final void collidePolygonAndCircle(Manifold manifold, final PolygonShape polygon,
       final Transform xfA, final CircleShape circle, final Transform xfB) {
@@ -433,13 +444,12 @@ public class Collision {
 
   /**
    * Find the max separation between poly1 and poly2 using edge normals from poly1.
-   * 
-   * @param edgeIndex
-   * @param poly1
-   * @param xf1
-   * @param poly2
-   * @param xf2
-   * @return
+   *
+   * @param poly1 a {@link org.jbox2d.collision.shapes.PolygonShape} object
+   * @param xf1 a {@link org.jbox2d.common.Transform} object
+   * @param poly2 a {@link org.jbox2d.collision.shapes.PolygonShape} object
+   * @param xf2 a {@link org.jbox2d.common.Transform} object
+   * @param results a {@link org.jbox2d.collision.Collision.EdgeResults} object
    */
   public final void findMaxSeparation(EdgeResults results, final PolygonShape poly1,
       final Transform xf1, final PolygonShape poly2, final Transform xf2) {
@@ -479,6 +489,16 @@ public class Collision {
     results.separation = maxSeparation;
   }
 
+  /**
+   * <p>findIncidentEdge.</p>
+   *
+   * @param c an array of {@link org.jbox2d.collision.Collision.ClipVertex} objects
+   * @param poly1 a {@link org.jbox2d.collision.shapes.PolygonShape} object
+   * @param xf1 a {@link org.jbox2d.common.Transform} object
+   * @param edge1 a int
+   * @param poly2 a {@link org.jbox2d.collision.shapes.PolygonShape} object
+   * @param xf2 a {@link org.jbox2d.common.Transform} object
+   */
   public final void findIncidentEdge(final ClipVertex[] c, final PolygonShape poly1,
       final Transform xf1, int edge1, final PolygonShape poly2, final Transform xf2) {
     int count1 = poly1.m_count;
@@ -560,12 +580,12 @@ public class Collision {
 
   /**
    * Compute the collision manifold between two polygons.
-   * 
-   * @param manifold
-   * @param polygon1
-   * @param xf1
-   * @param polygon2
-   * @param xf2
+   *
+   * @param manifold a {@link org.jbox2d.collision.Manifold} object
+   * @param polyA a {@link org.jbox2d.collision.shapes.PolygonShape} object
+   * @param xfA a {@link org.jbox2d.common.Transform} object
+   * @param polyB a {@link org.jbox2d.collision.shapes.PolygonShape} object
+   * @param xfB a {@link org.jbox2d.common.Transform} object
    */
   public final void collidePolygons(Manifold manifold, final PolygonShape polyA,
       final Transform xfA, final PolygonShape polyB, final Transform xfB) {
@@ -720,6 +740,15 @@ public class Collision {
 
   // Compute contact points for edge versus circle.
   // This accounts for edge connectivity.
+  /**
+   * <p>collideEdgeAndCircle.</p>
+   *
+   * @param manifold a {@link org.jbox2d.collision.Manifold} object
+   * @param edgeA a {@link org.jbox2d.collision.shapes.EdgeShape} object
+   * @param xfA a {@link org.jbox2d.common.Transform} object
+   * @param circleB a {@link org.jbox2d.collision.shapes.CircleShape} object
+   * @param xfB a {@link org.jbox2d.common.Transform} object
+   */
   public void collideEdgeAndCircle(Manifold manifold, final EdgeShape edgeA, final Transform xfA,
       final CircleShape circleB, final Transform xfB) {
     manifold.pointCount = 0;
@@ -846,6 +875,15 @@ public class Collision {
 
   private final EPCollider collider = new EPCollider();
 
+  /**
+   * <p>collideEdgeAndPolygon.</p>
+   *
+   * @param manifold a {@link org.jbox2d.collision.Manifold} object
+   * @param edgeA a {@link org.jbox2d.collision.shapes.EdgeShape} object
+   * @param xfA a {@link org.jbox2d.common.Transform} object
+   * @param polygonB a {@link org.jbox2d.collision.shapes.PolygonShape} object
+   * @param xfB a {@link org.jbox2d.common.Transform} object
+   */
   public void collideEdgeAndPolygon(Manifold manifold, final EdgeShape edgeA, final Transform xfA,
       final PolygonShape polygonB, final Transform xfB) {
     collider.collide(manifold, edgeA, xfA, polygonB, xfB);

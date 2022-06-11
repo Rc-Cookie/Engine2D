@@ -31,7 +31,10 @@ import org.jbox2d.dynamics.Body;
  */
 
 /**
+ * <p>WeldJointDef class.</p>
+ *
  * @author Daniel Murphy
+ * @version $Id: $Id
  */
 public class WeldJointDef extends JointDef {
   /**
@@ -59,6 +62,9 @@ public class WeldJointDef extends JointDef {
    */
   public float dampingRatio;
 
+  /**
+   * <p>Constructor for WeldJointDef.</p>
+   */
   public WeldJointDef() {
     super(JointType.WELD);
     localAnchorA = new float2();
@@ -68,10 +74,10 @@ public class WeldJointDef extends JointDef {
 
   /**
    * Initialize the bodies, anchors, and reference angle using a world anchor point.
-   * 
-   * @param bA
-   * @param bB
-   * @param anchor
+   *
+   * @param bA a {@link org.jbox2d.dynamics.Body} object
+   * @param bB a {@link org.jbox2d.dynamics.Body} object
+   * @param anchor a {@link com.github.rccookie.geometry.performance.float2} object
    */
   public void initialize(Body bA, Body bB, float2 anchor) {
     bodyA = bA;

@@ -35,8 +35,9 @@ import com.github.rccookie.geometry.performance.float2;
 /**
  * A line segment (edge) shape. These can be connected in chains or loops to other edge shapes. The
  * connectivity information is used to ensure correct contact normals.
- * 
+ *
  * @author Daniel
+ * @version $Id: $Id
  */
 public class EdgeShape extends Shape {
 
@@ -60,22 +61,33 @@ public class EdgeShape extends Shape {
   public boolean m_hasVertex0 = false, m_hasVertex3 = false;
 
 
+  /**
+   * <p>Constructor for EdgeShape.</p>
+   */
   public EdgeShape() {
     super(ShapeType.EDGE);
     m_radius = Settings.polygonRadius;
   }
 
+  /** {@inheritDoc} */
   @Override
   public int getChildCount() {
     return 1;
   }
 
+  /**
+   * <p>set.</p>
+   *
+   * @param v1 a {@link com.github.rccookie.geometry.performance.float2} object
+   * @param v2 a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public void set(float2 v1, float2 v2) {
     m_vertex1.set(v1);
     m_vertex2.set(v2);
     m_hasVertex0 = m_hasVertex3 = false;
   }
 
+  /** {@inheritDoc} */
   @Override
   public boolean testPoint(Transform xf, float2 p) {
     return false;
@@ -84,6 +96,7 @@ public class EdgeShape extends Shape {
   // for pooling
   private final float2 normal = new float2();
 
+  /** {@inheritDoc} */
   @Override
   public float computeDistanceToOut(Transform xf, float2 p, int childIndex, float2 normalOut) {
     float xfqc = xf.q.c;
@@ -126,6 +139,7 @@ public class EdgeShape extends Shape {
   // v = v1 + s * e
   // p1 + t * d = v1 + s * e
   // s * e - t * d = p1 - v1
+  /** {@inheritDoc} */
   @Override
   public boolean raycast(RayCastOutput output, RayCastInput input, Transform xf, int childIndex) {
 
@@ -210,6 +224,7 @@ public class EdgeShape extends Shape {
     return true;
   }
 
+  /** {@inheritDoc} */
   @Override
   public void computeAABB(AABB aabb, Transform xf, int childIndex) {
     final float2 lowerBound = aabb.lowerBound;
@@ -232,6 +247,7 @@ public class EdgeShape extends Shape {
     upperBound.y += m_radius;
   }
 
+  /** {@inheritDoc} */
   @Override
   public void computeMass(MassData massData, float density) {
     massData.mass = 0.0f;
@@ -239,6 +255,7 @@ public class EdgeShape extends Shape {
     massData.I = 0.0f;
   }
 
+  /** {@inheritDoc} */
   @Override
   public Shape clone() {
     EdgeShape edge = new EdgeShape();

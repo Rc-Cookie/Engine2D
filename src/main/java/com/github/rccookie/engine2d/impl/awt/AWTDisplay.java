@@ -13,9 +13,9 @@ import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
 import com.github.rccookie.engine2d.Application;
-import com.github.rccookie.engine2d.Color;
 import com.github.rccookie.engine2d.Execute;
 import com.github.rccookie.engine2d.core.DrawObject;
+import com.github.rccookie.engine2d.image.Color;
 import com.github.rccookie.engine2d.impl.Display;
 import com.github.rccookie.engine2d.impl.DisplayController;
 import com.github.rccookie.geometry.performance.int2;
@@ -83,7 +83,10 @@ public class AWTDisplay extends JPanel implements Display {
     @Override
     public void draw(DrawObject[] objects, Color background) {
         synchronized (this) {
-            this.objects = objects;
+//            this.objects = Utils.deepClone(objects);
+            this.objects = new DrawObject[objects.length];
+            for(int i=0; i<objects.length; i++)
+                this.objects[i] = objects[i].clone();
             this.background = background;
         }
         repaint();

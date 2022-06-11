@@ -35,18 +35,26 @@ import org.jbox2d.pooling.IWorldPool;
 
 /**
  * Class used for computing the time of impact. This class should not be constructed usually, just
- * retrieve from the {@link IWorldPool#getTimeOfImpact()}.
- * 
+ * retrieve from the {@link org.jbox2d.pooling.IWorldPool#getTimeOfImpact()}.
+ *
  * @author daniel
+ * @version $Id: $Id
  */
 public class TimeOfImpact {
+  /** Constant <code>MAX_ITERATIONS=20</code> */
   public static final int MAX_ITERATIONS = 20;
+  /** Constant <code>MAX_ROOT_ITERATIONS=50</code> */
   public static final int MAX_ROOT_ITERATIONS = 50;
 
+  /** Constant <code>toiCalls=0</code> */
   public static int toiCalls = 0;
+  /** Constant <code>toiIters=0</code> */
   public static int toiIters = 0;
+  /** Constant <code>toiMaxIters=0</code> */
   public static int toiMaxIters = 0;
+  /** Constant <code>toiRootIters=0</code> */
   public static int toiRootIters = 0;
+  /** Constant <code>toiMaxRootIters=0</code> */
   public static int toiMaxRootIters = 0;
 
   /**
@@ -94,6 +102,11 @@ public class TimeOfImpact {
 
   private final IWorldPool pool;
 
+  /**
+   * <p>Constructor for TimeOfImpact.</p>
+   *
+   * @param argPool a {@link org.jbox2d.pooling.IWorldPool} object
+   */
   public TimeOfImpact(IWorldPool argPool) {
     pool = argPool;
   }
@@ -103,9 +116,9 @@ public class TimeOfImpact {
    * between [0,tMax]. This uses a swept separating axis and may miss some intermediate,
    * non-tunneling collision. If you change the time interval, you should call this function again.
    * Note: use Distance to compute the contact point and normal at the time of impact.
-   * 
-   * @param output
-   * @param input
+   *
+   * @param output a {@link org.jbox2d.collision.TimeOfImpact.TOIOutput} object
+   * @param input a {@link org.jbox2d.collision.TimeOfImpact.TOIInput} object
    */
   public final void timeOfImpact(TOIOutput output, TOIInput input) {
     // CCD via the local separating axis method. This seeks progression
@@ -318,6 +331,17 @@ class SeparationFunction {
   // djm pooling
   private final float2 localPointA = new float2();
   private final float2 localPointB = new float2();
+  /**
+   * <p>initialize.</p>
+   *
+   * @param cache a {@link org.jbox2d.collision.Distance.SimplexCache} object
+   * @param proxyA a {@link org.jbox2d.collision.Distance.DistanceProxy} object
+   * @param sweepA a {@link org.jbox2d.common.Sweep} object
+   * @param proxyB a {@link org.jbox2d.collision.Distance.DistanceProxy} object
+   * @param sweepB a {@link org.jbox2d.common.Sweep} object
+   * @param t1 a float
+   * @return a float
+   */
   private final float2 pointA = new float2();
   private final float2 pointB = new float2();
   private final float2 localPointA1 = new float2();
@@ -409,6 +433,13 @@ class SeparationFunction {
       Transform.mulToOutUnsafe(xfb, localPointB, pointB);
 
       temp.set(pointB).sub(pointA);
+      /**
+       * <p>findMinSeparation.</p>
+       *
+       * @param indexes an array of {@link int} objects
+       * @param t a float
+       * @return a float
+       */
       float s = float2.dot(temp, normal);
       if (s < 0.0f) {
         m_axis.negate();
@@ -472,6 +503,14 @@ class SeparationFunction {
         indexes[0] = m_proxyA.getSupport(axisA);
 
         localPointA.set(m_proxyA.getVertex(indexes[0]));
+        /**
+         * <p>evaluate.</p>
+         *
+         * @param indexA a int
+         * @param indexB a int
+         * @param t a float
+         * @return a float
+         */
         Transform.mulToOutUnsafe(xfa, localPointA, pointA);
 
         float separation = float2.dot(pointA.sub(pointB), normal);

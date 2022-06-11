@@ -25,21 +25,33 @@ package org.jbox2d.common;
 
 /**
  * Timer for profiling
- * 
+ *
  * @author Daniel
+ * @version $Id: $Id
  */
 public class Timer {
 
   private long resetNanos;
 
+  /**
+   * <p>Constructor for Timer.</p>
+   */
   public Timer() {
     reset();
   }
 
+  /**
+   * <p>reset.</p>
+   */
   public void reset() {
     resetNanos = System.nanoTime();
   }
 
+  /**
+   * <p>getMilliseconds.</p>
+   *
+   * @return a float
+   */
   public float getMilliseconds() {
     return (System.nanoTime() - resetNanos) / 1000 * 1f / 1000;
   }

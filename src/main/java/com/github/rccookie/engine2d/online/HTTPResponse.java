@@ -16,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 public final class HTTPResponse {
 
     /**
-     * The response code for the request. Anything >= 400 means error.
+     * The response code for the request. Anything &gt;= 400 means error.
      */
     public final int code;
     /**
@@ -31,7 +31,7 @@ public final class HTTPResponse {
     public final Map<String,String> header;
     /**
      * Whether the request was successful, which is true exactly when
-     * {@link #code} < 400.
+     * {@link #code} &lt; 400.
      */
     public final boolean success;
 

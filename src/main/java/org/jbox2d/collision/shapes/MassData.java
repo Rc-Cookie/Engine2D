@@ -50,7 +50,10 @@ import com.github.rccookie.geometry.performance.float2;
 
 // Updated to rev 100
 
-/** This holds the mass data computed for a shape. */
+/**
+ * This holds the mass data computed for a shape.
+ *
+ */
 public class MassData {
 	/** The mass of the shape, usually in kilograms. */
 	public float mass;
@@ -69,7 +72,7 @@ public class MassData {
 	
 	/**
 	 * Copies from the given mass data
-	 * 
+	 *
 	 * @param md
 	 *            mass data to copy from
 	 */
@@ -79,13 +82,22 @@ public class MassData {
 		center = md.center.clone();
 	}
 	
+	/**
+	 * <p>set.</p>
+	 *
+	 * @param md a {@link org.jbox2d.collision.shapes.MassData} object
+	 */
 	public void set(MassData md) {
 		mass = md.mass;
 		I = md.I;
 		center.set(md.center);
 	}
 	
-	/** Return a copy of this object. */
+	/**
+	 * Return a copy of this object.
+	 *
+	 * @return a {@link org.jbox2d.collision.shapes.MassData} object
+	 */
 	public MassData clone() {
 		return new MassData(this);
 	}

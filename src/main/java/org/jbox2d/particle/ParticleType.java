@@ -2,10 +2,12 @@ package org.jbox2d.particle;
 
 /**
  * The particle type. Can be combined with | operator. Zero means liquid.
- * 
+ *
  * @author dmurph
+ * @version $Id: $Id
  */
 public class ParticleType {
+  /** Constant <code>b2_waterParticle=0</code> */
   public static final int b2_waterParticle = 0;
   /** removed after next step */
   public static final int b2_zombieParticle = 1 << 1;

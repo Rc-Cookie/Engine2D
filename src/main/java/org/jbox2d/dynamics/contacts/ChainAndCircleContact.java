@@ -32,12 +32,22 @@ import org.jbox2d.common.Transform;
 import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.pooling.IWorldPool;
 
+/**
+ * <p>ChainAndCircleContact class.</p>
+ *
+ */
 public class ChainAndCircleContact extends Contact {
 
+  /**
+   * <p>Constructor for ChainAndCircleContact.</p>
+   *
+   * @param argPool a {@link org.jbox2d.pooling.IWorldPool} object
+   */
   public ChainAndCircleContact(IWorldPool argPool) {
     super(argPool);
   }
 
+  /** {@inheritDoc} */
   @Override
   public void init(Fixture fA, int indexA, Fixture fB, int indexB) {
     super.init(fA, indexA, fB, indexB);
@@ -47,6 +57,7 @@ public class ChainAndCircleContact extends Contact {
 
   private final EdgeShape edge = new EdgeShape();
 
+  /** {@inheritDoc} */
   @Override
   public void evaluate(Manifold manifold, Transform xfA, Transform xfB) {
     ChainShape chain = (ChainShape) m_fixtureA.getShape();

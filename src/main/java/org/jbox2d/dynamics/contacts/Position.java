@@ -25,6 +25,10 @@ package org.jbox2d.dynamics.contacts;
 
 import com.github.rccookie.geometry.performance.float2;
 
+/**
+ * <p>Position class.</p>
+ *
+ */
 public class Position {
   public final float2 c = new float2();
   public float a;

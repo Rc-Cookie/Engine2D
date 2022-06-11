@@ -33,11 +33,19 @@ import org.jbox2d.pooling.IWorldPool;
 /**
  * The base joint class. Joints are used to constrain two bodies together in various fashions. Some
  * joints also feature limits and motors.
- * 
+ *
  * @author Daniel Murphy
+ * @version $Id: $Id
  */
 public abstract class Joint {
 
+  /**
+   * <p>create.</p>
+   *
+   * @param world a {@link org.jbox2d.dynamics.World} object
+   * @param def a {@link org.jbox2d.dynamics.joints.JointDef} object
+   * @return a {@link org.jbox2d.dynamics.joints.Joint} object
+   */
   public static Joint create(World world, JointDef def) {
     // Joint joint = null;
     switch (def.type) {
@@ -71,6 +79,11 @@ public abstract class Joint {
     }
   }
 
+  /**
+   * <p>destroy.</p>
+   *
+   * @param joint a {@link org.jbox2d.dynamics.joints.Joint} object
+   */
   public static void destroy(Joint joint) {
     joint.destructor();
   }
@@ -95,6 +108,12 @@ public abstract class Joint {
   // float m_invMassA, m_invIA;
   // float m_invMassB, m_invIB;
 
+  /**
+   * <p>Constructor for Joint.</p>
+   *
+   * @param worldPool a {@link org.jbox2d.pooling.IWorldPool} object
+   * @param def a {@link org.jbox2d.dynamics.joints.JointDef} object
+   */
   protected Joint(IWorldPool worldPool, JointDef def) {
     assert (def.bodyA != def.bodyB);
 
@@ -126,8 +145,8 @@ public abstract class Joint {
 
   /**
    * get the type of the concrete joint.
-   * 
-   * @return
+   *
+   * @return a {@link org.jbox2d.dynamics.joints.JointType} object
    */
   public JointType getType() {
     return m_type;
@@ -135,6 +154,8 @@ public abstract class Joint {
 
   /**
    * get the first body attached to this joint.
+   *
+   * @return a {@link org.jbox2d.dynamics.Body} object
    */
   public final Body getBodyA() {
     return m_bodyA;
@@ -142,8 +163,8 @@ public abstract class Joint {
 
   /**
    * get the second body attached to this joint.
-   * 
-   * @return
+   *
+   * @return a {@link org.jbox2d.dynamics.Body} object
    */
   public final Body getBodyB() {
     return m_bodyB;
@@ -151,36 +172,38 @@ public abstract class Joint {
 
   /**
    * get the anchor point on bodyA in world coordinates.
-   * 
-   * @return
+   *
+   * @param out a {@link com.github.rccookie.geometry.performance.float2} object
    */
   public abstract void getAnchorA(float2 out);
 
   /**
    * get the anchor point on bodyB in world coordinates.
-   * 
-   * @return
+   *
+   * @param out a {@link com.github.rccookie.geometry.performance.float2} object
    */
   public abstract void getAnchorB(float2 out);
 
   /**
    * get the reaction force on body2 at the joint anchor in Newtons.
-   * 
-   * @param inv_dt
-   * @return
+   *
+   * @param inv_dt a float
+   * @param out a {@link com.github.rccookie.geometry.performance.float2} object
    */
   public abstract void getReactionForce(float inv_dt, float2 out);
 
   /**
    * get the reaction torque on body2 in N*m.
-   * 
-   * @param inv_dt
-   * @return
+   *
+   * @param inv_dt a float
+   * @return a float
    */
   public abstract float getReactionTorque(float inv_dt);
 
   /**
    * get the next joint the world joint list.
+   *
+   * @return a {@link org.jbox2d.dynamics.joints.Joint} object
    */
   public Joint getNext() {
     return m_next;
@@ -188,6 +211,8 @@ public abstract class Joint {
 
   /**
    * get the user data pointer.
+   *
+   * @return a {@link java.lang.Object} object
    */
   public Object getUserData() {
     return m_userData;
@@ -195,6 +220,8 @@ public abstract class Joint {
 
   /**
    * Set the user data pointer.
+   *
+   * @param data a {@link java.lang.Object} object
    */
   public void setUserData(Object data) {
     m_userData = data;
@@ -203,6 +230,8 @@ public abstract class Joint {
   /**
    * Get collide connected. Note: modifying the collide connect flag won't work correctly because
    * the flag is only checked when fixture AABBs begin to overlap.
+   *
+   * @return a boolean
    */
   public final boolean getCollideConnected() {
     return m_collideConnected;
@@ -210,21 +239,32 @@ public abstract class Joint {
 
   /**
    * Short-cut function to determine if either body is inactive.
-   * 
-   * @return
+   *
+   * @return a boolean
    */
   public boolean isActive() {
     return m_bodyA.isActive() && m_bodyB.isActive();
   }
 
-  /** Internal */
+  /**
+   * Internal
+   *
+   * @param data a {@link org.jbox2d.dynamics.SolverData} object
+   */
   public abstract void initVelocityConstraints(SolverData data);
 
-  /** Internal */
+  /**
+   * Internal
+   *
+   * @param data a {@link org.jbox2d.dynamics.SolverData} object
+   */
   public abstract void solveVelocityConstraints(SolverData data);
 
   /**
    * This returns true if the position errors are within tolerance. Internal.
+   *
+   * @param data a {@link org.jbox2d.dynamics.SolverData} object
+   * @return a boolean
    */
   public abstract boolean solvePositionConstraints(SolverData data);
 

@@ -35,7 +35,7 @@ abstract class AbstractCollider<S extends Shape> extends Collider {
     /**
      * The offset of the collider to the gameobject's center.
      */
-    final float2 offset = float2.ZERO.clone();
+    final float2 offset = float2.zero();
 
 
     /**

@@ -1,6 +1,6 @@
 package com.github.rccookie.engine2d.ui;
 
-import com.github.rccookie.engine2d.Image;
+import com.github.rccookie.engine2d.image.Image;
 import com.github.rccookie.engine2d.UIObject;
 import com.github.rccookie.event.ParamEvent;
 import com.github.rccookie.geometry.performance.int2;
@@ -43,14 +43,17 @@ public class TextCheckbox extends Dimension {
         checkbox.relativeLoc.x = -1;
 
         onToggle = checkbox.onToggle;
-        checkbox.onClick.add(onClick::invoke);
-        checkbox.onPress.add(onPress::invoke);
-        checkbox.onHover.add(onHover::invoke);
+        onClick.add(checkbox.onClick::invoke); // TODO: Also link reverse, with recursive-safe check
+        onPress.add(checkbox.onPress::invoke);
+        onHover.add(checkbox.onHover::invoke);
         checkbox.onHoverChange.add(onHoverChange::invoke);
 
         text = new Text(this, title);
         text.relativeLoc.x = 1;
         text.onClick.add(checkbox::toggle);
+
+        setFocusable(true);
+        checkbox.setFocusable(false);
     }
 
     @Override

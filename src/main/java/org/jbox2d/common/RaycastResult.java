@@ -27,10 +27,20 @@ package org.jbox2d.common;
 
 import com.github.rccookie.geometry.performance.float2;
 
+/**
+ * <p>RaycastResult class.</p>
+ *
+ */
 public class RaycastResult {
 	public float lambda = 0.0f;
 	public final float2 normal = new float2();
 	
+	/**
+	 * <p>set.</p>
+	 *
+	 * @param argOther a {@link org.jbox2d.common.RaycastResult} object
+	 * @return a {@link org.jbox2d.common.RaycastResult} object
+	 */
 	public RaycastResult set(RaycastResult argOther){
 		lambda = argOther.lambda;
 		normal.set( argOther.normal);

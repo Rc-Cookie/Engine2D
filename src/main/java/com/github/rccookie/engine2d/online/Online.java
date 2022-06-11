@@ -3,9 +3,6 @@ package com.github.rccookie.engine2d.online;
 import java.util.function.BinaryOperator;
 import java.util.function.Consumer;
 
-import com.github.rccookie.json.JsonElement;
-import com.github.rccookie.json.JsonObject;
-
 /**
  * Utility class for communicating with a Engine2D server and other clients.
  */
@@ -33,6 +30,9 @@ public class Online {
 
     /**
      * Connects to the given host at the default port.
+     * <p>The first messages will not be processed until the end of the current frame,
+     * meaning that there is no chance that processors may be attached to late for the
+     * messages, if they are attached immediately after connection.</p>
      *
      * @param host The host to connect to, for example an ip address
      */
@@ -42,6 +42,9 @@ public class Online {
 
     /**
      * Connects to the given host.
+     * <p>The first messages will not be processed until the end of the current frame,
+     * meaning that there is no chance that processors may be attached to late for the
+     * messages, if they are attached immediately after connection.</p>
      *
      * @param host The host to connect to, for example an ip address
      * @param port The port to connect to
@@ -56,6 +59,7 @@ public class Online {
      * Asynchronously starts a server on this machine and connects this
      * application as client to it.
      */
+    @Deprecated
     public void hostAndConnect() {
         hostAndConnect(DEFAULT_PORT);
     }
@@ -66,6 +70,7 @@ public class Online {
      *
      * @param port The port to host the server on
      */
+    @Deprecated
     public synchronized static void hostAndConnect(int port) {
         if(clientConnection != null)
             throw new IllegalStateException("Already connected");
@@ -106,16 +111,21 @@ public class Online {
 
     /**
      * Registers a message processor for received messages of the specified name that
-     * were used with {@link #submitData(String, Object)}.
+     * were used with {@link #share(String, Object)}.
      * <p>This method may only be called when connected.</p>
      *
      * @param key The name of messages to listen to
      * @param processor The action to perform when a message of the specified type is
      *                  received
      */
-    public static void registerProcessor(String key, Consumer<OnlineData> processor) {
+    public static void registerShareProcessor(String key, Consumer<OnlineData> processor) {
         checkConnected();
-        clientConnection.registerProcessor(key, processor);
+        clientConnection.registerShareProcessor(key, processor);
+    }
+
+    public static void registerSendProcessor(String key, Consumer<OnlineData> processor) {
+        checkConnected();
+        clientConnection.registerSendProcessor(key, processor);
     }
 
     /**
@@ -123,12 +133,12 @@ public class Online {
      * is already queued up with the same name it will be replaced and the old data
      * will not be sent.
      *
-     * @param key The name of the data, match this with {@link #registerProcessor(String, Consumer)}
+     * @param key The name of the data, match this with {@link #registerShareProcessor(String, Consumer)}
      * @param jsonValue The message content, must be convertible to json
      */
-    public static void submitData(String key, Object jsonValue) {
+    public static void share(String key, Object jsonValue) {
         checkConnected();
-        clientConnection.submit(key, jsonValue);
+        clientConnection.share(key, jsonValue);
     }
 
     /**
@@ -137,29 +147,24 @@ public class Online {
      * old data using the specified function. The first parameter will be the new data,
      * the second one the old one.
      *
-     * @param key The name of the data, match this with {@link #registerProcessor(String, Consumer)}
+     * @param key The name of the data, match this with {@link #registerShareProcessor(String, Consumer)}
      * @param jsonValue The message content, must be convertible to json
      */
-    public static <T> void submitData(String key, T jsonValue, BinaryOperator<T> combiner) {
+    public static <T> void share(String key, T jsonValue, BinaryOperator<T> combiner) {
         checkConnected();
-        clientConnection.submit(key, jsonValue, combiner);
+        clientConnection.share(key, jsonValue, combiner);
     }
 
-
-    /**
-     * Creates a new json message from the given content.
-     *
-     * @param jsonContent The content to be used
-     * @param type The type of message to create
-     * @return The message as json element
-     */
-    static JsonElement createMessage(Object jsonContent, MessageType type) {
-        JsonObject data = new JsonObject();
-        data.put("content", jsonContent);
-        data.put("type", type.ordinal());
-        data.put("time", System.currentTimeMillis());
-        return data.asElement();
+    public static void send(String key, Object jsonValue) {
+        checkConnected();
+        clientConnection.send(key, jsonValue);
     }
+
+    public static <T> void send(String key, T jsonValue, BinaryOperator<T> combiner) {
+        checkConnected();
+        clientConnection.send(key, jsonValue, combiner);
+    }
+
 
     /**
      * Checks that the client is connected.

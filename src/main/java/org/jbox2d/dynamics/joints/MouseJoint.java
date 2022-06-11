@@ -37,8 +37,9 @@ import org.jbox2d.pooling.IWorldPool;
  * constraint with a maximum force. This allows the constraint to stretch and without applying huge
  * forces. NOTE: this joint is not documented in the manual because it was developed to be used in
  * the testbed. If you want to learn how to use the mouse joint, look at the testbed.
- * 
+ *
  * @author Daniel
+ * @version $Id: $Id
  */
 public class MouseJoint extends Joint {
 
@@ -62,6 +63,12 @@ public class MouseJoint extends Joint {
   private final Mat22 m_mass = new Mat22();
   private final float2 m_C = new float2();
 
+  /**
+   * <p>Constructor for MouseJoint.</p>
+   *
+   * @param argWorld a {@link org.jbox2d.pooling.IWorldPool} object
+   * @param def a {@link org.jbox2d.dynamics.joints.MouseJointDef} object
+   */
   protected MouseJoint(IWorldPool argWorld, MouseJointDef def) {
     super(argWorld, def);
     assert (def.target.isValid());
@@ -82,27 +89,36 @@ public class MouseJoint extends Joint {
     m_gamma = 0;
   }
 
+  /** {@inheritDoc} */
   @Override
   public void getAnchorA(float2 argOut) {
     argOut.set(m_targetA);
   }
 
+  /** {@inheritDoc} */
   @Override
   public void getAnchorB(float2 argOut) {
     m_bodyB.getWorldPointToOut(m_localAnchorB, argOut);
   }
 
+  /** {@inheritDoc} */
   @Override
   public void getReactionForce(float invDt, float2 argOut) {
     argOut.set(m_impulse).scale(invDt);
   }
 
+  /** {@inheritDoc} */
   @Override
   public float getReactionTorque(float invDt) {
     return invDt * 0.0f;
   }
 
 
+  /**
+   * <p>setTarget.</p>
+   *
+   * @param target a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public void setTarget(float2 target) {
     if (m_bodyB.isAwake() == false) {
       m_bodyB.setAwake(true);
@@ -110,37 +126,73 @@ public class MouseJoint extends Joint {
     m_targetA.set(target);
   }
 
+  /**
+   * <p>getTarget.</p>
+   *
+   * @return a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public float2 getTarget() {
     return m_targetA;
   }
 
   // / set/get the maximum force in Newtons.
+  /**
+   * <p>setMaxForce.</p>
+   *
+   * @param force a float
+   */
   public void setMaxForce(float force) {
     m_maxForce = force;
   }
 
+  /**
+   * <p>getMaxForce.</p>
+   *
+   * @return a float
+   */
   public float getMaxForce() {
     return m_maxForce;
   }
 
   // / set/get the frequency in Hertz.
+  /**
+   * <p>setFrequency.</p>
+   *
+   * @param hz a float
+   */
   public void setFrequency(float hz) {
     m_frequencyHz = hz;
   }
 
+  /**
+   * <p>getFrequency.</p>
+   *
+   * @return a float
+   */
   public float getFrequency() {
     return m_frequencyHz;
   }
 
   // / set/get the damping ratio (dimensionless).
+  /**
+   * <p>setDampingRatio.</p>
+   *
+   * @param ratio a float
+   */
   public void setDampingRatio(float ratio) {
     m_dampingRatio = ratio;
   }
 
+  /**
+   * <p>getDampingRatio.</p>
+   *
+   * @return a float
+   */
   public float getDampingRatio() {
     return m_dampingRatio;
   }
 
+  /** {@inheritDoc} */
   @Override
   public void initVelocityConstraints(final SolverData data) {
     m_indexB = m_bodyB.m_islandIndex;
@@ -218,11 +270,13 @@ public class MouseJoint extends Joint {
     pool.pushRot(1);
   }
 
+  /** {@inheritDoc} */
   @Override
   public boolean solvePositionConstraints(final SolverData data) {
     return true;
   }
 
+  /** {@inheritDoc} */
   @Override
   public void solveVelocityConstraints(final SolverData data) {
 

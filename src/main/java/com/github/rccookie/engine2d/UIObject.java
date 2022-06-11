@@ -2,30 +2,35 @@ package com.github.rccookie.engine2d;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import com.github.rccookie.engine2d.core.LocalExecutionManager;
 import com.github.rccookie.engine2d.core.LocalInputManager;
-import com.github.rccookie.engine2d.ui.Dimension;
+import com.github.rccookie.engine2d.image.Image;
 import com.github.rccookie.engine2d.ui.Structure;
-import com.github.rccookie.engine2d.ui.Theme;
+import com.github.rccookie.engine2d.image.Theme;
 import com.github.rccookie.engine2d.ui.util.Alignment;
+import com.github.rccookie.engine2d.util.Bounds;
 import com.github.rccookie.engine2d.util.NamedCaughtEvent;
+import com.github.rccookie.engine2d.util.RecursiveIterator;
+import com.github.rccookie.engine2d.util.TwoWayIterator;
+import com.github.rccookie.engine2d.util.TwoWayRecursiveIterator;
 import com.github.rccookie.event.BiParamEvent;
 import com.github.rccookie.event.CaughtBiParamEvent;
 import com.github.rccookie.event.CaughtEvent;
 import com.github.rccookie.event.CaughtParamEvent;
 import com.github.rccookie.event.Event;
+import com.github.rccookie.event.LazyEvent;
 import com.github.rccookie.event.ParamEvent;
+import com.github.rccookie.event.action.Action;
 import com.github.rccookie.geometry.performance.float2;
 import com.github.rccookie.geometry.performance.int2;
 import com.github.rccookie.util.Arguments;
 import com.github.rccookie.util.Console;
+import com.github.rccookie.util.IterableIterator;
 import com.github.rccookie.util.ModIterableArrayList;
 
 import com.diogonunes.jcolor.Attribute;
@@ -55,12 +60,12 @@ public abstract class UIObject implements Iterable<UIObject> {
      * <p>Can be modified.</p>
      */
     @NotNull
-    public final float2 relativeLoc = float2.ZERO.clone();
+    public final float2 relativeLoc = float2.zero();
     /**
      * An absolute location offset of this object to its relative position, in pixels.
      */
     @NotNull
-    public final int2 offset = int2.ZERO.clone();
+    public final int2 offset = int2.zero();
 
     /**
      * The last generated image.
@@ -82,7 +87,7 @@ public abstract class UIObject implements Iterable<UIObject> {
      * The ui objects minimum size.
      */
     @NotNull
-    private final int2 minSize = int2.ONE.clone();
+    private final int2 minSize = int2.one.clone();
     /**
      * The ui objects maximum size.
      */
@@ -141,6 +146,17 @@ public abstract class UIObject implements Iterable<UIObject> {
      */
     boolean clickThrough = false;
 
+    /**
+     * Whether this ui object can be focused on using tab.
+     */
+    private boolean focusable = true;
+
+    /**
+     * Whether the elements in this ui object should be traversed
+     * from top to bottom / from end to start using tab navigation.
+     */
+    private boolean traverseReverse = false;
+
 
     /**
      * Whether this ui object has been modified since the last image
@@ -153,13 +169,23 @@ public abstract class UIObject implements Iterable<UIObject> {
      */
     private boolean modifyLock = false;
 
+    private final Event childUpdate = new LazyEvent(this::incUpdateUses, this::decUpdateUses);
+
+    private int updateUses = 0, hoverUses = 0;
 
     /**
      * Called once per frame after the map was updated. Parents get updated
      * before their children, and the children are updated in the order they
      * were added.
      */
-    public final Event update = new NamedCaughtEvent(false, "UIObject.update on " + this) {
+    // TODO: Make lazily called. Requires the hover update to be lazily
+    //       checked as well, which means all mouse-interaction events have
+    //       to be lazily connected, and the number of actual uses has to be
+    //       counted. The main issue with that is that the values #hovered
+    //       #pressed are constantly updated. Maybe check in the getter whether
+    //       the 'auto update' is currently attached, if not calculate on
+    //       the fly?
+    public final Event update = new NamedCaughtEvent(false, () -> "UIObject.update on " + this) {
         @Override
         public boolean invoke() {
             // Invoked by parent so no global check needed
@@ -172,6 +198,7 @@ public abstract class UIObject implements Iterable<UIObject> {
             return false;
         }
     };
+    private final Action updateAction = update::invoke;
     /**
      * Invoked when the enabled state of this ui object gets changed, with the new enabled
      * state as parameter.
@@ -283,16 +310,16 @@ public abstract class UIObject implements Iterable<UIObject> {
             setParent(parent);
 
         update.add(this::updateHoverState);
-        onHoverChange.add(s -> hovered = s);
+        onHoverChange.add(s -> hovered = s); // <- TODO: These constant updates cause update always to be needed
         update.add(() -> { if(hovered) onHover.invoke(); });
 
         input.mousePressed.add(() -> {
-            if(!clickable || !hovered) return;
+            if(!isClickable() || !hovered) return;
             pressed = true;
             onPress.invoke();
         });
         input.mouseReleased.add(() -> {
-            if(!clickable || !pressed) return;
+            if(!isClickable() || !pressed) return;
             pressed = false;
             if(hovered) onClick.invoke();
             onRelease.invoke();
@@ -321,6 +348,26 @@ public abstract class UIObject implements Iterable<UIObject> {
         return name + " at " + getScreenPos();
     }
 
+
+    private void incUpdateUses() {
+        if(updateUses++ == 0 && parent != null)
+            parent.childUpdate.add(updateAction);
+    }
+
+    private void decUpdateUses() {
+        if(--updateUses == 0 && parent != null)
+            parent.childUpdate.remove(updateAction);
+    }
+
+    private void incHoverUses() {
+        if(hoverUses++ == 0)
+            ;// TODO
+    }
+
+    private void decHoverUses() {
+        if(--hoverUses == 0)
+            ;// TODO
+    }
 
 
     /**
@@ -393,7 +440,7 @@ public abstract class UIObject implements Iterable<UIObject> {
                 int2 oldSize = getSize(); // Will NOT try to rerender because of modifyLock
                 image = generateImage();
                 int2 newSize = getSize();
-                if(oldSize.equals(newSize))
+                if(!oldSize.equals(newSize))
                     for(UIObject child : children)
                         child.onParentSizeChange.invoke(newSize);
             } catch(Exception e) {
@@ -453,7 +500,7 @@ public abstract class UIObject implements Iterable<UIObject> {
      * Sets the order in which the image of this ui object and the image of its children
      * will be requested. The default value is {@link RenderOrder#BEFORE_CHILDREN}.
      *
-     * @param renderOrder The render order to use
+     * @param renderOrder The render order to be used
      */
     public void setRenderOrder(@NotNull RenderOrder renderOrder) {
         this.renderOrder = Arguments.checkNull(renderOrder, "renderOrder");
@@ -487,6 +534,7 @@ public abstract class UIObject implements Iterable<UIObject> {
      * @param minSize The minimum size to set
      */
     public void setMinSize(@NotNull int2 minSize) {
+        if(this.minSize.equals(Arguments.checkNull(minSize, "minSize"))) return;
         this.minSize.set(minSize);
         maxSize.set(int2.max(minSize, maxSize));
         modified();
@@ -500,6 +548,7 @@ public abstract class UIObject implements Iterable<UIObject> {
      * @param maxSize The maximum size to set
      */
     public void setMaxSize(@NotNull int2 maxSize) {
+        if(this.maxSize.equals(Arguments.checkNull(maxSize, "maxSize"))) return;
         this.maxSize.set(maxSize);
         minSize.set(int2.min(minSize, maxSize));
         modified();
@@ -543,6 +592,7 @@ public abstract class UIObject implements Iterable<UIObject> {
      *
      * @return Whether this ui object itself is enabled
      */
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean isEnabledLocal() {
         return enabled;
     }
@@ -639,7 +689,7 @@ public abstract class UIObject implements Iterable<UIObject> {
      *
      * @return Whether this ui object is clickable
      */
-    protected boolean isClickable() {
+    public boolean isClickable() {
         return clickable;
     }
 
@@ -653,12 +703,21 @@ public abstract class UIObject implements Iterable<UIObject> {
     }
 
     /**
+     * Returns whether this ui object can be "tabbed into".
+     *
+     * @return Whether this object can be selected using tab
+     */
+    public boolean isFocusable() {
+        return focusable && isEnabledGlobal() && isVisible();
+    }
+
+    /**
      * Sets this ui object to be clickable or not. A non-clickable ui object
      * will not receive click events.
      *
      * @param clickable The clickable state to set
      */
-    protected void setClickable(boolean clickable) {
+    public void setClickable(boolean clickable) {
         if(this.clickable == clickable) return;
         this.clickable = clickable;
         if(!clickable && pressed) {
@@ -681,12 +740,30 @@ public abstract class UIObject implements Iterable<UIObject> {
     }
 
     /**
+     * Sets whether this ui object can be "tabbed into".
+     *
+     * @param focusable Whether this object can be focused with tab
+     */
+    public void setFocusable(boolean focusable) {
+        this.focusable = focusable;
+        // Don't modify: Has nothing to do with rendering
+    }
+
+    /**
      * Updates the mouse hover state and invokes onHoverChange if needed.
      */
     private void updateHoverState() {
         if(!clickable || hovered == containsMouse(true)) return;
 
         onHoverChange.invoke(!hovered);
+    }
+
+    public boolean isTraverseReverse() {
+        return traverseReverse;
+    }
+
+    public void setTraverseReverse(boolean reverse) {
+        this.traverseReverse = reverse;
     }
 
 
@@ -710,7 +787,7 @@ public abstract class UIObject implements Iterable<UIObject> {
         if(pixel.x < pos.x - (size.x / 2) || pixel.x > pos.x + (size.x - size.x / 2)
                 || pixel.y < pos.y - (size.y / 2) || pixel.y >= pos.y + (size.y - size.y / 2)) return false;
 
-        return !pixelPerfect || image.getPixel(int2.min(image.size.subed(int2.ONE), pixel.subed(pos).add(image.center))).a != 0;
+        return !pixelPerfect || image.getPixel(int2.min(image.size.subed(int2.one), pixel.subed(pos).add(image.center))).a != 0;
     }
 
     /**
@@ -742,7 +819,6 @@ public abstract class UIObject implements Iterable<UIObject> {
      * @param parent The parent to set
      * @throws IllegalStateException If the parent is also a child of this object
      */
-    @SuppressWarnings("ConstantConditions")
     public void setParent(@Nullable UIObject parent) {
         if(structureLocked)
             throw new UnsupportedOperationException(this + " is locked.");
@@ -757,7 +833,7 @@ public abstract class UIObject implements Iterable<UIObject> {
         }
         // Save now but run later. If null is set that would also change the size, but
         // as the object is not shown then there is no need to render it.
-        boolean sizeChanged = this.parent == null || !this.parent.getSize().equals(parent.getSize());
+        boolean sizeChanged = this.parent == null || parent == null || !this.parent.getSize().equals(parent.getSize());
         this.parent = parent;
         if(parent != null) {
             parent.children.add(this);
@@ -768,7 +844,7 @@ public abstract class UIObject implements Iterable<UIObject> {
             hovered = pressed = false;
         }
         if(sizeChanged && onParentSizeChange.getActions().size() != 0)
-            onParentSizeChange.invoke(parent.getSize()); // parent is never null here
+            onParentSizeChange.invoke(parent != null ? parent.getSize() : int2.zero);
     }
 
     /**
@@ -821,11 +897,12 @@ public abstract class UIObject implements Iterable<UIObject> {
     }
 
     /**
-     * Sets the own index as child in the parent to 0.
+     * Sets the own index as child in the parent to 0 so that it is behind
+     * its siblings.
      *
      * @throws NullPointerException If this object has no parent
      */
-    public void moveToBottom() {
+    public void moveToBack() {
         setIndex(0);
     }
 
@@ -875,38 +952,18 @@ public abstract class UIObject implements Iterable<UIObject> {
      */
     @Override
     @NotNull
-    public Iterator<UIObject> iterator() {
-        return new Iterator<>() {
-
-            int index = -1;
-            Iterator<UIObject> childIt = null;
-
-            @Override
-            public boolean hasNext() {
-                return index < children.size() && (childIt == null || childIt.hasNext());
-            }
+    public IterableIterator<UIObject> iterator() {
+        return new RecursiveIterator<>() {
+            int childNr = 0;
+            IterableIterator<UIObject> innerIt = IterableIterator.empty();
+            UIObject curr = null;
 
             @Override
-            public UIObject next() {
-                if(!hasNext())
-                    throw new NoSuchElementException();
-
-                UIObject out;
-                if(index == -1) {
-                    out = UIObject.this;
-                    index++;
-                    if(!children.isEmpty())
-                        childIt = children.get(0).iterator();
-                }
-                else {
-                    out = childIt.next();
-                    if(!childIt.hasNext()) {
-                        index++;
-                        if(children.size() <= index) childIt = null;
-                        else childIt = children.get(index).iterator();
-                    }
-                }
-                return out;
+            protected UIObject getNext() {
+                if(curr == null) return curr = UIObject.this;
+                while(!innerIt.hasNext() && ++childNr < childCount())
+                    innerIt = children.get(childNr).iterator();
+                return curr = (innerIt.hasNext() ? innerIt.next() : null);
             }
         };
     }
@@ -955,24 +1012,102 @@ public abstract class UIObject implements Iterable<UIObject> {
     }
 
     /**
-     * Adds all enabled, visible, non-transparent ui objects in this
-     * subtree to the given list in paint order from top to bottom.
+     * Returns a lazy-populated iterator over all visible, enabled,
+     * non-transparent ui objects in this subtree, from top to bottom.
      *
-     * @param list The list to add to
+     * @param excludeBlank Whether objects that do have an image and are
+     *                     set to be visible should be excluded, if their
+     *                     image is known to be fully blank. This is good
+     *                     for rendering performance, but may cause
+     *                     inconsistencies when searching for objects at
+     *                     a specific pixel
+     * @return An iterator over all specified ui objects
      */
-    void addAllRelevantInPaintOrder(@NotNull List<UIObject> list) {
+    @NotNull
+    IterableIterator<UIObject> paintOrderIterator(boolean excludeBlank) {
         // Called by parent so no global enabled check needed
-        if(!enabled || !visible) return;
+        if(!enabled || !visible) return IterableIterator.empty();
 
-        Image image = null;
-        RenderOrder renderOrder = this.renderOrder;
-        if(renderOrder != RenderOrder.AFTER_CHILDREN) image = getImage();
+        return new RecursiveIterator<>() {
+            int childNr = childCount();
+            IterableIterator<UIObject> innerIt = IterableIterator.empty();
 
-        for(int i=children.size()-1; i>=0; i--)
-            children.get(i).addAllRelevantInPaintOrder(list);
+            final RenderOrder renderOrder = UIObject.this.renderOrder;
+            Image image = renderOrder != RenderOrder.AFTER_CHILDREN ? getImage() : null;
 
-        if(renderOrder != RenderOrder.BEFORE_CHILDREN) image = getImage();
-        if(image != null && !image.definitelyBlank) list.add(this);
+            UIObject curr = null;
+
+            @Override
+            protected UIObject getNext() {
+                if(curr == UIObject.this)
+                    return curr = null;
+                while(!innerIt.hasNext() && --childNr >= 0)
+                    innerIt = children.get(childNr).paintOrderIterator(excludeBlank);
+                if(innerIt.hasNext())
+                    return curr = innerIt.next();
+                if(renderOrder != RenderOrder.BEFORE_CHILDREN) image = getImage();
+                return curr = (image != null && (!excludeBlank || !Image.definitelyBlank(image)) ? UIObject.this : null);
+            }
+        };
+    }
+
+    @NotNull
+    TwoWayIterator<UIObject> focusIterator() {
+        // Called by parent so no global enabled check needed
+        if(!enabled || !visible) return TwoWayIterator.empty();
+
+        return new TwoWayRecursiveIterator<>() {
+            UIObject currChild = null; // Save child instead of index to be able to
+                                       // work when the children are modified in the
+                                       // meantime
+            boolean start = true, end = false;
+            final boolean reverse = isTraverseReverse();
+            TwoWayIterator<UIObject> innerIt = TwoWayIterator.empty();
+
+            @Override
+            protected UIObject getNext() {
+                if(end) return null;
+
+                boolean wasStart = start;
+                start = false;
+                if(wasStart && isFocusable()) return UIObject.this;
+
+                if(innerIt.hasNext()) return innerIt.next();
+
+                int index = wasStart || currChild == null ? (reverse ? childCount() : -1) : currChild.getIndex();
+
+                while((reverse ? --index : ++index) >= 0 && index < childCount()) {
+                    currChild = getChild(index);
+                    innerIt = currChild.focusIterator();
+                    if(innerIt.hasNext()) return next();
+                }
+                end = true;
+                return null;
+            }
+
+            @Override
+            protected @Nullable UIObject getPrev() {
+                if(start) return null;
+
+                boolean wasEnd = end;
+                end = false;
+
+                if(innerIt.hasPrev()) return innerIt.prev();
+
+                int index = wasEnd || currChild == null ? (reverse ? -1 : childCount()) : currChild.getIndex();
+
+                while((reverse ? ++index : --index) >= 0 && index < childCount()) {
+                    currChild = getChild(index);
+                    innerIt = currChild.focusIterator();
+                    innerIt.skipToEnd();
+                    if(innerIt.hasPrev()) return innerIt.prev();
+                }
+
+                if(wasEnd && isFocusable()) return UIObject.this;
+                start = true;
+                return null;
+            }
+        };
     }
 
     /**
@@ -1017,7 +1152,7 @@ public abstract class UIObject implements Iterable<UIObject> {
     }
 
     /**
-     * Returns the camera that the ui root is attached to, if a ui is
+     * Returns the camera that the ui root is attached to, if an ui is
      * present and is attached to any camera.
      *
      * @return The camera this ui object is attached to, or {@code null}
@@ -1109,7 +1244,27 @@ public abstract class UIObject implements Iterable<UIObject> {
     public int2 getSize() {
         Image image = getImage();
         if(image != null) return image.size;
-        return parent != null ? parent.getSize() : int2.ZERO;
+        return parent != null ? parent.getSize() : int2.zero;
+    }
+
+    public Bounds getBounds() {
+        int2 pos = getScreenPos();
+        if(pos == null) return null;
+
+        int2 min = pos.clone(), max = pos.clone();
+
+        int2 hSize = getSize().dived(2);
+        min = int2.min(min, pos.subed(hSize));
+        max = int2.max(max, pos.added(hSize));
+
+        for(UIObject child : children) {
+            if(!child.isVisible() || !child.enabled || child instanceof UI.Focus) continue;
+            Bounds bounds = child.getBounds();
+            min = int2.min(min, bounds.min);
+            max = int2.max(max, bounds.max);
+        }
+
+        return new Bounds(min, max);
     }
 
     /**
@@ -1129,14 +1284,11 @@ public abstract class UIObject implements Iterable<UIObject> {
      * @return The ui objects absolute screen position
      */
     @Nullable
-    int2 calcScreenPos(boolean useCache) {
+    protected int2 calcScreenPos(boolean useCache) {
         if(parent == null) return null;
 
         int2 parentPos = useCache ? parent.getCachedScreenPos() : parent.calcScreenPos(false);
         if(parentPos == null) return null;
-
-        if(this instanceof Structure && !(this instanceof Dimension))
-            return parentPos;
 
         int2 parentSize = parent.getSize();
         return parentPos
@@ -1156,7 +1308,7 @@ public abstract class UIObject implements Iterable<UIObject> {
         if(this instanceof Structure)
             return alignment.getOffset(getSize(), this);
         Image image = getImage();
-        return image != null ? alignment.getOffset(image.size, this) : int2.ZERO;
+        return image != null ? alignment.getOffset(image.size, this) : int2.zero;
     }
 
     /**
@@ -1216,10 +1368,10 @@ public abstract class UIObject implements Iterable<UIObject> {
 
         if(enabled)
             line.append(this);
-        else if(Console.Config.coloredOutput) line.append(Console.colored(this.toString(), DISABLED_COLOR));
+        else if(Console.Config.colored) line.append(Console.colored(this.toString(), DISABLED_COLOR));
         else line.append(this).append(" (disabled)");
 
-        Console.info(line);
+        Console.log(line);
 
         depthInfo.add(new DepthInfo(enabled, true));
         for(int i=0; i<children.size(); i++) {

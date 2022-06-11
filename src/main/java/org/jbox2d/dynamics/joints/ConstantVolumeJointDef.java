@@ -28,8 +28,9 @@ import java.util.ArrayList;
 import org.jbox2d.dynamics.Body;
 
 /**
- * Definition for a {@link ConstantVolumeJoint}, which connects a group a bodies together so they
+ * Definition for a {@link org.jbox2d.dynamics.joints.ConstantVolumeJoint}, which connects a group a bodies together so they
  * maintain a constant volume within them.
+ *
  */
 public class ConstantVolumeJointDef extends JointDef {
   public float frequencyHz;
@@ -38,6 +39,9 @@ public class ConstantVolumeJointDef extends JointDef {
   ArrayList<Body> bodies;
   ArrayList<DistanceJoint> joints;
 
+  /**
+   * <p>Constructor for ConstantVolumeJointDef.</p>
+   */
   public ConstantVolumeJointDef() {
     super(JointType.CONSTANT_VOLUME);
     bodies = new ArrayList<Body>();
@@ -49,8 +53,8 @@ public class ConstantVolumeJointDef extends JointDef {
 
   /**
    * Adds a body to the group
-   * 
-   * @param argBody
+   *
+   * @param argBody a {@link org.jbox2d.dynamics.Body} object
    */
   public void addBody(Body argBody) {
     bodies.add(argBody);
@@ -64,6 +68,9 @@ public class ConstantVolumeJointDef extends JointDef {
 
   /**
    * Adds a body and the pre-made distance joint. Should only be used for deserialization.
+   *
+   * @param argBody a {@link org.jbox2d.dynamics.Body} object
+   * @param argJoint a {@link org.jbox2d.dynamics.joints.DistanceJoint} object
    */
   public void addBodyAndJoint(Body argBody, DistanceJoint argJoint) {
     addBody(argBody);

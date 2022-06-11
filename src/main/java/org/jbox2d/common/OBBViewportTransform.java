@@ -27,8 +27,9 @@ import com.github.rccookie.geometry.performance.float2;
 
 /**
  * Orientated bounding box viewport transform
- * 
+ *
  * @author Daniel Murphy
+ * @version $Id: $Id
  */
 public class OBBViewportTransform implements IViewportTransform {
 
@@ -42,10 +43,18 @@ public class OBBViewportTransform implements IViewportTransform {
   private boolean yFlip = false;
   private final Mat22 yFlipMat = new Mat22(1, 0, 0, -1);
 
+  /**
+   * <p>Constructor for OBBViewportTransform.</p>
+   */
   public OBBViewportTransform() {
     box.R.setIdentity();
   }
 
+  /**
+   * <p>set.</p>
+   *
+   * @param vpt a {@link org.jbox2d.common.OBBViewportTransform} object
+   */
   public void set(OBBViewportTransform vpt) {
     box.center.set(vpt.box.center);
     box.extents.set(vpt.box.extents);
@@ -53,42 +62,60 @@ public class OBBViewportTransform implements IViewportTransform {
     yFlip = vpt.yFlip;
   }
 
+  /** {@inheritDoc} */
   public void setCamera(float x, float y, float scale) {
     box.center.set(x, y);
     Mat22.createScaleTransform(scale, box.R);
   }
 
+  /**
+   * <p>getExtents.</p>
+   *
+   * @return a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public float2 getExtents() {
     return box.extents;
   }
   
+  /** {@inheritDoc} */
   @Override
   public Mat22 getMat22Representation() {
     return box.R;
   }
 
+  /** {@inheritDoc} */
   public void setExtents(float2 argExtents) {
     box.extents.set(argExtents);
   }
 
+  /** {@inheritDoc} */
   public void setExtents(float halfWidth, float halfHeight) {
     box.extents.set(halfWidth, halfHeight);
   }
 
+  /**
+   * <p>getCenter.</p>
+   *
+   * @return a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public float2 getCenter() {
     return box.center;
   }
 
+  /** {@inheritDoc} */
   public void setCenter(float2 argPos) {
     box.center.set(argPos);
   }
 
+  /** {@inheritDoc} */
   public void setCenter(float x, float y) {
     box.center.set(x, y);
   }
 
   /**
    * Gets the transform of the viewport, transforms around the center. Not a copy.
+   *
+   * @return a {@link org.jbox2d.common.Mat22} object
    */
   public Mat22 getTransform() {
     return box.R;
@@ -96,12 +123,16 @@ public class OBBViewportTransform implements IViewportTransform {
 
   /**
    * Sets the transform of the viewport. Transforms about the center.
+   *
+   * @param transform a {@link org.jbox2d.common.Mat22} object
    */
   public void setTransform(Mat22 transform) {
     box.R.set(transform);
   }
 
   /**
+   * {@inheritDoc}
+   *
    * Multiplies the obb transform by the given transform
    */
   @Override
@@ -109,16 +140,23 @@ public class OBBViewportTransform implements IViewportTransform {
     box.R.mulLocal(transform);
   }
 
+  /**
+   * <p>isYFlip.</p>
+   *
+   * @return a boolean
+   */
   public boolean isYFlip() {
     return yFlip;
   }
 
+  /** {@inheritDoc} */
   public void setYFlip(boolean yFlip) {
     this.yFlip = yFlip;
   }
 
   private final Mat22 inv = new Mat22();
 
+  /** {@inheritDoc} */
   public void getScreenVectorToWorld(float2 screen, float2 world) {
     box.R.invertToOut(inv);
     inv.mulToOut(screen, world);
@@ -127,6 +165,7 @@ public class OBBViewportTransform implements IViewportTransform {
     }
   }
 
+  /** {@inheritDoc} */
   public void getWorldVectorToScreen(float2 world, float2 screen) {
     box.R.mulToOut(world, screen);
     if (yFlip) {
@@ -134,6 +173,7 @@ public class OBBViewportTransform implements IViewportTransform {
     }
   }
 
+  /** {@inheritDoc} */
   public void getWorldToScreen(float2 world, float2 screen) {
     screen.x = world.x - box.center.x;
     screen.y = world.y - box.center.y;
@@ -147,6 +187,7 @@ public class OBBViewportTransform implements IViewportTransform {
 
   private final Mat22 inv2 = new Mat22();
 
+  /** {@inheritDoc} */
   public void getScreenToWorld(float2 screen, float2 world) {
     world.x = screen.x - box.extents.x;
     world.y = screen.y - box.extents.y;

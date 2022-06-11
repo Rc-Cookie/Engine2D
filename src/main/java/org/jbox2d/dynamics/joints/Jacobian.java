@@ -25,6 +25,10 @@ package org.jbox2d.dynamics.joints;
 
 import com.github.rccookie.geometry.performance.float2;
 
+/**
+ * <p>Jacobian class.</p>
+ *
+ */
 public class Jacobian {
 	public final float2 linearA = new float2();
 	public float angularA;

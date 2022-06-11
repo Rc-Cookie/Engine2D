@@ -49,15 +49,21 @@ package org.jbox2d.common;
 // updated to rev 100
 /**
  * Similar to javax.vecmath.Color3f holder
- * @author ewjordan
  *
+ * @author ewjordan
+ * @version $Id: $Id
  */
 public class Color3f {
 	
+	/** Constant <code>WHITE</code> */
 	public static final Color3f WHITE = new Color3f(1, 1, 1);
+	/** Constant <code>BLACK</code> */
 	public static final Color3f BLACK = new Color3f(0, 0, 0);
+	/** Constant <code>BLUE</code> */
 	public static final Color3f BLUE = new Color3f(0, 0, 1);
+	/** Constant <code>GREEN</code> */
 	public static final Color3f GREEN = new Color3f(0, 1, 0);
+	/** Constant <code>RED</code> */
 	public static final Color3f RED = new Color3f(1, 0, 0);
 	
 	public float x;
@@ -65,21 +71,43 @@ public class Color3f {
 	public float z;
 
 	
+	/**
+	 * <p>Constructor for Color3f.</p>
+	 */
 	public Color3f(){
 		x = y = z = 0;
 	}
+	/**
+	 * <p>Constructor for Color3f.</p>
+	 *
+	 * @param r a float
+	 * @param g a float
+	 * @param b a float
+	 */
 	public Color3f(float r, float g, float b) {
 		x = r;
 		y = g;
 		z = b;
 	}
 	
+	/**
+	 * <p>set.</p>
+	 *
+	 * @param r a float
+	 * @param g a float
+	 * @param b a float
+	 */
 	public void set(float r, float g, float b){
 		x = r;
 		y = g;
 		z = b;
 	}
 	
+	/**
+	 * <p>set.</p>
+	 *
+	 * @param argColor a {@link org.jbox2d.common.Color3f} object
+	 */
 	public void set(Color3f argColor){
 		x = argColor.x;
 		y = argColor.y;

@@ -1,6 +1,6 @@
 package com.github.rccookie.engine2d.ui;
 
-import com.github.rccookie.engine2d.Image;
+import com.github.rccookie.engine2d.image.Image;
 import com.github.rccookie.engine2d.UIObject;
 import com.github.rccookie.util.Arguments;
 

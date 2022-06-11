@@ -1,7 +1,9 @@
 package com.github.rccookie.engine2d.ui;
 
-import com.github.rccookie.engine2d.Image;
+import com.github.rccookie.engine2d.UI;
+import com.github.rccookie.engine2d.image.Image;
 import com.github.rccookie.engine2d.UIObject;
+import com.github.rccookie.engine2d.util.Bounds;
 import com.github.rccookie.geometry.performance.int2;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -21,6 +23,8 @@ public abstract class Structure extends UIObject {
      */
     public Structure(@Nullable UIObject parent) {
         super(parent);
+        if(!(this instanceof UI))
+            setFocusable(false);
     }
 
     /**
@@ -45,7 +49,7 @@ public abstract class Structure extends UIObject {
     @Override
     public int2 getSize() {
         UIObject parent = getParent();
-        return parent == null ? int2.ZERO : parent.getSize();
+        return parent == null ? int2.zero : parent.getSize();
     }
 
     /**
@@ -53,4 +57,23 @@ public abstract class Structure extends UIObject {
      * Updates whatever makes up this structure.
      */
     protected abstract void updateStructure();
+
+    @Override
+    public Bounds getBounds() {
+        int2 pos = getScreenPos();
+        if(pos == null) return null;
+
+        int2 min = int2.max(), max = int2.min();
+
+        for(UIObject child : getChildren()) {
+            if(!child.isVisible() || !child.isEnabledLocal() || child instanceof UI.Focus) continue;
+            Bounds bounds = child.getBounds();
+            min = int2.min(min, bounds.min);
+            max = int2.max(max, bounds.max);
+        }
+
+        if(min.x > max.x || min.y > max.y)
+            return new Bounds(pos, pos);
+        return new Bounds(min, max);
+    }
 }

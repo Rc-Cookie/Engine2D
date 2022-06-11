@@ -1,8 +1,13 @@
 package org.jbox2d.particle;
 
-import org.jbox2d.common.Transform;
 import com.github.rccookie.geometry.performance.float2;
 
+import org.jbox2d.common.Transform;
+
+/**
+ * <p>ParticleGroup class.</p>
+ *
+ */
 public class ParticleGroup {
 
   ParticleSystem m_system;
@@ -27,6 +32,9 @@ public class ParticleGroup {
 
   Object m_userData;
 
+  /**
+   * <p>Constructor for ParticleGroup.</p>
+   */
   public ParticleGroup() {
     // m_system = null;
     m_firstIndex = 0;
@@ -45,73 +53,151 @@ public class ParticleGroup {
     m_toBeSplit = false;
   }
 
+  /**
+   * <p>getNext.</p>
+   *
+   * @return a {@link org.jbox2d.particle.ParticleGroup} object
+   */
   public ParticleGroup getNext() {
     return m_next;
   }
 
+  /**
+   * <p>getParticleCount.</p>
+   *
+   * @return a int
+   */
   public int getParticleCount() {
     return m_lastIndex - m_firstIndex;
   }
 
+  /**
+   * <p>getBufferIndex.</p>
+   *
+   * @return a int
+   */
   public int getBufferIndex() {
     return m_firstIndex;
   }
 
+  /**
+   * <p>getGroupFlags.</p>
+   *
+   * @return a int
+   */
   public int getGroupFlags() {
     return m_groupFlags;
   }
 
+  /**
+   * <p>setGroupFlags.</p>
+   *
+   * @param flags a int
+   */
   public void setGroupFlags(int flags) {
     m_groupFlags = flags;
   }
 
+  /**
+   * <p>getMass.</p>
+   *
+   * @return a float
+   */
   public float getMass() {
     updateStatistics();
     return m_mass;
   }
 
+  /**
+   * <p>getInertia.</p>
+   *
+   * @return a float
+   */
   public float getInertia() {
     updateStatistics();
     return m_inertia;
   }
 
+  /**
+   * <p>getCenter.</p>
+   *
+   * @return a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public float2 getCenter() {
     updateStatistics();
     return m_center;
   }
 
+  /**
+   * <p>getLinearVelocity.</p>
+   *
+   * @return a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public float2 getLinearVelocity() {
     updateStatistics();
     return m_linearVelocity;
   }
 
+  /**
+   * <p>getAngularVelocity.</p>
+   *
+   * @return a float
+   */
   public float getAngularVelocity() {
     updateStatistics();
     return m_angularVelocity;
   }
 
+  /**
+   * <p>getTransform.</p>
+   *
+   * @return a {@link org.jbox2d.common.Transform} object
+   */
   public Transform getTransform() {
     return m_transform;
   }
 
+  /**
+   * <p>getPosition.</p>
+   *
+   * @return a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public float2 getPosition() {
     return m_transform.p;
   }
 
+  /**
+   * <p>getAngle.</p>
+   *
+   * @return a float
+   */
   public float getAngle() {
     return m_transform.q.getAngle();
   }
 
+  /**
+   * <p>getUserData.</p>
+   *
+   * @return a {@link java.lang.Object} object
+   */
   public Object getUserData() {
     return m_userData;
   }
 
+  /**
+   * <p>setUserData.</p>
+   *
+   * @param data a {@link java.lang.Object} object
+   */
   public void setUserData(Object data) {
     m_userData = data;
   }
   
   
 
+  /**
+   * <p>updateStatistics.</p>
+   */
   public void updateStatistics() {
     if (m_timestamp != m_system.m_timestamp) {
       float m = m_system.getParticleMass();

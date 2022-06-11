@@ -27,9 +27,27 @@ import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.pooling.IWorldPool;
 
 // updated to rev 100
+/**
+ * <p>ContactCreator interface.</p>
+ *
+ */
 public interface ContactCreator {
 
+	/**
+	 * <p>contactCreateFcn.</p>
+	 *
+	 * @param argPool a {@link org.jbox2d.pooling.IWorldPool} object
+	 * @param fixtureA a {@link org.jbox2d.dynamics.Fixture} object
+	 * @param fixtureB a {@link org.jbox2d.dynamics.Fixture} object
+	 * @return a {@link org.jbox2d.dynamics.contacts.Contact} object
+	 */
 	public Contact contactCreateFcn(IWorldPool argPool, Fixture fixtureA, Fixture fixtureB);
 	
+	/**
+	 * <p>contactDestroyFcn.</p>
+	 *
+	 * @param argPool a {@link org.jbox2d.pooling.IWorldPool} object
+	 * @param contact a {@link org.jbox2d.dynamics.contacts.Contact} object
+	 */
 	public void contactDestroyFcn(IWorldPool argPool, Contact contact);
 }

@@ -14,6 +14,8 @@ import com.github.rccookie.json.Json;
 import com.github.rccookie.json.JsonElement;
 import com.github.rccookie.json.JsonObject;
 import com.github.rccookie.json.JsonParser;
+import com.github.rccookie.util.Args;
+import com.github.rccookie.util.ArgsParser;
 import com.github.rccookie.util.Console;
 import com.github.rccookie.util.ModIterableArrayList;
 
@@ -91,7 +93,7 @@ public class Server {
                 JsonObject content = new JsonObject();
                 content.put("message", "client connected");
                 content.put("address", client.getInetAddress().getHostAddress());
-                sendData(Online.createMessage(content, MessageType.SERVER_TO_CLIENT), out);
+                sendData(createMessage(content, MessageType.SERVER_TO_CLIENT), out);
             }
         } catch(IOException e) {
             throw new UncheckedIOException(e);
@@ -109,8 +111,16 @@ public class Server {
     @Blocking
     private void listen(InputStream in, PrintStream out, Socket client) {
         try(JsonParser parser = Json.getParser(in)) {
-            for (JsonElement data : parser)
-                sendData(data, out);
+            for (JsonElement data : parser) {
+                if(data.get("type").asInt() == MessageType.CLIENT_TO_CLIENT.ordinal())
+                    sendData(data, out);
+                else {
+                    float delay = (System.currentTimeMillis() - data.get("time").asInt()) / 1000f;
+                    JsonElement content = data.get("content");
+                    MessageType type = MessageType.values()[data.get("type").asInt()];
+                    onMessage(new OnlineData(content, delay, type));
+                }
+            }
         } catch(UncheckedIOException e) {
             if(!(e.getCause() instanceof SocketException) || !"Connection reset".equals(e.getCause().getMessage()))
                 throw e;
@@ -119,8 +129,31 @@ public class Server {
             JsonObject content = new JsonObject();
             content.put("message", "client disconnected");
             content.put("address", client.getInetAddress().getHostAddress());
-            sendData(Online.createMessage(content, MessageType.SERVER_TO_CLIENT), null);
+            sendData(createMessage(content, MessageType.SERVER_TO_CLIENT), null);
         }
+    }
+
+    protected void onConnect() {
+
+    }
+
+    protected void onMessage(OnlineData message) {
+    }
+
+
+    /**
+     * Creates a new json message from the given content.
+     *
+     * @param jsonContent The content to be used
+     * @param type The type of message to create
+     * @return The message as json element
+     */
+    static JsonElement createMessage(Object jsonContent, MessageType type) {
+        JsonObject data = new JsonObject();
+        data.put("content", jsonContent);
+        data.put("type", type.ordinal());
+        data.put("time", System.currentTimeMillis());
+        return data.asElement();
     }
 
     /**
@@ -142,7 +175,13 @@ public class Server {
      * @param args ignored
      */
     public static void main(String[] args) {
-        // TODO: Select port via args
-        new Server(Online.DEFAULT_PORT, true);
+        ArgsParser parser = new ArgsParser();
+        parser.addDefaults();
+        parser.setName("Engine2D Server");
+        parser.setDescription("Standalone server for Engine2D applications");
+        parser.addOption('p', "port", true, "The port to open the server at");
+        Args options = parser.parse(args);
+
+        new Server(options.getIntOr("port", Online.DEFAULT_PORT), true);
     }
 }

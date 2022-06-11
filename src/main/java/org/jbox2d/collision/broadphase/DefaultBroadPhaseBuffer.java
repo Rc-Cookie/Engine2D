@@ -37,8 +37,9 @@ import com.github.rccookie.geometry.performance.float2;
  * The broad-phase is used for computing pairs and performing volume queries and ray casts. This
  * broad-phase does not persist pairs. Instead, this reports potentially new pairs. It is up to the
  * client to consume the new pairs and to track subsequent overlap.
- * 
+ *
  * @author Daniel Murphy
+ * @version $Id: $Id
  */
 public class DefaultBroadPhaseBuffer implements TreeCallback, BroadPhase {
 
@@ -56,6 +57,11 @@ public class DefaultBroadPhaseBuffer implements TreeCallback, BroadPhase {
 
   private int m_queryProxyId;
 
+  /**
+   * <p>Constructor for DefaultBroadPhaseBuffer.</p>
+   *
+   * @param strategy a {@link org.jbox2d.collision.broadphase.BroadPhaseStrategy} object
+   */
   public DefaultBroadPhaseBuffer(BroadPhaseStrategy strategy) {
     m_proxyCount = 0;
 
@@ -74,6 +80,7 @@ public class DefaultBroadPhaseBuffer implements TreeCallback, BroadPhase {
     m_queryProxyId = NULL_PROXY;
   }
 
+  /** {@inheritDoc} */
   @Override
   public final int createProxy(final AABB aabb, Object userData) {
     int proxyId = m_tree.createProxy(aabb, userData);
@@ -82,6 +89,7 @@ public class DefaultBroadPhaseBuffer implements TreeCallback, BroadPhase {
     return proxyId;
   }
 
+  /** {@inheritDoc} */
   @Override
   public final void destroyProxy(int proxyId) {
     unbufferMove(proxyId);
@@ -89,6 +97,7 @@ public class DefaultBroadPhaseBuffer implements TreeCallback, BroadPhase {
     m_tree.destroyProxy(proxyId);
   }
 
+  /** {@inheritDoc} */
   @Override
   public final void moveProxy(int proxyId, final AABB aabb, final float2 displacement) {
     boolean buffer = m_tree.moveProxy(proxyId, aabb, displacement);
@@ -97,21 +106,25 @@ public class DefaultBroadPhaseBuffer implements TreeCallback, BroadPhase {
     }
   }
 
+  /** {@inheritDoc} */
   @Override
   public void touchProxy(int proxyId) {
     bufferMove(proxyId);
   }
 
+  /** {@inheritDoc} */
   @Override
   public Object getUserData(int proxyId) {
     return m_tree.getUserData(proxyId);
   }
 
+  /** {@inheritDoc} */
   @Override
   public AABB getFatAABB(int proxyId) {
     return m_tree.getFatAABB(proxyId);
   }
 
+  /** {@inheritDoc} */
   @Override
   public boolean testOverlap(int proxyIdA, int proxyIdB) {
     // return AABB.testOverlap(proxyA.aabb, proxyB.aabb);
@@ -129,16 +142,19 @@ public class DefaultBroadPhaseBuffer implements TreeCallback, BroadPhase {
     return true;
   }
 
+  /** {@inheritDoc} */
   @Override
   public final int getProxyCount() {
     return m_proxyCount;
   }
 
+  /** {@inheritDoc} */
   @Override
   public void drawTree(DebugDraw argDraw) {
     m_tree.drawTree(argDraw);
   }
 
+  /** {@inheritDoc} */
   @Override
   public final void updatePairs(PairCallback callback) {
     // Reset pair buffer
@@ -189,31 +205,41 @@ public class DefaultBroadPhaseBuffer implements TreeCallback, BroadPhase {
     }
   }
 
+  /** {@inheritDoc} */
   @Override
   public final void query(final TreeCallback callback, final AABB aabb) {
     m_tree.query(callback, aabb);
   }
 
+  /** {@inheritDoc} */
   @Override
   public final void raycast(final TreeRayCastCallback callback, final RayCastInput input) {
     m_tree.raycast(callback, input);
   }
 
+  /** {@inheritDoc} */
   @Override
   public final int getTreeHeight() {
     return m_tree.getHeight();
   }
 
+  /** {@inheritDoc} */
   @Override
   public int getTreeBalance() {
     return m_tree.getMaxBalance();
   }
 
+  /** {@inheritDoc} */
   @Override
   public float getTreeQuality() {
     return m_tree.getAreaRatio();
   }
 
+  /**
+   * <p>bufferMove.</p>
+   *
+   * @param proxyId a int
+   */
   protected final void bufferMove(int proxyId) {
     if (m_moveCount == m_moveCapacity) {
       int[] old = m_moveBuffer;
@@ -226,6 +252,11 @@ public class DefaultBroadPhaseBuffer implements TreeCallback, BroadPhase {
     ++m_moveCount;
   }
 
+  /**
+   * <p>unbufferMove.</p>
+   *
+   * @param proxyId a int
+   */
   protected final void unbufferMove(int proxyId) {
     for (int i = 0; i < m_moveCount; i++) {
       if (m_moveBuffer[i] == proxyId) {
@@ -235,6 +266,8 @@ public class DefaultBroadPhaseBuffer implements TreeCallback, BroadPhase {
   }
 
   /**
+   * {@inheritDoc}
+   *
    * This is called from DynamicTree::query when we are gathering pairs.
    */
   public final boolean treeCallback(int proxyId) {

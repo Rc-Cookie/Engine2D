@@ -34,9 +34,16 @@ import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Settings;
 import com.github.rccookie.geometry.performance.float2;
 
+/**
+ * <p>DynamicTreeFlatNodes class.</p>
+ *
+ */
 public class DynamicTreeFlatNodes implements BroadPhaseStrategy {
+  /** Constant <code>MAX_STACK_SIZE=64</code> */
   public static final int MAX_STACK_SIZE = 64;
+  /** Constant <code>NULL_NODE=-1</code> */
   public static final int NULL_NODE = -1;
+  /** Constant <code>INITIAL_BUFFER_LENGTH=16</code> */
   public static final int INITIAL_BUFFER_LENGTH = 16;
 
   public int m_root;
@@ -54,6 +61,9 @@ public class DynamicTreeFlatNodes implements BroadPhaseStrategy {
 
   private final float2[] drawVecs = new float2[4];
 
+  /**
+   * <p>Constructor for DynamicTreeFlatNodes.</p>
+   */
   public DynamicTreeFlatNodes() {
     m_root = NULL_NODE;
     m_nodeCount = 0;
@@ -84,6 +94,7 @@ public class DynamicTreeFlatNodes implements BroadPhaseStrategy {
     m_freeList = oldSize;
   }
 
+  /** {@inheritDoc} */
   @Override
   public final int createProxy(final AABB aabb, Object userData) {
     final int node = allocateNode();
@@ -100,6 +111,7 @@ public class DynamicTreeFlatNodes implements BroadPhaseStrategy {
     return node;
   }
 
+  /** {@inheritDoc} */
   @Override
   public final void destroyProxy(int proxyId) {
     assert (0 <= proxyId && proxyId < m_nodeCapacity);
@@ -109,6 +121,7 @@ public class DynamicTreeFlatNodes implements BroadPhaseStrategy {
     freeNode(proxyId);
   }
 
+  /** {@inheritDoc} */
   @Override
   public final boolean moveProxy(int proxyId, final AABB aabb, float2 displacement) {
     assert (0 <= proxyId && proxyId < m_nodeCapacity);
@@ -151,12 +164,14 @@ public class DynamicTreeFlatNodes implements BroadPhaseStrategy {
     return true;
   }
 
+  /** {@inheritDoc} */
   @Override
   public final Object getUserData(int proxyId) {
     assert (0 <= proxyId && proxyId < m_nodeCount);
     return m_userData[proxyId];
   }
 
+  /** {@inheritDoc} */
   @Override
   public final AABB getFatAABB(int proxyId) {
     assert (0 <= proxyId && proxyId < m_nodeCount);
@@ -166,6 +181,7 @@ public class DynamicTreeFlatNodes implements BroadPhaseStrategy {
   private int[] nodeStack = new int[20];
   private int nodeStackIndex;
 
+  /** {@inheritDoc} */
   @Override
   public final void query(TreeCallback callback, AABB aabb) {
     nodeStackIndex = 0;
@@ -200,6 +216,7 @@ public class DynamicTreeFlatNodes implements BroadPhaseStrategy {
   private final AABB aabb = new AABB();
   private final RayCastInput subInput = new RayCastInput();
 
+  /** {@inheritDoc} */
   @Override
   public void raycast(TreeRayCastCallback callback, RayCastInput input) {
     final float2 p1 = input.p1;
@@ -307,6 +324,7 @@ public class DynamicTreeFlatNodes implements BroadPhaseStrategy {
     }
   }
 
+  /** {@inheritDoc} */
   @Override
   public final int computeHeight() {
     return computeHeight(m_root);
@@ -342,6 +360,7 @@ public class DynamicTreeFlatNodes implements BroadPhaseStrategy {
     assert (m_nodeCount + freeCount == m_nodeCapacity);
   }
 
+  /** {@inheritDoc} */
   @Override
   public int getHeight() {
     if (m_root == NULL_NODE) {
@@ -350,6 +369,7 @@ public class DynamicTreeFlatNodes implements BroadPhaseStrategy {
     return m_height[m_root];
   }
 
+  /** {@inheritDoc} */
   @Override
   public int getMaxBalance() {
     int maxBalance = 0;
@@ -369,6 +389,7 @@ public class DynamicTreeFlatNodes implements BroadPhaseStrategy {
     return maxBalance;
   }
 
+  /** {@inheritDoc} */
   @Override
   public float getAreaRatio() {
     if (m_root == NULL_NODE) {
@@ -839,6 +860,7 @@ public class DynamicTreeFlatNodes implements BroadPhaseStrategy {
     validateMetrics(child2);
   }
 
+  /** {@inheritDoc} */
   @Override
   public void drawTree(DebugDraw argDraw) {
     if (m_root == NULL_NODE) {
@@ -851,6 +873,14 @@ public class DynamicTreeFlatNodes implements BroadPhaseStrategy {
   private final Color3f color = new Color3f();
   private final float2 textVec = new float2();
 
+  /**
+   * <p>drawTree.</p>
+   *
+   * @param argDraw a {@link org.jbox2d.callbacks.DebugDraw} object
+   * @param node a int
+   * @param spot a int
+   * @param height a int
+   */
   public void drawTree(DebugDraw argDraw, int node, int spot, int height) {
     AABB a = m_aabb[node];
     a.getVertices(drawVecs);

@@ -75,7 +75,7 @@ public class ValueInputField<T> extends TextInputField {
      */
     public T getValue() {
         if(!hasLast)
-            setText(writer.toString());
+            setValue0(writer.toString());//setText(writer.toString());
         return lastResult;
     }
 

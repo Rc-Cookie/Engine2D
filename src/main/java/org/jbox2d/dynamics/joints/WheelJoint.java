@@ -52,8 +52,9 @@ import org.jbox2d.pooling.IWorldPool;
  * bodyA and rotation in the plane. You can use a joint limit to restrict the range of motion and a
  * joint motor to drive the rotation or to model rotational friction. This joint is designed for
  * vehicle suspensions.
- * 
+ *
  * @author Daniel Murphy
+ * @version $Id: $Id
  */
 public class WheelJoint extends Joint {
 
@@ -96,6 +97,12 @@ public class WheelJoint extends Joint {
   private float m_bias;
   private float m_gamma;
 
+  /**
+   * <p>Constructor for WheelJoint.</p>
+   *
+   * @param argPool a {@link org.jbox2d.pooling.IWorldPool} object
+   * @param def a {@link org.jbox2d.dynamics.joints.WheelJointDef} object
+   */
   protected WheelJoint(IWorldPool argPool, WheelJointDef def) {
     super(argPool, def);
     m_localAnchorA.set(def.localAnchorA);
@@ -115,24 +122,37 @@ public class WheelJoint extends Joint {
     m_dampingRatio = def.dampingRatio;
   }
 
+  /**
+   * <p>getLocalAnchorA.</p>
+   *
+   * @return a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public float2 getLocalAnchorA() {
     return m_localAnchorA;
   }
 
+  /**
+   * <p>getLocalAnchorB.</p>
+   *
+   * @return a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public float2 getLocalAnchorB() {
     return m_localAnchorB;
   }
 
+  /** {@inheritDoc} */
   @Override
   public void getAnchorA(float2 argOut) {
     m_bodyA.getWorldPointToOut(m_localAnchorA, argOut);
   }
 
+  /** {@inheritDoc} */
   @Override
   public void getAnchorB(float2 argOut) {
     m_bodyB.getWorldPointToOut(m_localAnchorB, argOut);
   }
 
+  /** {@inheritDoc} */
   @Override
   public void getReactionForce(float inv_dt, float2 argOut) {
     final float2 temp = pool.popVec2();
@@ -141,11 +161,17 @@ public class WheelJoint extends Joint {
     pool.pushVec2(1);
   }
 
+  /** {@inheritDoc} */
   @Override
   public float getReactionTorque(float inv_dt) {
     return inv_dt * m_motorImpulse;
   }
 
+  /**
+   * <p>getJointTranslation.</p>
+   *
+   * @return a float
+   */
   public float getJointTranslation() {
     Body b1 = m_bodyA;
     Body b2 = m_bodyB;
@@ -163,61 +189,126 @@ public class WheelJoint extends Joint {
     return translation;
   }
 
-  /** For serialization */
+  /**
+   * For serialization
+   *
+   * @return a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public float2 getLocalAxisA() {
     return m_localXAxisA;
   }
 
+  /**
+   * <p>getJointSpeed.</p>
+   *
+   * @return a float
+   */
   public float getJointSpeed() {
     return m_bodyA.m_angularVelocity - m_bodyB.m_angularVelocity;
   }
 
+  /**
+   * <p>isMotorEnabled.</p>
+   *
+   * @return a boolean
+   */
   public boolean isMotorEnabled() {
     return m_enableMotor;
   }
 
+  /**
+   * <p>enableMotor.</p>
+   *
+   * @param flag a boolean
+   */
   public void enableMotor(boolean flag) {
     m_bodyA.setAwake(true);
     m_bodyB.setAwake(true);
     m_enableMotor = flag;
   }
 
+  /**
+   * <p>setMotorSpeed.</p>
+   *
+   * @param speed a float
+   */
   public void setMotorSpeed(float speed) {
     m_bodyA.setAwake(true);
     m_bodyB.setAwake(true);
     m_motorSpeed = speed;
   }
 
+  /**
+   * <p>getMotorSpeed.</p>
+   *
+   * @return a float
+   */
   public float getMotorSpeed() {
     return m_motorSpeed;
   }
 
+  /**
+   * <p>getMaxMotorTorque.</p>
+   *
+   * @return a float
+   */
   public float getMaxMotorTorque() {
     return m_maxMotorTorque;
   }
 
+  /**
+   * <p>setMaxMotorTorque.</p>
+   *
+   * @param torque a float
+   */
   public void setMaxMotorTorque(float torque) {
     m_bodyA.setAwake(true);
     m_bodyB.setAwake(true);
     m_maxMotorTorque = torque;
   }
 
+  /**
+   * <p>getMotorTorque.</p>
+   *
+   * @param inv_dt a float
+   * @return a float
+   */
   public float getMotorTorque(float inv_dt) {
     return m_motorImpulse * inv_dt;
   }
 
+  /**
+   * <p>setSpringFrequencyHz.</p>
+   *
+   * @param hz a float
+   */
   public void setSpringFrequencyHz(float hz) {
     m_frequencyHz = hz;
   }
 
+  /**
+   * <p>getSpringFrequencyHz.</p>
+   *
+   * @return a float
+   */
   public float getSpringFrequencyHz() {
     return m_frequencyHz;
   }
 
+  /**
+   * <p>setSpringDampingRatio.</p>
+   *
+   * @param ratio a float
+   */
   public void setSpringDampingRatio(float ratio) {
     m_dampingRatio = ratio;
   }
 
+  /**
+   * <p>getSpringDampingRatio.</p>
+   *
+   * @return a float
+   */
   public float getSpringDampingRatio() {
     return m_dampingRatio;
   }
@@ -227,6 +318,7 @@ public class WheelJoint extends Joint {
   private final float2 rB = new float2();
   private final float2 d = new float2();
 
+  /** {@inheritDoc} */
   @Override
   public void initVelocityConstraints(SolverData data) {
     m_indexA = m_bodyA.m_islandIndex;
@@ -364,6 +456,7 @@ public class WheelJoint extends Joint {
     data.velocities[m_indexB].w = wB;
   }
 
+  /** {@inheritDoc} */
   @Override
   public void solveVelocityConstraints(SolverData data) {
     float mA = m_invMassA, mB = m_invMassB;
@@ -438,6 +531,7 @@ public class WheelJoint extends Joint {
     data.velocities[m_indexB].w = wB;
   }
 
+  /** {@inheritDoc} */
   @Override
   public boolean solvePositionConstraints(SolverData data) {
     float2 cA = data.positions[m_indexA].c;

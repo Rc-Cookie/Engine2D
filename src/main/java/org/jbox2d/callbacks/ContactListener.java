@@ -36,21 +36,23 @@ import org.jbox2d.dynamics.contacts.Contact;
  * single time step.
  * You should strive to make your callbacks efficient because there may be
  * many callbacks per time step.
- * @warning You cannot create/destroy Box2D entities inside these callbacks.
- * @author Daniel Murphy
  *
+ * @author Daniel Murphy
+ * @version $Id: $Id
  */
 public interface ContactListener {
 
 	/**
 	 * Called when two fixtures begin to touch.
-	 * @param contact
+	 *
+	 * @param contact a {@link org.jbox2d.dynamics.contacts.Contact} object
 	 */
 	public void beginContact(Contact contact);
 	
 	/**
 	 * Called when two fixtures cease to touch.
-	 * @param contact
+	 *
+	 * @param contact a {@link org.jbox2d.dynamics.contacts.Contact} object
 	 */
 	public void endContact(Contact contact);
 	
@@ -67,8 +69,9 @@ public interface ContactListener {
 	 * the next step.
 	 * Note: the oldManifold parameter is pooled, so it will be the same object for every callback
 	 * for each thread.
-	 * @param contact
-	 * @param oldManifold
+	 *
+	 * @param contact a {@link org.jbox2d.dynamics.contacts.Contact} object
+	 * @param oldManifold a {@link org.jbox2d.collision.Manifold} object
 	 */
 	public void preSolve(Contact contact, Manifold oldManifold);
 	
@@ -79,7 +82,8 @@ public interface ContactListener {
 	 * arbitrarily large if the sub-step is small. Hence the impulse is provided explicitly
 	 * in a separate data structure.
 	 * Note: this is only called for contacts that are touching, solid, and awake.
-	 * @param contact
+	 *
+	 * @param contact a {@link org.jbox2d.dynamics.contacts.Contact} object
 	 * @param impulse this is usually a pooled variable, so it will be modified after
 	 * this call
 	 */

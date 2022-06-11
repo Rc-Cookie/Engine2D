@@ -2,6 +2,7 @@ package com.github.rccookie.engine2d.ui.debug;
 
 import com.github.rccookie.engine2d.*;
 import com.github.rccookie.engine2d.core.stats.PerformanceStats;
+import com.github.rccookie.engine2d.image.Color;
 import com.github.rccookie.engine2d.ui.ColorPanel;
 import com.github.rccookie.engine2d.ui.KeyValueText;
 import com.github.rccookie.engine2d.ui.SimpleList;
@@ -33,8 +34,7 @@ public class DebugPanel extends ColorPanel {
 
         SimpleList list = new SimpleList(this, true);
         list.setOutsideGap(false);
-
-        // TODO: Add UI update time
+        list.relativeLoc.x = -1;
 
         new FpsDisplay(list);
         new AutoRefreshText(list, () -> {

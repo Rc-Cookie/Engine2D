@@ -9,8 +9,8 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import com.github.rccookie.engine2d.Color;
-import com.github.rccookie.engine2d.Image;
+import com.github.rccookie.engine2d.image.Color;
+import com.github.rccookie.engine2d.image.Image;
 import com.github.rccookie.engine2d.impl.ImageImpl;
 import com.github.rccookie.engine2d.util.RuntimeIOException;
 import com.github.rccookie.geometry.performance.int2;
@@ -51,8 +51,9 @@ public class AWTImageImpl implements ImageImpl {
     public AWTImageImpl(String file) throws RuntimeIOException {
         BufferedImage loaded;
         try {
-            loaded = ImageIO.read(new File(file));
-        } catch (IOException e) { throw new RuntimeIOException(e); }
+            //noinspection ConstantConditions
+            loaded = ImageIO.read(new File(getClass().getClassLoader().getResource(file).getFile()));
+        } catch (NullPointerException | IOException e) { throw new RuntimeIOException(e); }
 
         image = new BufferedImage(loaded.getWidth(), loaded.getHeight(), BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = image.createGraphics();
@@ -98,18 +99,18 @@ public class AWTImageImpl implements ImageImpl {
     }
 
     @Override
-    public void fillOval(int2 center, int2 size, Color color) {
+    public void fillOval(int2 topLeft, int2 size, Color color) {
         Graphics2D g = image.createGraphics();
         g.setColor(color.getAwtColor());
-        g.fillOval(center.x - size.x / 2, center.y - size.y / 2, size.x, size.y);
+        g.fillOval(topLeft.x, topLeft.y, size.x-1, size.y-1);
         g.dispose();
     }
 
     @Override
-    public void drawOval(int2 center, int2 size, Color color) {
+    public void drawOval(int2 topLeft, int2 size, Color color) {
         Graphics2D g = image.createGraphics();
         g.setColor(color.getAwtColor());
-        g.drawOval(center.x - size.x / 2, center.y - size.y / 2, size.x, size.y);
+        g.drawOval(topLeft.x, topLeft.y, size.x-1, size.y-1);
         g.dispose();
     }
 
@@ -123,7 +124,7 @@ public class AWTImageImpl implements ImageImpl {
 
     @Override
     public void setPixel(int2 location, Color color) {
-        image.setRGB(location.x, location.y, color.getRGB());
+        image.setRGB(location.x, location.y, color.rgb);
     }
 
     @Override

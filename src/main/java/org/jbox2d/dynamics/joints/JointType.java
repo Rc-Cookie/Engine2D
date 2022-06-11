@@ -23,6 +23,10 @@
  ******************************************************************************/
 package org.jbox2d.dynamics.joints;
 
+/**
+ * <p>JointType class.</p>
+ *
+ */
 public enum JointType {
   UNKNOWN, REVOLUTE, PRISMATIC, DISTANCE, PULLEY, MOUSE, GEAR, WHEEL, WELD, FRICTION, ROPE, CONSTANT_VOLUME, MOTOR
 }

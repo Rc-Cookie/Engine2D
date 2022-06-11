@@ -33,16 +33,19 @@ import org.jbox2d.dynamics.Fixture;
 /**
  * Implement this class to provide collision filtering. In other words, you can implement
  * this class if you want finer control over contact creation.
+ *
  * @author Daniel Murphy
+ * @version $Id: $Id
  */
 public class ContactFilter {
 
 	/**
 	 * Return true if contact calculations should be performed between these two shapes.
-	 * @warning for performance reasons this is only called when the AABBs begin to overlap.
-	 * @param fixtureA
-	 * @param fixtureB
-	 * @return
+	 *
+	 *
+	 * @param fixtureA a {@link org.jbox2d.dynamics.Fixture} object
+	 * @param fixtureB a {@link org.jbox2d.dynamics.Fixture} object
+	 * @return a boolean
 	 */
 	public boolean shouldCollide(Fixture fixtureA, Fixture fixtureB){
 		Filter filterA = fixtureA.getFilterData();

@@ -31,6 +31,7 @@ import java.io.Serializable;
  * This describes the motion of a body/shape for TOI computation. Shapes are defined with respect to
  * the body origin, which may not coincide with the center of mass. However, to support dynamics we
  * must interpolate the center of mass position.
+ *
  */
 public class Sweep implements Serializable {
   private static final long serialVersionUID = 1L;
@@ -45,6 +46,11 @@ public class Sweep implements Serializable {
   /** Fraction of the current time step in the range [0,1] c0 and a0 are the positions at alpha0. */
   public float alpha0;
 
+  /**
+   * <p>toString.</p>
+   *
+   * @return a {@link java.lang.String} object
+   */
   public String toString() {
     String s = "Sweep:\nlocalCenter: " + localCenter + "\n";
     s += "c0: " + c0 + ", c: " + c + "\n";
@@ -53,18 +59,30 @@ public class Sweep implements Serializable {
     return s;
   }
 
+  /**
+   * <p>Constructor for Sweep.</p>
+   */
   public Sweep() {
     localCenter = new float2();
     c0 = new float2();
     c = new float2();
   }
 
+  /**
+   * <p>normalize.</p>
+   */
   public final void normalize() {
     float d = MathUtils.TWOPI * MathUtils.floor(a0 / MathUtils.TWOPI);
     a0 -= d;
     a -= d;
   }
 
+  /**
+   * <p>set.</p>
+   *
+   * @param other a {@link org.jbox2d.common.Sweep} object
+   * @return a {@link org.jbox2d.common.Sweep} object
+   */
   public final Sweep set(Sweep other) {
     localCenter.set(other.localCenter);
     c0.set(other.c0);
@@ -77,9 +95,9 @@ public class Sweep implements Serializable {
 
   /**
    * Get the interpolated transform at a specific time.
-   * 
+   *
    * @param xf the result is placed here - must not be null
-   * @param t the normalized time in [0,1].
+   * @param beta a float
    */
   public final void getTransform(final Transform xf, final float beta) {
     assert (xf != null);
@@ -100,7 +118,7 @@ public class Sweep implements Serializable {
 
   /**
    * Advance the sweep forward, yielding a new initial state.
-   * 
+   *
    * @param alpha the new initial time.
    */
   public final void advance(final float alpha) {

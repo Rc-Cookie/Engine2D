@@ -1,6 +1,6 @@
 package com.github.rccookie.engine2d.ui;
 
-import com.github.rccookie.engine2d.Image;
+import com.github.rccookie.engine2d.image.Image;
 import com.github.rccookie.engine2d.UIObject;
 
 import org.jetbrains.annotations.Nullable;
@@ -25,6 +25,7 @@ public class IconPanel extends UIObject {
     public IconPanel(UIObject parent, @Nullable Image icon) {
         super(parent);
         this.icon = icon;
+        setFocusable(false);
     }
 
     @Override

@@ -4,6 +4,10 @@ import org.jbox2d.common.MathUtils;
 import com.github.rccookie.geometry.performance.float2;
 import org.jbox2d.pooling.normal.MutableStack;
 
+/**
+ * <p>VoronoiDiagram class.</p>
+ *
+ */
 public class VoronoiDiagram {
   public static class Generator {
     final float2 center = new float2();
@@ -41,6 +45,11 @@ public class VoronoiDiagram {
   // The diagram is an array of "pointers".
   private Generator[] m_diagram;
 
+  /**
+   * <p>Constructor for VoronoiDiagram.</p>
+   *
+   * @param generatorCapacity a int
+   */
   public VoronoiDiagram(int generatorCapacity) {
     m_generatorBuffer = new Generator[generatorCapacity];
     for (int i = 0; i < generatorCapacity; i++) {
@@ -52,6 +61,11 @@ public class VoronoiDiagram {
     m_diagram = null;
   }
 
+  /**
+   * <p>getNodes.</p>
+   *
+   * @param callback a {@link org.jbox2d.particle.VoronoiDiagram.VoronoiDiagramCallback} object
+   */
   public void getNodes(VoronoiDiagramCallback callback) {
     for (int y = 0; y < m_countY - 1; y++) {
       for (int x = 0; x < m_countX - 1; x++) {
@@ -72,6 +86,12 @@ public class VoronoiDiagram {
     }
   }
 
+  /**
+   * <p>addGenerator.</p>
+   *
+   * @param center a {@link com.github.rccookie.geometry.performance.float2} object
+   * @param tag a int
+   */
   public void addGenerator(float2 center, int tag) {
     Generator g = m_generatorBuffer[m_generatorCount++];
     g.center.x = center.x;
@@ -95,6 +115,11 @@ public class VoronoiDiagram {
       };
   private final StackQueue<VoronoiDiagramTask> queue = new StackQueue<VoronoiDiagramTask>();
 
+  /**
+   * <p>generate.</p>
+   *
+   * @param radius a float
+   */
   public void generate(float radius) {
     assert (m_diagram == null);
     float inverseRadius = 1 / radius;

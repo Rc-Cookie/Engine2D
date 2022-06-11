@@ -2,10 +2,13 @@ package com.github.rccookie.engine2d.ui;
 
 import java.util.function.UnaryOperator;
 
-import com.github.rccookie.engine2d.Color;
-import com.github.rccookie.engine2d.Image;
+import com.github.rccookie.engine2d.image.Color;
+import com.github.rccookie.engine2d.image.Image;
 import com.github.rccookie.engine2d.UIObject;
+import com.github.rccookie.engine2d.image.Theme;
+import com.github.rccookie.engine2d.image.ThemeColor;
 import com.github.rccookie.engine2d.ui.util.TypeWriter;
+import com.github.rccookie.engine2d.util.ColorProperty;
 import com.github.rccookie.event.ParamEvent;
 import com.github.rccookie.geometry.performance.int2;
 import com.github.rccookie.util.Arguments;
@@ -44,13 +47,11 @@ public class TextInputField extends TextButton {
     /**
      * The color of the cursor.
      */
-    @NotNull
-    private ThemeColor cursorColor = t -> t.first.getComplement();
+    public final ColorProperty cursorColor = new ColorProperty(this, ThemeColor.FIRST.complement());
     /**
      * The color of the selection overlay.
      */
-    @NotNull
-    private ThemeColor selectionColor = ThemeColor.TEXT_ACCENT;
+    public final ColorProperty selectionColor = new ColorProperty(this, ThemeColor.TEXT_ACCENT);
     /**
      * Whether the default text should be grayed out.
      */
@@ -107,11 +108,13 @@ public class TextInputField extends TextButton {
         writer.onChange.add(this::modified);
 
         input.mousePressed.addConsuming(() -> setFocus(containsMouse(true), true));
+        onClick.add(() -> setFocus(true, true));
         input.addKeyPressListener(writer.onSubmit::invoke, "esc");
         input.keyPressed.addConsuming(k -> {
             if(hasFocus) return writer.keyTyped(k);
             return false;
         });
+        onEnable.add(e -> { if(!e) setFocus(false); });
 
         onType = writer.onChange;
         onSubmit = writer.onSubmit;
@@ -126,26 +129,6 @@ public class TextInputField extends TextButton {
      */
     public String getText() {
         return text.getText();
-    }
-
-    /**
-     * Returns the current cursor color.
-     *
-     * @return The current cursor color
-     */
-    @NotNull
-    public ThemeColor getCursorColor() {
-        return cursorColor;
-    }
-
-    /**
-     * Returns the current selection overlay color.
-     *
-     * @return The current selection color
-     */
-    @NotNull
-    public ThemeColor getSelectionColor() {
-        return selectionColor;
     }
 
     /**
@@ -174,29 +157,6 @@ public class TextInputField extends TextButton {
     @NotNull
     public String getDefaultString() {
         return defaultString;
-    }
-
-    /**
-     * Sets the cursor color to the specified color.
-     *
-     * @param cursorColor The color to use
-     */
-    public void setCursorColor(@NotNull ThemeColor cursorColor) {
-        if(this.cursorColor == Arguments.checkNull(cursorColor)) return;
-        this.cursorColor = cursorColor;
-        if(hasFocus) modified();
-    }
-
-    /**
-     * Sets the selection overlay color to the specified color. The color should
-     * be reasonably transparent.
-     *
-     * @param selectionColor The color to use
-     */
-    public void setSelectionColor(@NotNull ThemeColor selectionColor) {
-        if(this.selectionColor == Arguments.checkNull(selectionColor)) return;
-        this.selectionColor = selectionColor;
-        if(hasFocus && writer.hasSelection()) modified();
     }
 
     /**
@@ -268,7 +228,7 @@ public class TextInputField extends TextButton {
         text.setText(string);
         int charCount = string.length();
         Theme theme = getTheme();
-        Color textColor = text.getColor().get(theme);
+        Color textColor = text.color.get(theme);
 
         if(!hasFocus) {
             if(grayDefault && defaultString.equals(string))
@@ -277,36 +237,36 @@ public class TextInputField extends TextButton {
         }
 
         Image textImage;
-        Color cursorColor = this.cursorColor.get(theme);
+        Color cursorColor = this.cursorColor.get();
         int cursor = writer.getCursor();
         if(writer.hasSelection()) {
             int2 selection = writer.getSelection();
             if(selection.x == 0) {
                 if(selection.y == charCount) {
                     textImage = getPartialTextImage(0, charCount, textColor);
-                    textImage.fillRect(cursor == 0 ? int2.ZERO : new int2(textImage.size.x - CURSOR_WIDTH, 0),
+                    textImage.fillRect(cursor == 0 ? int2.zero : new int2(textImage.size.x - CURSOR_WIDTH, 0),
                             new int2(CURSOR_WIDTH, textImage.size.y), cursorColor);
-                    textImage.fill(selectionColor.get(theme).setAlpha(SELECTION_ALPHA));
+                    textImage.fill(selectionColor.get().setAlpha(SELECTION_ALPHA));
                 }
                 else {
                     Image selected = getPartialTextImage(0, selection.y, textColor),
                             other = getPartialTextImage(selection.y, charCount, textColor);
                     textImage = new Image(selected.size.added(other.size.x, 0));
 
-                    textImage.drawImage(selected, int2.ZERO);
+                    textImage.drawImage(selected, int2.zero);
                     textImage.drawImage(other, new int2(selected.size.x, 0));
 
                     textImage.fillRect(new int2((cursor == selection.x ? 0 : selected.size.x) - CURSOR_WIDTH / 2, 0),
                             new int2(CURSOR_WIDTH, textImage.size.y), cursorColor);
 
-                    textImage.fillRect(int2.ZERO, selected.size, selectionColor.get(theme).setAlpha(SELECTION_ALPHA));
+                    textImage.fillRect(int2.zero, selected.size, selectionColor.get(theme).setAlpha(SELECTION_ALPHA));
                 }
             } else if(selection.y == charCount) {
                 Image other = getPartialTextImage(0, selection.x, textColor),
                         selected = getPartialTextImage(selection.x, charCount, textColor);
                 textImage = new Image(selected.size.added(other.size.x, 0));
 
-                textImage.drawImage(other, int2.ZERO);
+                textImage.drawImage(other, int2.zero);
                 textImage.drawImage(selected, new int2(other.size.x, 0));
 
                 textImage.fillRect(new int2(other.size.x + (cursor == selection.x ? 0 : selected.size.x) - CURSOR_WIDTH / 2, 0),
@@ -319,7 +279,7 @@ public class TextInputField extends TextButton {
                         second = getPartialTextImage(selection.y, charCount, textColor);
                 textImage = new Image(first.size.added(selected.size.x + second.size.x, 0));
 
-                textImage.drawImage(first, int2.ZERO);
+                textImage.drawImage(first, int2.zero);
                 textImage.drawImage(selected, new int2(first.size.x, 0));
                 textImage.drawImage(second, new int2(first.size.x + selected.size.x, 0));
 
@@ -332,14 +292,14 @@ public class TextInputField extends TextButton {
         else {
             if(cursor == 0 || cursor == charCount) {
                 textImage = getPartialTextImage(0, charCount, textColor); // Don't modify the internal instance
-                textImage.fillRect(cursor == 0 ? int2.ZERO : new int2(textImage.size.x - CURSOR_WIDTH, 0),
+                textImage.fillRect(cursor == 0 ? int2.zero : new int2(textImage.size.x - CURSOR_WIDTH, 0),
                         new int2(CURSOR_WIDTH, textImage.size.y), cursorColor);
             }
             else {
                 Image first = getPartialTextImage(0, cursor, textColor), second = getPartialTextImage(cursor, charCount, textColor);
                 textImage = new Image(first.size.added(second.size.x, 0));
 
-                textImage.drawImage(first, int2.ZERO);
+                textImage.drawImage(first, int2.zero);
                 textImage.drawImage(second, new int2(first.size.x, 0));
 
                 textImage.fillRect(new int2(first.size.x - CURSOR_WIDTH/2, 0), new int2(CURSOR_WIDTH, textImage.size.y), cursorColor);
@@ -349,7 +309,7 @@ public class TextInputField extends TextButton {
     }
 
     private Image getPartialTextImage(int start, int end, Color textColor) {
-        return Image.text(text.getText().substring(start, end), text.getFontSize(), textColor);
+        return text.getFont().render(text.getText().substring(start, end), textColor);
     }
 
     /**
@@ -359,10 +319,11 @@ public class TextInputField extends TextButton {
      * @return A new image with background behind the text
      */
     protected Image renderBackground(@NotNull Image textImage) {
-        Image image = new Image(clampSize(textImage.size.added(getBorder().scale(2))), getBackgroundColor().get(getTheme()));
+        Image image = new Image(clampSize(textImage.size.added(getBorder().scale(2))), backgroundColor.get());
         image.drawImageCr(textImage, image.center.added(0, -2));
-        image.drawRect(int2.ZERO, image.size, Color.LIGHT_GRAY);
-        image.drawRect(int2.ONE, image.size.added(-2, -2), Color.LIGHT_GRAY);
+        Color border = borderColor.get();
+        image.drawRect(int2.zero, image.size, border);
+        image.drawRect(int2.one, image.size.added(-2, -2), border);
         return image;
     }
 }

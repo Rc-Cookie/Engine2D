@@ -29,13 +29,18 @@ import java.io.Serializable;
 
 /**
  * A 2-by-2 matrix. Stored in column-major order.
+ *
  */
 public class Mat22 implements Serializable {
   private static final long serialVersionUID = 2L;
 
   public final float2 ex, ey;
 
-  /** Convert the matrix to printable format. */
+  /**
+   * {@inheritDoc}
+   *
+   * Convert the matrix to printable format.
+   */
   @Override
   public String toString() {
     String s = "";
@@ -55,7 +60,7 @@ public class Mat22 implements Serializable {
 
   /**
    * Create a matrix with given vectors as columns.
-   * 
+   *
    * @param c1 Column 1 of matrix
    * @param c2 Column 2 of matrix
    */
@@ -66,11 +71,11 @@ public class Mat22 implements Serializable {
 
   /**
    * Create a matrix from four floats.
-   * 
-   * @param exx
-   * @param col2x
-   * @param exy
-   * @param col2y
+   *
+   * @param exx a float
+   * @param col2x a float
+   * @param exy a float
+   * @param col2y a float
    */
   public Mat22(final float exx, final float col2x, final float exy, final float col2y) {
     ex = new float2(exx, exy);
@@ -79,8 +84,9 @@ public class Mat22 implements Serializable {
 
   /**
    * Set as a copy of another matrix.
-   * 
+   *
    * @param m Matrix to copy
+   * @return a {@link org.jbox2d.common.Mat22} object
    */
   public final Mat22 set(final Mat22 m) {
     ex.x = m.ex.x;
@@ -90,6 +96,15 @@ public class Mat22 implements Serializable {
     return this;
   }
 
+  /**
+   * <p>set.</p>
+   *
+   * @param exx a float
+   * @param col2x a float
+   * @param exy a float
+   * @param col2y a float
+   * @return a {@link org.jbox2d.common.Mat22} object
+   */
   public final Mat22 set(final float exx, final float col2x, final float exy, final float col2y) {
     ex.x = exx;
     ex.y = exy;
@@ -100,6 +115,8 @@ public class Mat22 implements Serializable {
 
   /**
    * Return a clone of this matrix. djm fixed double allocation
+   *
+   * @return a {@link org.jbox2d.common.Mat22} object
    */
   // @Override // annotation omitted for GWT-compatibility
   public final Mat22 clone() {
@@ -108,7 +125,7 @@ public class Mat22 implements Serializable {
 
   /**
    * Set as a matrix representing a rotation.
-   * 
+   *
    * @param angle Rotation (in radians) that matrix represents.
    */
   public final void set(final float angle) {
@@ -141,8 +158,8 @@ public class Mat22 implements Serializable {
 
   /**
    * Extract the angle from this matrix (assumed to be a rotation matrix).
-   * 
-   * @return
+   *
+   * @return a float
    */
   public final float getAngle() {
     return MathUtils.atan2(ex.y, ex.x);
@@ -150,7 +167,7 @@ public class Mat22 implements Serializable {
 
   /**
    * Set by column vectors.
-   * 
+   *
    * @param c1 Column 1
    * @param c2 Column 2
    */
@@ -161,7 +178,11 @@ public class Mat22 implements Serializable {
     ey.y = c2.y;
   }
 
-  /** Returns the inverted Mat22 - does NOT invert the matrix locally! */
+  /**
+   * Returns the inverted Mat22 - does NOT invert the matrix locally!
+   *
+   * @return a {@link org.jbox2d.common.Mat22} object
+   */
   public final Mat22 invert() {
     final float a = ex.x, b = ey.x, c = ex.y, d = ey.y;
     final Mat22 B = new Mat22();
@@ -176,6 +197,11 @@ public class Mat22 implements Serializable {
     return B;
   }
 
+  /**
+   * <p>invertLocal.</p>
+   *
+   * @return a {@link org.jbox2d.common.Mat22} object
+   */
   public final Mat22 invertLocal() {
     final float a = ex.x, b = ey.x, c = ex.y, d = ey.y;
     float det = a * d - b * c;
@@ -189,6 +215,11 @@ public class Mat22 implements Serializable {
     return this;
   }
 
+  /**
+   * <p>invertToOut.</p>
+   *
+   * @param out a {@link org.jbox2d.common.Mat22} object
+   */
   public final void invertToOut(final Mat22 out) {
     final float a = ex.x, b = ey.x, c = ex.y, d = ey.y;
     float det = a * d - b * c;
@@ -204,7 +235,7 @@ public class Mat22 implements Serializable {
 
   /**
    * Return the matrix composed of the absolute values of all elements. djm: fixed double allocation
-   * 
+   *
    * @return Absolute value matrix
    */
   public final Mat22 abs() {
@@ -214,14 +245,21 @@ public class Mat22 implements Serializable {
 
   /**
    * Return the matrix composed of the absolute values of all elements.
-   * 
+   *
    * @return Absolute value matrix
+   * @param R a {@link org.jbox2d.common.Mat22} object
    */
   public final static Mat22 abs(final Mat22 R) {
     return R.abs();
   }
 
   /* djm created */
+  /**
+   * <p>absToOut.</p>
+   *
+   * @param R a {@link org.jbox2d.common.Mat22} object
+   * @param out a {@link org.jbox2d.common.Mat22} object
+   */
   public static void absToOut(final Mat22 R, final Mat22 out) {
     out.ex.x = MathUtils.abs(R.ex.x);
     out.ex.y = MathUtils.abs(R.ex.y);
@@ -231,7 +269,7 @@ public class Mat22 implements Serializable {
 
   /**
    * Multiply a vector by this matrix.
-   * 
+   *
    * @param v Vector to multiply by matrix.
    * @return Resulting vector
    */
@@ -239,12 +277,24 @@ public class Mat22 implements Serializable {
     return new float2(ex.x * v.x + ey.x * v.y, ex.y * v.x + ey.y * v.y);
   }
 
+  /**
+   * <p>mulToOut.</p>
+   *
+   * @param v a {@link com.github.rccookie.geometry.performance.float2} object
+   * @param out a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public final void mulToOut(final float2 v, final float2 out) {
     final float tempy = ex.y * v.x + ey.y * v.y;
     out.x = ex.x * v.x + ey.x * v.y;
     out.y = tempy;
   }
 
+  /**
+   * <p>mulToOutUnsafe.</p>
+   *
+   * @param v a {@link com.github.rccookie.geometry.performance.float2} object
+   * @param out a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public final void mulToOutUnsafe(final float2 v, final float2 out) {
     assert (v != out);
     out.x = ex.x * v.x + ey.x * v.y;
@@ -254,9 +304,9 @@ public class Mat22 implements Serializable {
 
   /**
    * Multiply another matrix by this one (this one on left). djm optimized
-   * 
-   * @param R
-   * @return
+   *
+   * @param R a {@link org.jbox2d.common.Mat22} object
+   * @return a {@link org.jbox2d.common.Mat22} object
    */
   public final Mat22 mul(final Mat22 R) {
     /*
@@ -271,11 +321,23 @@ public class Mat22 implements Serializable {
     return C;
   }
 
+  /**
+   * <p>mulLocal.</p>
+   *
+   * @param R a {@link org.jbox2d.common.Mat22} object
+   * @return a {@link org.jbox2d.common.Mat22} object
+   */
   public final Mat22 mulLocal(final Mat22 R) {
     mulToOut(R, this);
     return this;
   }
 
+  /**
+   * <p>mulToOut.</p>
+   *
+   * @param R a {@link org.jbox2d.common.Mat22} object
+   * @param out a {@link org.jbox2d.common.Mat22} object
+   */
   public final void mulToOut(final Mat22 R, final Mat22 out) {
     final float tempy1 = this.ex.y * R.ex.x + this.ey.y * R.ex.y;
     final float tempx1 = this.ex.x * R.ex.x + this.ey.x * R.ex.y;
@@ -287,6 +349,12 @@ public class Mat22 implements Serializable {
     out.ey.y = tempy2;
   }
 
+  /**
+   * <p>mulToOutUnsafe.</p>
+   *
+   * @param R a {@link org.jbox2d.common.Mat22} object
+   * @param out a {@link org.jbox2d.common.Mat22} object
+   */
   public final void mulToOutUnsafe(final Mat22 R, final Mat22 out) {
     assert (out != R);
     assert (out != this);
@@ -299,9 +367,9 @@ public class Mat22 implements Serializable {
   /**
    * Multiply another matrix by the transpose of this one (transpose of this one on left). djm:
    * optimized
-   * 
-   * @param B
-   * @return
+   *
+   * @param B a {@link org.jbox2d.common.Mat22} object
+   * @return a {@link org.jbox2d.common.Mat22} object
    */
   public final Mat22 mulTrans(final Mat22 B) {
     /*
@@ -319,11 +387,23 @@ public class Mat22 implements Serializable {
     return C;
   }
 
+  /**
+   * <p>mulTransLocal.</p>
+   *
+   * @param B a {@link org.jbox2d.common.Mat22} object
+   * @return a {@link org.jbox2d.common.Mat22} object
+   */
   public final Mat22 mulTransLocal(final Mat22 B) {
     mulTransToOut(B, this);
     return this;
   }
 
+  /**
+   * <p>mulTransToOut.</p>
+   *
+   * @param B a {@link org.jbox2d.common.Mat22} object
+   * @param out a {@link org.jbox2d.common.Mat22} object
+   */
   public final void mulTransToOut(final Mat22 B, final Mat22 out) {
     /*
      * out.ex.x = Vec2.dot(this.ex, B.ex); out.ex.y = Vec2.dot(this.ey, B.ex); out.ey.x =
@@ -339,6 +419,12 @@ public class Mat22 implements Serializable {
     out.ey.y = y2;
   }
 
+  /**
+   * <p>mulTransToOutUnsafe.</p>
+   *
+   * @param B a {@link org.jbox2d.common.Mat22} object
+   * @param out a {@link org.jbox2d.common.Mat22} object
+   */
   public final void mulTransToOutUnsafe(final Mat22 B, final Mat22 out) {
     assert (B != out);
     assert (this != out);
@@ -350,9 +436,9 @@ public class Mat22 implements Serializable {
 
   /**
    * Multiply a vector by the transpose of this matrix.
-   * 
-   * @param v
-   * @return
+   *
+   * @param v a {@link com.github.rccookie.geometry.performance.float2} object
+   * @return a {@link com.github.rccookie.geometry.performance.float2} object
    */
   public final float2 mulTrans(final float2 v) {
     // return new Vec2(Vec2.dot(v, ex), Vec2.dot(v, col2));
@@ -360,6 +446,12 @@ public class Mat22 implements Serializable {
   }
 
   /* djm added */
+  /**
+   * <p>mulTransToOut.</p>
+   *
+   * @param v a {@link com.github.rccookie.geometry.performance.float2} object
+   * @param out a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public final void mulTransToOut(final float2 v, final float2 out) {
     /*
      * out.x = Vec2.dot(v, ex); out.y = Vec2.dot(v, col2);
@@ -371,9 +463,9 @@ public class Mat22 implements Serializable {
 
   /**
    * Add this matrix to B, return the result.
-   * 
-   * @param B
-   * @return
+   *
+   * @param B a {@link org.jbox2d.common.Mat22} object
+   * @return a {@link org.jbox2d.common.Mat22} object
    */
   public final Mat22 add(final Mat22 B) {
     // return new Mat22(ex.add(B.ex), col2.add(B.ey));
@@ -387,9 +479,9 @@ public class Mat22 implements Serializable {
 
   /**
    * Add B to this matrix locally.
-   * 
-   * @param B
-   * @return
+   *
+   * @param B a {@link org.jbox2d.common.Mat22} object
+   * @return a {@link org.jbox2d.common.Mat22} object
    */
   public final Mat22 addLocal(final Mat22 B) {
     // ex.addLocal(B.ex);
@@ -403,8 +495,9 @@ public class Mat22 implements Serializable {
 
   /**
    * Solve A * x = b where A = this matrix.
-   * 
+   *
    * @return The vector x that solves the above equation.
+   * @param b a {@link com.github.rccookie.geometry.performance.float2} object
    */
   public final float2 solve(final float2 b) {
     final float a11 = ex.x, a12 = ey.x, a21 = ex.y, a22 = ey.y;
@@ -416,6 +509,12 @@ public class Mat22 implements Serializable {
     return x;
   }
 
+  /**
+   * <p>solveToOut.</p>
+   *
+   * @param b a {@link com.github.rccookie.geometry.performance.float2} object
+   * @param out a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public final void solveToOut(final float2 b, final float2 out) {
     final float a11 = ex.x, a12 = ey.x, a21 = ex.y, a22 = ey.y;
     float det = a11 * a22 - a12 * a21;
@@ -427,23 +526,51 @@ public class Mat22 implements Serializable {
     out.y = tempy;
   }
 
+  /**
+   * <p>mul.</p>
+   *
+   * @param R a {@link org.jbox2d.common.Mat22} object
+   * @param v a {@link com.github.rccookie.geometry.performance.float2} object
+   * @return a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public final static float2 mul(final Mat22 R, final float2 v) {
     // return R.mul(v);
     return new float2(R.ex.x * v.x + R.ey.x * v.y, R.ex.y * v.x + R.ey.y * v.y);
   }
 
+  /**
+   * <p>mulToOut.</p>
+   *
+   * @param R a {@link org.jbox2d.common.Mat22} object
+   * @param v a {@link com.github.rccookie.geometry.performance.float2} object
+   * @param out a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public final static void mulToOut(final Mat22 R, final float2 v, final float2 out) {
     final float tempy = R.ex.y * v.x + R.ey.y * v.y;
     out.x = R.ex.x * v.x + R.ey.x * v.y;
     out.y = tempy;
   }
 
+  /**
+   * <p>mulToOutUnsafe.</p>
+   *
+   * @param R a {@link org.jbox2d.common.Mat22} object
+   * @param v a {@link com.github.rccookie.geometry.performance.float2} object
+   * @param out a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public final static void mulToOutUnsafe(final Mat22 R, final float2 v, final float2 out) {
     assert (v != out);
     out.x = R.ex.x * v.x + R.ey.x * v.y;
     out.y = R.ex.y * v.x + R.ey.y * v.y;
   }
 
+  /**
+   * <p>mul.</p>
+   *
+   * @param A a {@link org.jbox2d.common.Mat22} object
+   * @param B a {@link org.jbox2d.common.Mat22} object
+   * @return a {@link org.jbox2d.common.Mat22} object
+   */
   public final static Mat22 mul(final Mat22 A, final Mat22 B) {
     // return A.mul(B);
     final Mat22 C = new Mat22();
@@ -454,6 +581,13 @@ public class Mat22 implements Serializable {
     return C;
   }
 
+  /**
+   * <p>mulToOut.</p>
+   *
+   * @param A a {@link org.jbox2d.common.Mat22} object
+   * @param B a {@link org.jbox2d.common.Mat22} object
+   * @param out a {@link org.jbox2d.common.Mat22} object
+   */
   public final static void mulToOut(final Mat22 A, final Mat22 B, final Mat22 out) {
     final float tempy1 = A.ex.y * B.ex.x + A.ey.y * B.ex.y;
     final float tempx1 = A.ex.x * B.ex.x + A.ey.x * B.ex.y;
@@ -465,6 +599,13 @@ public class Mat22 implements Serializable {
     out.ey.y = tempy2;
   }
 
+  /**
+   * <p>mulToOutUnsafe.</p>
+   *
+   * @param A a {@link org.jbox2d.common.Mat22} object
+   * @param B a {@link org.jbox2d.common.Mat22} object
+   * @param out a {@link org.jbox2d.common.Mat22} object
+   */
   public final static void mulToOutUnsafe(final Mat22 A, final Mat22 B, final Mat22 out) {
     assert (out != A);
     assert (out != B);
@@ -474,22 +615,50 @@ public class Mat22 implements Serializable {
     out.ey.y = A.ex.y * B.ey.x + A.ey.y * B.ey.y;
   }
 
+  /**
+   * <p>mulTrans.</p>
+   *
+   * @param R a {@link org.jbox2d.common.Mat22} object
+   * @param v a {@link com.github.rccookie.geometry.performance.float2} object
+   * @return a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public final static float2 mulTrans(final Mat22 R, final float2 v) {
     return new float2((v.x * R.ex.x + v.y * R.ex.y), (v.x * R.ey.x + v.y * R.ey.y));
   }
 
+  /**
+   * <p>mulTransToOut.</p>
+   *
+   * @param R a {@link org.jbox2d.common.Mat22} object
+   * @param v a {@link com.github.rccookie.geometry.performance.float2} object
+   * @param out a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public final static void mulTransToOut(final Mat22 R, final float2 v, final float2 out) {
     float outx = v.x * R.ex.x + v.y * R.ex.y;
     out.y = v.x * R.ey.x + v.y * R.ey.y;
     out.x = outx;
   }
 
+  /**
+   * <p>mulTransToOutUnsafe.</p>
+   *
+   * @param R a {@link org.jbox2d.common.Mat22} object
+   * @param v a {@link com.github.rccookie.geometry.performance.float2} object
+   * @param out a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public final static void mulTransToOutUnsafe(final Mat22 R, final float2 v, final float2 out) {
     assert (out != v);
     out.y = v.x * R.ey.x + v.y * R.ey.y;
     out.x = v.x * R.ex.x + v.y * R.ex.y;
   }
 
+  /**
+   * <p>mulTrans.</p>
+   *
+   * @param A a {@link org.jbox2d.common.Mat22} object
+   * @param B a {@link org.jbox2d.common.Mat22} object
+   * @return a {@link org.jbox2d.common.Mat22} object
+   */
   public final static Mat22 mulTrans(final Mat22 A, final Mat22 B) {
     final Mat22 C = new Mat22();
     C.ex.x = A.ex.x * B.ex.x + A.ex.y * B.ex.y;
@@ -499,6 +668,13 @@ public class Mat22 implements Serializable {
     return C;
   }
 
+  /**
+   * <p>mulTransToOut.</p>
+   *
+   * @param A a {@link org.jbox2d.common.Mat22} object
+   * @param B a {@link org.jbox2d.common.Mat22} object
+   * @param out a {@link org.jbox2d.common.Mat22} object
+   */
   public final static void mulTransToOut(final Mat22 A, final Mat22 B, final Mat22 out) {
     final float x1 = A.ex.x * B.ex.x + A.ex.y * B.ex.y;
     final float y1 = A.ey.x * B.ex.x + A.ey.y * B.ex.y;
@@ -511,6 +687,13 @@ public class Mat22 implements Serializable {
     out.ey.y = y2;
   }
 
+  /**
+   * <p>mulTransToOutUnsafe.</p>
+   *
+   * @param A a {@link org.jbox2d.common.Mat22} object
+   * @param B a {@link org.jbox2d.common.Mat22} object
+   * @param out a {@link org.jbox2d.common.Mat22} object
+   */
   public final static void mulTransToOutUnsafe(final Mat22 A, final Mat22 B, final Mat22 out) {
     assert (A != out);
     assert (B != out);
@@ -520,6 +703,12 @@ public class Mat22 implements Serializable {
     out.ey.y = A.ey.x * B.ey.x + A.ey.y * B.ey.y;
   }
 
+  /**
+   * <p>createRotationalTransform.</p>
+   *
+   * @param angle a float
+   * @return a {@link org.jbox2d.common.Mat22} object
+   */
   public final static Mat22 createRotationalTransform(float angle) {
     Mat22 mat = new Mat22();
     final float c = MathUtils.cos(angle);
@@ -531,6 +720,12 @@ public class Mat22 implements Serializable {
     return mat;
   }
 
+  /**
+   * <p>createRotationalTransform.</p>
+   *
+   * @param angle a float
+   * @param out a {@link org.jbox2d.common.Mat22} object
+   */
   public final static void createRotationalTransform(float angle, Mat22 out) {
     final float c = MathUtils.cos(angle);
     final float s = MathUtils.sin(angle);
@@ -540,6 +735,12 @@ public class Mat22 implements Serializable {
     out.ey.y = c;
   }
 
+  /**
+   * <p>createScaleTransform.</p>
+   *
+   * @param scale a float
+   * @return a {@link org.jbox2d.common.Mat22} object
+   */
   public final static Mat22 createScaleTransform(float scale) {
     Mat22 mat = new Mat22();
     mat.ex.x = scale;
@@ -547,11 +748,18 @@ public class Mat22 implements Serializable {
     return mat;
   }
 
+  /**
+   * <p>createScaleTransform.</p>
+   *
+   * @param scale a float
+   * @param out a {@link org.jbox2d.common.Mat22} object
+   */
   public final static void createScaleTransform(float scale, Mat22 out) {
     out.ex.x = scale;
     out.ey.y = scale;
   }
 
+  /** {@inheritDoc} */
   @Override
   public int hashCode() {
     final int prime = 31;
@@ -561,6 +769,7 @@ public class Mat22 implements Serializable {
     return result;
   }
 
+  /** {@inheritDoc} */
   @Override
   public boolean equals(Object obj) {
     if (this == obj) return true;

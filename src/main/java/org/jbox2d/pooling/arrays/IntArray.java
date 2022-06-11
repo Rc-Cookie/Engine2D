@@ -30,12 +30,20 @@ import java.util.HashMap;
 
 /**
  * Not thread safe int[] pooling
+ *
  * @author Daniel Murphy
+ * @version $Id: $Id
  */
 public class IntArray {
 	
 	private final HashMap<Integer, int[]> map = new HashMap<Integer, int[]>();
 	
+	/**
+	 * <p>get.</p>
+	 *
+	 * @param argLength a int
+	 * @return an array of {@link int} objects
+	 */
 	public int[] get( int argLength){
 		assert(argLength > 0);
 		
@@ -47,6 +55,12 @@ public class IntArray {
 		return map.get(argLength);
 	}
 	
+	/**
+	 * <p>getInitializedArray.</p>
+	 *
+	 * @param argLength a int
+	 * @return an array of {@link int} objects
+	 */
 	protected int[] getInitializedArray(int argLength){
 		return new int[argLength];
 	}

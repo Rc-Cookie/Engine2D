@@ -5,6 +5,7 @@ import java.util.function.Consumer;
 import com.github.rccookie.engine2d.Application;
 import com.github.rccookie.engine2d.Camera;
 import com.github.rccookie.engine2d.core.stats.Bottleneck;
+import com.github.rccookie.util.Console;
 
 public class ParallelLoopExecutor extends LoopExecutor {
 
@@ -40,30 +41,21 @@ public class ParallelLoopExecutor extends LoopExecutor {
         renderThread.start();
     }
 
-
-    // TODO update bottleneck
+    private final Object lock = new Object();
 
     @Override
-    public void runIteration() {
-        long frameStart = System.nanoTime();
-        startLoops = true;
-        while(!(updateThread.running && renderThread.running)) Thread.yield();
-        startLoops = false;
+    public Bottleneck runIterationUntimed() {
 
-        long delay = getIterationDelay();
-        long remainingDelay = delay - (System.nanoTime() - frameStart);
-        if(remainingDelay > 0) {
-            if(Application.getImplementation().supportsSleeping() || Application.FORCE_FPS_CAP) {
-                Application.getImplementation().sleep(remainingDelay / 1000000, (int) (remainingDelay % 1000000));
-                // Parallel execution looses enough time for managing the threads so that an exact waiting is unnecessary
-            }
+        startLoops = true;
+        synchronized(lock) {
+            lock.notifyAll();
         }
 
-        boolean bottlenecked = updateThread.running || renderThread.running;
-
+        while(!(updateThread.running && renderThread.running)) Thread.yield();
+        startLoops = false;
         while(updateThread.running || renderThread.running) Thread.yield();
-        if(!bottlenecked) setBottleneck(Bottleneck.FPS_CAP);
-        else setBottleneck(frameDuration < renderDuration1 + renderDuration2 ? Bottleneck.RENDERING : Bottleneck.UPDATE);
+
+       return frameDuration < renderDuration1 + renderDuration2 ? Bottleneck.RENDERING : Bottleneck.UPDATE;
     }
 
     @Override
@@ -83,18 +75,26 @@ public class ParallelLoopExecutor extends LoopExecutor {
 
         @Override
         public void run() {
+            while (!startLoops) Thread.yield();
             //noinspection InfiniteLoopStatement
             while (true) {
-                while (!startLoops) Thread.yield();
 
                 running = true;
 
                 Camera camera = Camera.getActive();
                 loopAction.accept(camera);
 
-                while (startLoops) Thread.yield();
+                while(startLoops) Thread.yield();
 
                 running = false;
+                while(!startLoops) try {
+                    synchronized(lock) {
+                        if(startLoops) break;
+                        lock.wait();
+                    }
+                } catch(InterruptedException e) {
+                    Console.error(e);
+                }
             }
         }
     }

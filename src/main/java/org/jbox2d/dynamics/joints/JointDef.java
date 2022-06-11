@@ -27,10 +27,17 @@ import org.jbox2d.dynamics.Body;
 
 /**
  * Joint definitions are used to construct joints.
+ *
  * @author Daniel Murphy
+ * @version $Id: $Id
  */
 public class JointDef {
 
+	/**
+	 * <p>Constructor for JointDef.</p>
+	 *
+	 * @param type a {@link org.jbox2d.dynamics.joints.JointType} object
+	 */
 	public JointDef(JointType type){
 		this.type = type;
 		userData = null;

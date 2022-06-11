@@ -1,7 +1,8 @@
 package com.github.rccookie.engine2d.impl;
 
+import com.github.rccookie.engine2d.Properties;
 import com.github.rccookie.engine2d.util.Coroutine;
-import com.github.rccookie.engine2d.util.Future;
+import com.github.rccookie.util.Future;
 
 /**
  * Generic interface for an implementation of an Engine-2D application.
@@ -21,7 +22,7 @@ public interface Implementation {
      *
      * @return The image factory
      */
-    ImageImplFactory getImageFactory();
+    ImageManager getImageFactory();
 
     /**
      * Returns the implementation's display.
@@ -43,6 +44,13 @@ public interface Implementation {
      * @return The online manager
      */
     OnlineManager getOnlineManager();
+
+    /**
+     * Returns the implementation's file manager.
+     *
+     * @return The file manager
+     */
+    IOManager getIOManager();
 
     /**
      * Returns whether the implementation supports multithreading.
@@ -120,4 +128,26 @@ public interface Implementation {
      */
     @Deprecated
     void sleepUntilNextFrame();
+
+    /**
+     * Sets the executing thread as the main thread.
+     *
+     * @throws IllegalStateException If called multiple times. Optional
+     */
+    void setMainThread() throws IllegalStateException;
+
+    /**
+     * Returns whether the executing thread is the main thread as set
+     * by {@link #setMainThread()}.
+     *
+     * @return Whether this is the main thread
+     */
+    boolean isMainThread();
+
+    /**
+     * Applies default values for the application properties, if any.
+     *
+     * @param properties The properties to modify
+     */
+    void initProperties(Properties properties);
 }

@@ -1,8 +1,9 @@
 package com.github.rccookie.engine2d.ui;
 
-import com.github.rccookie.engine2d.Color;
+import com.github.rccookie.engine2d.image.Color;
 import com.github.rccookie.engine2d.Time;
 import com.github.rccookie.engine2d.UIObject;
+import com.github.rccookie.engine2d.image.ThemeColor;
 import com.github.rccookie.event.CaughtParamEvent;
 import com.github.rccookie.event.ParamEvent;
 import com.github.rccookie.geometry.performance.Interpolation;
@@ -77,8 +78,8 @@ public class Fade extends ColorPanel {
      * @param color The theme color of the fade object
      */
     public Fade(UIObject parent, ThemeColor color) {
-        super(parent, int2.ONE, ThemeColor.FIRST);
-        setColor(t -> color.get(t).setAlpha(interpolation.get(progress)));
+        super(parent, int2.one, ThemeColor.FIRST);
+        this.color.set(t -> color.get(t).setAlpha(interpolation.get(progress)));
         setClickThrough(true);
         update.add(() -> {
             if(direction == null) return;
@@ -102,7 +103,7 @@ public class Fade extends ColorPanel {
     @Override
     public int2 getSize() {
         UIObject parent = getParent();
-        return parent == null ? int2.ZERO : parent.getSize();
+        return parent == null ? int2.zero : parent.getSize();
     }
 
     /**

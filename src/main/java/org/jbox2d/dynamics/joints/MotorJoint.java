@@ -22,8 +22,9 @@ import org.jbox2d.pooling.IWorldPool;
 /**
  * A motor joint is used to control the relative motion between two bodies. A typical usage is to
  * control the movement of a dynamic body with respect to the ground.
- * 
+ *
  * @author dmurph
+ * @version $Id: $Id
  */
 public class MotorJoint extends Joint {
 
@@ -52,6 +53,12 @@ public class MotorJoint extends Joint {
   private final Mat22 m_linearMass = new Mat22();
   private float m_angularMass;
 
+  /**
+   * <p>Constructor for MotorJoint.</p>
+   *
+   * @param pool a {@link org.jbox2d.pooling.IWorldPool} object
+   * @param def a {@link org.jbox2d.dynamics.joints.MotorJointDef} object
+   */
   public MotorJoint(IWorldPool pool, MotorJointDef def) {
     super(pool, def);
     m_linearOffset.set(def.linearOffset);
@@ -64,34 +71,50 @@ public class MotorJoint extends Joint {
     m_correctionFactor = def.correctionFactor;
   }
 
+  /** {@inheritDoc} */
   @Override
   public void getAnchorA(float2 out) {
     out.set(m_bodyA.getPosition());
   }
 
+  /** {@inheritDoc} */
   @Override
   public void getAnchorB(float2 out) {
     out.set(m_bodyB.getPosition());
   }
 
+  /** {@inheritDoc} */
   public void getReactionForce(float inv_dt, float2 out) {
     out.set(m_linearImpulse).scale(inv_dt);
   }
 
+  /** {@inheritDoc} */
   public float getReactionTorque(float inv_dt) {
     return m_angularImpulse * inv_dt;
   }
 
+  /**
+   * <p>getCorrectionFactor.</p>
+   *
+   * @return a float
+   */
   public float getCorrectionFactor() {
     return m_correctionFactor;
   }
 
+  /**
+   * <p>setCorrectionFactor.</p>
+   *
+   * @param correctionFactor a float
+   */
   public void setCorrectionFactor(float correctionFactor) {
     this.m_correctionFactor = correctionFactor;
   }
 
   /**
    * Set the target linear offset, in frame A, in meters.
+   *
+   * @param linearOffset a {@link com.github.rccookie.geometry.performance.float2} object
    */
   public void setLinearOffset(float2 linearOffset) {
     if (linearOffset.x != m_linearOffset.x || linearOffset.y != m_linearOffset.y) {
@@ -103,6 +126,8 @@ public class MotorJoint extends Joint {
 
   /**
    * Get the target linear offset, in frame A, in meters.
+   *
+   * @param out a {@link com.github.rccookie.geometry.performance.float2} object
    */
   public void getLinearOffset(float2 out) {
     out.set(m_linearOffset);
@@ -110,6 +135,8 @@ public class MotorJoint extends Joint {
 
   /**
    * Get the target linear offset, in frame A, in meters. Do not modify.
+   *
+   * @return a {@link com.github.rccookie.geometry.performance.float2} object
    */
   public float2 getLinearOffset() {
     return m_linearOffset;
@@ -117,8 +144,8 @@ public class MotorJoint extends Joint {
 
   /**
    * Set the target angular offset, in radians.
-   * 
-   * @param angularOffset
+   *
+   * @param angularOffset a float
    */
   public void setAngularOffset(float angularOffset) {
     if (angularOffset != m_angularOffset) {
@@ -128,14 +155,19 @@ public class MotorJoint extends Joint {
     }
   }
 
+  /**
+   * <p>getAngularOffset.</p>
+   *
+   * @return a float
+   */
   public float getAngularOffset() {
     return m_angularOffset;
   }
 
   /**
    * Set the maximum friction force in N.
-   * 
-   * @param force
+   *
+   * @param force a float
    */
   public void setMaxForce(float force) {
     assert (force >= 0.0f);
@@ -144,6 +176,8 @@ public class MotorJoint extends Joint {
 
   /**
    * Get the maximum friction force in N.
+   *
+   * @return a float
    */
   public float getMaxForce() {
     return m_maxForce;
@@ -151,6 +185,8 @@ public class MotorJoint extends Joint {
 
   /**
    * Set the maximum friction torque in N*m.
+   *
+   * @param torque a float
    */
   public void setMaxTorque(float torque) {
     assert (torque >= 0.0f);
@@ -159,11 +195,14 @@ public class MotorJoint extends Joint {
 
   /**
    * Get the maximum friction torque in N*m.
+   *
+   * @return a float
    */
   public float getMaxTorque() {
     return m_maxTorque;
   }
 
+  /** {@inheritDoc} */
   @Override
   public void initVelocityConstraints(SolverData data) {
     m_indexA = m_bodyA.m_islandIndex;
@@ -258,6 +297,7 @@ public class MotorJoint extends Joint {
     data.velocities[m_indexB].w = wB;
   }
 
+  /** {@inheritDoc} */
   @Override
   public void solveVelocityConstraints(SolverData data) {
     final float2 vA = data.velocities[m_indexA].v;
@@ -332,6 +372,7 @@ public class MotorJoint extends Joint {
     data.velocities[m_indexB].w = wB;
   }
 
+  /** {@inheritDoc} */
   @Override
   public boolean solvePositionConstraints(SolverData data) {
     return true;

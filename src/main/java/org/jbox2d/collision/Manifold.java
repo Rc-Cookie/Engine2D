@@ -47,6 +47,7 @@ import com.github.rccookie.geometry.performance.float2;
  * We store contacts in this way so that position correction can account for movement, which is
  * critical for continuous physics. All contact scenarios must be expressed in one of these types.
  * This structure is stored across time steps, so we keep it small.
+ *
  */
 public class Manifold {
 
@@ -83,8 +84,8 @@ public class Manifold {
 
   /**
    * Creates this manifold as a copy of the other
-   * 
-   * @param other
+   *
+   * @param other a {@link org.jbox2d.collision.Manifold} object
    */
   public Manifold(Manifold other) {
     points = new ManifoldPoint[Settings.maxManifoldPoints];
@@ -100,7 +101,7 @@ public class Manifold {
 
   /**
    * copies this manifold from the given one
-   * 
+   *
    * @param cp manifold to copy from
    */
   public void set(Manifold cp) {

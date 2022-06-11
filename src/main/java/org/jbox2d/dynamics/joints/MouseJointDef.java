@@ -27,8 +27,9 @@ import com.github.rccookie.geometry.performance.float2;
 
 /**
  * Mouse joint definition. This requires a world target point, tuning parameters, and the time step.
- * 
+ *
  * @author Daniel
+ * @version $Id: $Id
  */
 public class MouseJointDef extends JointDef {
   /**
@@ -52,6 +53,9 @@ public class MouseJointDef extends JointDef {
    */
   public float dampingRatio;
 
+  /**
+   * <p>Constructor for MouseJointDef.</p>
+   */
   public MouseJointDef() {
     super(JointType.MOUSE);
     target.set(0, 0);

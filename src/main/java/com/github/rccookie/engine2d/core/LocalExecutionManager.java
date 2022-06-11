@@ -7,7 +7,7 @@ import com.github.rccookie.engine2d.Execute;
 import com.github.rccookie.engine2d.Time;
 import com.github.rccookie.engine2d.coroutine.Coroutine;
 import com.github.rccookie.engine2d.coroutine.Wait;
-import com.github.rccookie.engine2d.util.Future;
+import com.github.rccookie.util.Future;
 
 public class LocalExecutionManager {
 

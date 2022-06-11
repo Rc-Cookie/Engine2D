@@ -6,6 +6,7 @@ import com.github.rccookie.geometry.performance.float2;
 /**
  * A particle group definition holds all the data needed to construct a particle group. You can
  * safely re-use these definitions.
+ *
  */
 public class ParticleGroupDef {
 
@@ -51,6 +52,9 @@ public class ParticleGroupDef {
   /** Use this to store application-specific group data. */
   public Object userData;
 
+  /**
+   * <p>Constructor for ParticleGroupDef.</p>
+   */
   public ParticleGroupDef() {
     flags = 0;
     groupFlags = 0;

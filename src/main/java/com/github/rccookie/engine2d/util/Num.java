@@ -113,12 +113,12 @@ public enum Num {
 
     /**
      * Clamps the given value between the specified lower and upper bound.
+     * <p>a should be &lt;= b, otherwise the result may be anything.</p>
      *
      * @param x The value to clamp
      * @param a The lower bound
      * @param b The upper bound
      * @return The value clamped
-     * @apiNote a should be <= b, otherwise the result may be anything
      */
     @Contract(pure = true)
     public static int clamp(int x, int a, int b) {
@@ -127,12 +127,12 @@ public enum Num {
 
     /**
      * Clamps the given value between the specified lower and upper bound.
+     * <p>a should be &lt;= b, otherwise the result may be anything.</p>
      *
      * @param x The value to clamp
      * @param a The lower bound
      * @param b The upper bound
      * @return The value clamped
-     * @apiNote a should be <= b, otherwise the result may be anything
      */
     @Contract(pure = true)
     public static long clamp(long x, long a, long b) {
@@ -141,12 +141,12 @@ public enum Num {
 
     /**
      * Clamps the given value between the specified lower and upper bound.
+     * <p>a should be &lt;= b, otherwise the result may be anything.</p>
      *
      * @param x The value to clamp
      * @param a The lower bound
      * @param b The upper bound
      * @return The value clamped
-     * @apiNote a should be <= b, otherwise the result may be anything
      */
     @Contract(pure = true)
     public static float clamp(float x, float a, float b) {
@@ -155,12 +155,12 @@ public enum Num {
 
     /**
      * Clamps the given value between the specified lower and upper bound.
+     * <p>a should be &lt;= b, otherwise the result may be anything.</p>
      *
      * @param x The value to clamp
      * @param a The lower bound
      * @param b The upper bound
      * @return The value clamped
-     * @apiNote a should be <= b, otherwise the result may be anything
      */
     @Contract(pure = true)
     public static double clamp(double x, double a, double b) {
@@ -298,6 +298,55 @@ public enum Num {
     @Contract(pure = true)
     public static double average(double a, double b) {
         return (a + b) / 2;
+    }
+
+
+    public static int round(float x) {
+        return Math.round(x);
+    }
+
+    public static int round(double x) {
+        return Math.round((float) x);
+    }
+
+    public static long roundL(float x) {
+        return Math.round((double) x);
+    }
+
+    public static long roundL(double x) {
+        return Math.round(x);
+    }
+
+    public static int floor(float x) {
+        return (int) Math.floor(x);
+    }
+
+    public static int floor(double x) {
+        return (int) Math.floor(x);
+    }
+
+    public static long floorL(float x) {
+        return (long) Math.floor(x);
+    }
+
+    public static long floorL(double x) {
+        return (long) Math.floor(x);
+    }
+
+    public static int ceil(float x) {
+        return (int) Math.ceil(x);
+    }
+
+    public static int ceil(double x) {
+        return (int) Math.ceil(x);
+    }
+
+    public static long ceilL(float x) {
+        return (long) Math.ceil(x);
+    }
+
+    public static long ceilL(double x) {
+        return (long) Math.ceil(x);
     }
 
 

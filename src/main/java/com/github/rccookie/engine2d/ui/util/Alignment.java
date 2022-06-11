@@ -16,7 +16,7 @@ public interface Alignment {
     /**
      * Aligns the ui object with its center.
      */
-    Alignment CENTER       = (s,o) -> int2.ZERO;
+    Alignment CENTER       = (s,o) -> int2.zero;
     /**
      * Aligns the ui object with its top center.
      */

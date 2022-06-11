@@ -24,15 +24,24 @@ public class AWTInputAdapter implements InputAdapter {
     @Override
     public void attachKeyEvent(BiParamAction<String, Boolean> event) {
         JFrame window = AWTDisplay.INSTANCE.window;
+        window.setFocusTraversalKeysEnabled(false);
         window.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                event.run(getKeyString(e), true);
+                try {
+                    event.run(getKeyString(e), true);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             }
 
             @Override
             public void keyReleased(KeyEvent e) {
-                event.run(getKeyString(e), false);
+                try {
+                    event.run(getKeyString(e), false);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             }
         });
     }
@@ -55,7 +64,11 @@ public class AWTInputAdapter implements InputAdapter {
                 Point displayOnScreenPoint = AWTDisplay.INSTANCE.getLocationOnScreen();
                 int2 pos = new int2(e.getXOnScreen() - displayOnScreenPoint.x,
                         e.getYOnScreen() - displayOnScreenPoint.y);
-                event.run(new MouseData(pos, e.getButton()));
+                try {
+                    event.run(new MouseData(pos, e.getButton()));
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             }
 
             @Override
@@ -63,7 +76,11 @@ public class AWTInputAdapter implements InputAdapter {
                 Point displayOnScreenPoint = AWTDisplay.INSTANCE.getLocationOnScreen();
                 int2 pos = new int2(e.getXOnScreen() - displayOnScreenPoint.x,
                         e.getYOnScreen() - displayOnScreenPoint.y);
-                event.run(new MouseData(pos, 0));
+                try {
+                    event.run(new MouseData(pos, 0));
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             }
         });
     }
@@ -105,6 +122,7 @@ public class AWTInputAdapter implements InputAdapter {
             case KeyEvent.VK_BACK_SPACE: return "backspace";
             case KeyEvent.VK_DELETE: return "delete";
             case KeyEvent.VK_ENTER: return "enter";
+            case KeyEvent.VK_TAB: return "tab";
         }
 
         char c = event.getKeyChar();

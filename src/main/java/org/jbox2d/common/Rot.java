@@ -23,72 +23,129 @@
  ******************************************************************************/
 package org.jbox2d.common;
 
-import com.github.rccookie.geometry.performance.float2;
-
 import java.io.Serializable;
+
+import com.github.rccookie.geometry.performance.float2;
 
 /**
  * Represents a rotation
- * 
+ *
  * @author Daniel
+ * @version $Id: $Id
  */
 public class Rot implements Serializable {
   private static final long serialVersionUID = 1L;
 
   public float s, c; // sin and cos
 
+  /**
+   * <p>Constructor for Rot.</p>
+   */
   public Rot() {
     setIdentity();
   }
 
+  /**
+   * <p>Constructor for Rot.</p>
+   *
+   * @param angle a float
+   */
   public Rot(float angle) {
     set(angle);
   }
 
+  /**
+   * <p>getSin.</p>
+   *
+   * @return a float
+   */
   public float getSin() {
     return s;
   }
 
+  /** {@inheritDoc} */
   @Override
   public String toString() {
     return "Rot(s:" + s + ", c:" + c + ")";
   }
 
+  /**
+   * <p>getCos.</p>
+   *
+   * @return a float
+   */
   public float getCos() {
     return c;
   }
 
+  /**
+   * <p>set.</p>
+   *
+   * @param angle a float
+   * @return a {@link org.jbox2d.common.Rot} object
+   */
   public Rot set(float angle) {
     s = MathUtils.sin(angle);
     c = MathUtils.cos(angle);
     return this;
   }
 
+  /**
+   * <p>set.</p>
+   *
+   * @param other a {@link org.jbox2d.common.Rot} object
+   * @return a {@link org.jbox2d.common.Rot} object
+   */
   public Rot set(Rot other) {
     s = other.s;
     c = other.c;
     return this;
   }
 
+  /**
+   * <p>setIdentity.</p>
+   *
+   * @return a {@link org.jbox2d.common.Rot} object
+   */
   public Rot setIdentity() {
     s = 0;
     c = 1;
     return this;
   }
 
+  /**
+   * <p>getAngle.</p>
+   *
+   * @return a float
+   */
   public float getAngle() {
     return MathUtils.atan2(s, c);
   }
 
+  /**
+   * <p>getXAxis.</p>
+   *
+   * @param xAxis a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public void getXAxis(float2 xAxis) {
     xAxis.set(c, s);
   }
 
+  /**
+   * <p>getYAxis.</p>
+   *
+   * @param yAxis a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public void getYAxis(float2 yAxis) {
     yAxis.set(-s, c);
   }
 
   // @Override // annotation omitted for GWT-compatibility
+  /**
+   * <p>clone.</p>
+   *
+   * @return a {@link org.jbox2d.common.Rot} object
+   */
   public Rot clone() {
     Rot copy = new Rot();
     copy.s = s;
@@ -96,12 +153,26 @@ public class Rot implements Serializable {
     return copy;
   }
 
+  /**
+   * <p>mul.</p>
+   *
+   * @param q a {@link org.jbox2d.common.Rot} object
+   * @param r a {@link org.jbox2d.common.Rot} object
+   * @param out a {@link org.jbox2d.common.Rot} object
+   */
   public static final void mul(Rot q, Rot r, Rot out) {
     float tempc = q.c * r.c - q.s * r.s;
     out.s = q.s * r.c + q.c * r.s;
     out.c = tempc;
   }
 
+  /**
+   * <p>mulUnsafe.</p>
+   *
+   * @param q a {@link org.jbox2d.common.Rot} object
+   * @param r a {@link org.jbox2d.common.Rot} object
+   * @param out a {@link org.jbox2d.common.Rot} object
+   */
   public static final void mulUnsafe(Rot q, Rot r, Rot out) {
     assert (r != out);
     assert (q != out);
@@ -113,12 +184,26 @@ public class Rot implements Serializable {
     out.c = q.c * r.c - q.s * r.s;
   }
 
+  /**
+   * <p>mulTrans.</p>
+   *
+   * @param q a {@link org.jbox2d.common.Rot} object
+   * @param r a {@link org.jbox2d.common.Rot} object
+   * @param out a {@link org.jbox2d.common.Rot} object
+   */
   public static final void mulTrans(Rot q, Rot r, Rot out) {
     final float tempc = q.c * r.c + q.s * r.s;
     out.s = q.c * r.s - q.s * r.c;
     out.c = tempc;
   }
 
+  /**
+   * <p>mulTransUnsafe.</p>
+   *
+   * @param q a {@link org.jbox2d.common.Rot} object
+   * @param r a {@link org.jbox2d.common.Rot} object
+   * @param out a {@link org.jbox2d.common.Rot} object
+   */
   public static final void mulTransUnsafe(Rot q, Rot r, Rot out) {
     // [ qc qs] * [rc -rs] = [qc*rc+qs*rs -qc*rs+qs*rc]
     // [-qs qc] [rs rc] [-qs*rc+qc*rs qs*rs+qc*rc]
@@ -128,23 +213,51 @@ public class Rot implements Serializable {
     out.c = q.c * r.c + q.s * r.s;
   }
 
+  /**
+   * <p>mulToOut.</p>
+   *
+   * @param q a {@link org.jbox2d.common.Rot} object
+   * @param v a {@link com.github.rccookie.geometry.performance.float2} object
+   * @param out a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public static final void mulToOut(Rot q, float2 v, float2 out) {
     float tempy = q.s * v.x + q.c * v.y;
     out.x = q.c * v.x - q.s * v.y;
     out.y = tempy;
   }
 
+  /**
+   * <p>mulToOutUnsafe.</p>
+   *
+   * @param q a {@link org.jbox2d.common.Rot} object
+   * @param v a {@link com.github.rccookie.geometry.performance.float2} object
+   * @param out a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public static final void mulToOutUnsafe(Rot q, float2 v, float2 out) {
     out.x = q.c * v.x - q.s * v.y;
     out.y = q.s * v.x + q.c * v.y;
   }
 
+  /**
+   * <p>mulTrans.</p>
+   *
+   * @param q a {@link org.jbox2d.common.Rot} object
+   * @param v a {@link com.github.rccookie.geometry.performance.float2} object
+   * @param out a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public static final void mulTrans(Rot q, float2 v, float2 out) {
     final float tempy = -q.s * v.x + q.c * v.y;
     out.x = q.c * v.x + q.s * v.y;
     out.y = tempy;
   }
 
+  /**
+   * <p>mulTransUnsafe.</p>
+   *
+   * @param q a {@link org.jbox2d.common.Rot} object
+   * @param v a {@link com.github.rccookie.geometry.performance.float2} object
+   * @param out a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public static final void mulTransUnsafe(Rot q, float2 v, float2 out) {
     out.x = q.c * v.x + q.s * v.y;
     out.y = -q.s * v.x + q.c * v.y;

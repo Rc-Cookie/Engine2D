@@ -27,14 +27,16 @@ import org.jbox2d.collision.broadphase.DynamicTree;
 
 // update to rev 100
 /**
- * callback for {@link DynamicTree}
- * @author Daniel Murphy
+ * callback for {@link org.jbox2d.collision.broadphase.DynamicTree}
  *
+ * @author Daniel Murphy
+ * @version $Id: $Id
  */
 public interface TreeCallback {
 	
 	/**
-	 * Callback from a query request.  
+	 * Callback from a query request.
+	 *
 	 * @param proxyId the id of the proxy
 	 * @return if the query should be continued
 	 */

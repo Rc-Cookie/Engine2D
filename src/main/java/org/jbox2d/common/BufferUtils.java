@@ -2,8 +2,21 @@ package org.jbox2d.common;
 
 import java.lang.reflect.Array;
 
+/**
+ * <p>BufferUtils class.</p>
+ *
+ */
 public class BufferUtils {
-  /** Reallocate a buffer. */
+  /**
+   * Reallocate a buffer.
+   *
+   * @param klass a {@link java.lang.Class} object
+   * @param oldBuffer an array of T[] objects
+   * @param oldCapacity a int
+   * @param newCapacity a int
+   * @param <T> a T class
+   * @return an array of T[] objects
+   */
   @SuppressWarnings("deprecation")
   public static <T> T[] reallocateBuffer(Class<T> klass, T[] oldBuffer, int oldCapacity,
                                          int newCapacity) {
@@ -23,7 +36,14 @@ public class BufferUtils {
     return newBuffer;
   }
 
-  /** Reallocate a buffer. */
+  /**
+   * Reallocate a buffer.
+   *
+   * @param oldBuffer an array of {@link int} objects
+   * @param oldCapacity a int
+   * @param newCapacity a int
+   * @return an array of {@link int} objects
+   */
   public static int[] reallocateBuffer(int[] oldBuffer, int oldCapacity, int newCapacity) {
     assert (newCapacity > oldCapacity);
     int[] newBuffer = new int[newCapacity];
@@ -33,7 +53,14 @@ public class BufferUtils {
     return newBuffer;
   }
 
-  /** Reallocate a buffer. */
+  /**
+   * Reallocate a buffer.
+   *
+   * @param oldBuffer an array of {@link float} objects
+   * @param oldCapacity a int
+   * @param newCapacity a int
+   * @return an array of {@link float} objects
+   */
   public static float[] reallocateBuffer(float[] oldBuffer, int oldCapacity, int newCapacity) {
     assert (newCapacity > oldCapacity);
     float[] newBuffer = new float[newCapacity];
@@ -46,6 +73,15 @@ public class BufferUtils {
   /**
    * Reallocate a buffer. A 'deferred' buffer is reallocated only if it is not NULL. If
    * 'userSuppliedCapacity' is not zero, buffer is user supplied and must be kept.
+   *
+   * @param klass a {@link java.lang.Class} object
+   * @param buffer an array of T[] objects
+   * @param userSuppliedCapacity a int
+   * @param oldCapacity a int
+   * @param newCapacity a int
+   * @param deferred a boolean
+   * @param <T> a T class
+   * @return an array of T[] objects
    */
   public static <T> T[] reallocateBuffer(Class<T> klass, T[] buffer, int userSuppliedCapacity,
       int oldCapacity, int newCapacity, boolean deferred) {
@@ -60,6 +96,13 @@ public class BufferUtils {
   /**
    * Reallocate an int buffer. A 'deferred' buffer is reallocated only if it is not NULL. If
    * 'userSuppliedCapacity' is not zero, buffer is user supplied and must be kept.
+   *
+   * @param buffer an array of {@link int} objects
+   * @param userSuppliedCapacity a int
+   * @param oldCapacity a int
+   * @param newCapacity a int
+   * @param deferred a boolean
+   * @return an array of {@link int} objects
    */
   public static int[] reallocateBuffer(int[] buffer, int userSuppliedCapacity, int oldCapacity,
       int newCapacity, boolean deferred) {
@@ -74,6 +117,13 @@ public class BufferUtils {
   /**
    * Reallocate a float buffer. A 'deferred' buffer is reallocated only if it is not NULL. If
    * 'userSuppliedCapacity' is not zero, buffer is user supplied and must be kept.
+   *
+   * @param buffer an array of {@link float} objects
+   * @param userSuppliedCapacity a int
+   * @param oldCapacity a int
+   * @param newCapacity a int
+   * @param deferred a boolean
+   * @return an array of {@link float} objects
    */
   public static float[] reallocateBuffer(float[] buffer, int userSuppliedCapacity, int oldCapacity,
       int newCapacity, boolean deferred) {
@@ -85,7 +135,15 @@ public class BufferUtils {
     return buffer;
   }
 
-  /** Rotate an array, see std::rotate */
+  /**
+   * Rotate an array, see std::rotate
+   *
+   * @param ray an array of T[] objects
+   * @param first a int
+   * @param new_first a int
+   * @param last a int
+   * @param <T> a T class
+   */
   public static <T> void rotate(T[] ray, int first, int new_first, int last) {
     int next = new_first;
     while (next != first) {
@@ -102,7 +160,14 @@ public class BufferUtils {
     }
   }
 
-  /** Rotate an array, see std::rotate */
+  /**
+   * Rotate an array, see std::rotate
+   *
+   * @param ray an array of {@link int} objects
+   * @param first a int
+   * @param new_first a int
+   * @param last a int
+   */
   public static void rotate(int[] ray, int first, int new_first, int last) {
     int next = new_first;
     while (next != first) {
@@ -119,7 +184,14 @@ public class BufferUtils {
     }
   }
 
-  /** Rotate an array, see std::rotate */
+  /**
+   * Rotate an array, see std::rotate
+   *
+   * @param ray an array of {@link float} objects
+   * @param first a int
+   * @param new_first a int
+   * @param last a int
+   */
   public static void rotate(float[] ray, int first, int new_first, int last) {
     int next = new_first;
     while (next != first) {

@@ -27,6 +27,10 @@ import org.jbox2d.common.Mat22;
 import org.jbox2d.common.Settings;
 import com.github.rccookie.geometry.performance.float2;
 
+/**
+ * <p>ContactVelocityConstraint class.</p>
+ *
+ */
 public class ContactVelocityConstraint {
   public VelocityConstraintPoint[] points = new VelocityConstraintPoint[Settings.maxManifoldPoints];
   public final float2 normal = new float2();
@@ -42,6 +46,9 @@ public class ContactVelocityConstraint {
   public int pointCount;
   public int contactIndex;
 
+  /**
+   * <p>Constructor for ContactVelocityConstraint.</p>
+   */
   public ContactVelocityConstraint() {
     for (int i = 0; i < points.length; i++) {
       points[i] = new VelocityConstraintPoint();

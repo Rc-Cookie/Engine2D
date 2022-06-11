@@ -33,8 +33,9 @@ package org.jbox2d.dynamics;
  * <p>static: zero mass, zero velocity, may be manually moved
  * <p>kinematic: zero mass, non-zero velocity set by user, moved by solver
  * <p>dynamic: positive mass, non-zero velocity determined by forces, moved by solver
- * 
+ *
  * @author daniel
+ * @version $Id: $Id
  */
 public enum BodyType {
 	STATIC, KINEMATIC, DYNAMIC

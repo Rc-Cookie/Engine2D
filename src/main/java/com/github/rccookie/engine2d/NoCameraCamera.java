@@ -1,6 +1,9 @@
 package com.github.rccookie.engine2d;
 
 import com.github.rccookie.engine2d.core.DrawObject;
+import com.github.rccookie.engine2d.image.Color;
+import com.github.rccookie.engine2d.image.Font;
+import com.github.rccookie.engine2d.image.Image;
 import com.github.rccookie.geometry.performance.int2;
 
 /**
@@ -17,9 +20,9 @@ final class NoCameraCamera extends Camera {
     private static final DrawObject[] DRAW_OBJECTS;
     private static final DrawObject TEXT_OBJECT;
     static {
-        Image text = Image.text("No camera rendering", 20, Color.WHITE);
-        TEXT_OBJECT = new DrawObject();
-        TEXT_OBJECT.image = text.impl;
+        Image text = Font.MONOSPACE.render("No camera rendering", Color.WHITE);
+        TEXT_OBJECT = DrawObject.get();
+        TEXT_OBJECT.image = Image.getImplementation(text);
         DRAW_OBJECTS = new DrawObject[] { TEXT_OBJECT };
     }
 

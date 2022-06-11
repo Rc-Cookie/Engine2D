@@ -25,12 +25,21 @@ package org.jbox2d.pooling.normal;
 
 import org.jbox2d.pooling.IDynamicStack;
 
+/**
+ * <p>Abstract MutableStack class.</p>
+ *
+ */
 public abstract class MutableStack<E> implements IDynamicStack<E> {
 
   private E[] stack;
   private int index;
   private int size;
 
+  /**
+   * <p>Constructor for MutableStack.</p>
+   *
+   * @param argInitSize a int
+   */
   public MutableStack(int argInitSize) {
     index = 0;
     stack = null;
@@ -50,6 +59,11 @@ public abstract class MutableStack<E> implements IDynamicStack<E> {
     size = newStack.length;
   }
 
+  /**
+   * <p>pop.</p>
+   *
+   * @return a E object
+   */
   public final E pop() {
     if (index >= size) {
       extendStack(size * 2);
@@ -57,13 +71,28 @@ public abstract class MutableStack<E> implements IDynamicStack<E> {
     return stack[index++];
   }
 
+  /**
+   * <p>push.</p>
+   *
+   * @param argObject a E object
+   */
   public final void push(E argObject) {
     assert (index > 0);
     stack[--index] = argObject;
   }
 
-  /** Creates a new instance of the object contained by this stack. */
+  /**
+   * Creates a new instance of the object contained by this stack.
+   *
+   * @return a E object
+   */
   protected abstract E newInstance();
   
+  /**
+   * <p>newArray.</p>
+   *
+   * @param size a int
+   * @return an array of E[] objects
+   */
   protected abstract E[] newArray(int size);
 }

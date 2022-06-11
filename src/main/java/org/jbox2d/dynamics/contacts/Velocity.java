@@ -25,6 +25,10 @@ package org.jbox2d.dynamics.contacts;
 
 import com.github.rccookie.geometry.performance.float2;
 
+/**
+ * <p>Velocity class.</p>
+ *
+ */
 public class Velocity {
   public final float2 v = new float2();
   public float w;

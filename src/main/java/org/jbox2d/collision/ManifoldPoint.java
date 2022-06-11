@@ -57,7 +57,7 @@ import com.github.rccookie.geometry.performance.float2;
  * <ul><li>e_circles: the local center of circleB</li>
  * <li>e_faceA: the local center of cirlceB or the clip point of polygonB</li>
  * <li>e_faceB: the clip point of polygonA</li></ul>
- * This structure is stored across time steps, so we keep it small.<br/>
+ * This structure is stored across time steps, so we keep it small.
  * Note: the impulses are used for internal caching and may not
  * provide reliable contact forces, especially for high speed collisions.
  */
@@ -82,6 +82,7 @@ public class ManifoldPoint {
 
 	/**
 	 * Creates a manifold point as a copy of the given point
+	 *
 	 * @param cp point to copy from
 	 */
 	public ManifoldPoint(final ManifoldPoint cp) {
@@ -93,6 +94,7 @@ public class ManifoldPoint {
 
 	/**
 	 * Sets this manifold point form the given one
+	 *
 	 * @param cp the point to copy from
 	 */
 	public void set(final ManifoldPoint cp){

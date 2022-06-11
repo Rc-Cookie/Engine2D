@@ -5,8 +5,9 @@ import com.github.rccookie.geometry.performance.float2;
 /**
  * Rope joint definition. This requires two body anchor points and a maximum lengths. Note: by
  * default the connected objects will not collide. see collideConnected in b2JointDef.
- * 
+ *
  * @author Daniel Murphy
+ * @version $Id: $Id
  */
 public class RopeJointDef extends JointDef {
 
@@ -26,6 +27,9 @@ public class RopeJointDef extends JointDef {
    */
   public float maxLength;
 
+  /**
+   * <p>Constructor for RopeJointDef.</p>
+   */
   public RopeJointDef() {
     super(JointType.ROPE);
     localAnchorA.set(-1.0f, 0.0f);

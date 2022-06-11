@@ -7,12 +7,13 @@ import java.util.Objects;
 import com.github.rccookie.engine2d.core.DrawObject;
 import com.github.rccookie.engine2d.core.LocalExecutionManager;
 import com.github.rccookie.engine2d.core.LocalInputManager;
+import com.github.rccookie.engine2d.image.Color;
+import com.github.rccookie.engine2d.image.Image;
 import com.github.rccookie.engine2d.impl.Display;
 import com.github.rccookie.engine2d.util.NamedCaughtEvent;
-import com.github.rccookie.engine2d.util.Pool;
 import com.github.rccookie.event.Event;
-import com.github.rccookie.geometry.performance.int2;
 import com.github.rccookie.geometry.performance.float2;
+import com.github.rccookie.geometry.performance.int2;
 import com.github.rccookie.util.ArgumentOutOfRangeException;
 import com.github.rccookie.util.Arguments;
 import com.github.rccookie.util.Console;
@@ -85,28 +86,28 @@ public class Camera {
      * The camera's resolution, in other words, the resolution of
      * the output display.
      */
-    final int2 resolution = int2.ZERO.clone();
+    final int2 resolution = int2.zero();
 
     /**
      * Half of {@link #resolution}.
      */
-    final float2 halfResolution = float2.ZERO.clone();
+    final float2 halfResolution = float2.zero();
 
     /**
      * Rendering background color.
      */
+    @NotNull
     private Color backgroundColor = Color.WHITE;
 
-
-    /**
-     * Pool of reusable draw objects.
-     */
-    private final Pool<DrawObject> drawObjectPool = new Pool<>(DrawObject::new);
 
     /**
      * Draw objects for the current frame.
      */
     final List<DrawObject> drawObjects = new ArrayList<>();
+
+    private int renderHash = -1;
+    private int lastRenderHash = -1;
+    private float lastRenderTime = -10;
 
 
     /**
@@ -191,7 +192,7 @@ public class Camera {
 
         Execute.nextFrame(() -> {
             if(active != this) return;
-            Console.map("Set resolution", resolution);
+            Console.mapDebug("Set resolution", resolution);
 
             this.resolution.set(resolution);
             this.halfResolution.set(resolution.x * 0.5f, resolution.y * 0.5f);
@@ -238,6 +239,7 @@ public class Camera {
      *
      * @return The rendering background
      */
+    @NotNull
     public Color getBackgroundColor() {
         return backgroundColor;
     }
@@ -378,7 +380,7 @@ public class Camera {
             gameObjects = gameObject.map.paintOrderObjects.stream()
                     .filter(o -> {
                         Image image = o.getImage();
-                        if(image == null || image.definitelyBlank) return false;
+                        if(image == null || Image.definitelyBlank(image)) return false;
                         if(o == gameObject) return true;
 
                         // Simple circle collision detection
@@ -392,24 +394,25 @@ public class Camera {
 
         List<UIObject> uiObjects = new ArrayList<>();
         if(ui != null)
-            ui.addAllRelevantInPaintOrder(uiObjects);
+            for(UIObject o : ((UIObject)ui).paintOrderIterator(true))
+                uiObjects.add(o);
 
         int errorMessage = gameObject != null && gameObject.map == null ? 1 : 0;
         drawCount = gameObjects.length + uiObjects.size() + errorMessage;
 
-//            Console.map("Objects to draw", drawCount);
+//        Console.mapDebug("Objects to draw", drawCount);
 
         // Don't read drawObjects for rendering while it's being edited
         synchronized (drawObjects) {
 
             // Match the number of draw objects and the number of gameobjects to draw
             if(drawCount < drawObjects.size()) {
-                List<DrawObject> additionalObjects = drawObjects.subList(0, drawObjects.size() - drawCount);
-                drawObjectPool.returnObjects(additionalObjects);
+                List<DrawObject> additionalObjects = drawObjects.subList(drawCount, drawObjects.size());
+                DrawObject.returnObjects(additionalObjects);
                 additionalObjects.clear();
             }
             else while(drawCount > drawObjects.size())
-                    drawObjects.add(drawObjectPool.get());
+                    drawObjects.add(DrawObject.get());
 
             if(gameObject != null && gameObject.map != null) {
                 float2 screenOffset = halfResolution.subed(gameObject.location);
@@ -419,7 +422,7 @@ public class Camera {
                     GameObject g = gameObjects[i];
                     DrawObject drawObject = drawObjects.get(i);
 
-                    drawObject.image = g.getImage().impl;
+                    drawObject.image = Image.getImplementation(g.getImage());
                     drawObject.rotation = g.angle - gameObject.angle;
                     // Translate world position to screen position
                     drawObject.screenLocation.set(g.location.added(screenOffset).rotateAround(halfResolution, -gameObject.angle).toI());
@@ -440,15 +443,17 @@ public class Camera {
                 UIObject u = uiObjects.get(uiObjects.size() - i - 1);
                 DrawObject drawObject = drawObjects.get(i + gameObjects.length + errorMessage);
 
-                drawObject.image = u.getImage().impl;
+                drawObject.image = Image.getImplementation(u.getImage());
                 drawObject.rotation = 0;
                 drawObject.screenLocation.set(u.getCachedScreenPos());
             }
+
+            renderHash = Objects.hash(backgroundColor, resolution, drawObjects);
         }
 
         // Reset the cache immediately after using it to use less resources rather than
         // having it stored unused until the next rendering
-        if(ui != null) ui.resetCache();
+        if(ui != null) ((UIObject) ui).resetCache();
 
         return renderPrepDuration = System.nanoTime() - start;
     }
@@ -468,9 +473,13 @@ public class Camera {
 
         // Possibly wait for prepareRender()
         synchronized (this.drawObjects) {
+            // Did anything change?
+            if(Time.realTime() - lastRenderTime < 1 && lastRenderHash == (lastRenderHash = renderHash))
+                return renderDuration = System.nanoTime() - start;
             // Create a copy to prevent any modifications from other threads
             drawObjects = this.drawObjects.toArray(new DrawObject[0]);
         }
+        lastRenderTime = Time.realTime();
 
         DISPLAY.draw(drawObjects, backgroundColor);
 
@@ -494,15 +503,6 @@ public class Camera {
         }
     }
 
-    /**
-     * Returns the draw pool size.
-     * @return
-     */
-    int getPoolSize() {
-        synchronized (drawObjects) {
-            return drawObjectPool.size();
-        }
-    }
 
 
     /**

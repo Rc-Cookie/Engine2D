@@ -30,23 +30,41 @@ import java.io.Serializable;
 
 /**
  * A 3-by-3 matrix. Stored in column-major order.
- * 
+ *
  * @author Daniel Murphy
+ * @version $Id: $Id
  */
 public class Mat33 implements Serializable {
   private static final long serialVersionUID = 2L;
 
+  /** Constant <code>IDENTITY</code> */
   public static final Mat33 IDENTITY = new Mat33(new float3(1, 0, 0), new float3(0, 1, 0), new float3(0,
       0, 1));
 
   public final float3 ex, ey, ez;
 
+  /**
+   * <p>Constructor for Mat33.</p>
+   */
   public Mat33() {
     ex = new float3();
     ey = new float3();
     ez = new float3();
   }
 
+  /**
+   * <p>Constructor for Mat33.</p>
+   *
+   * @param exx a float
+   * @param exy a float
+   * @param exz a float
+   * @param eyx a float
+   * @param eyy a float
+   * @param eyz a float
+   * @param ezx a float
+   * @param ezy a float
+   * @param ezz a float
+   */
   public Mat33(float exx, float exy, float exz, float eyx, float eyy, float eyz, float ezx,
       float ezy, float ezz) {
     ex = new float3(exx, exy, exz);
@@ -54,18 +72,41 @@ public class Mat33 implements Serializable {
     ez = new float3(ezx, ezy, ezz);
   }
 
+  /**
+   * <p>Constructor for Mat33.</p>
+   *
+   * @param argCol1 a {@link com.github.rccookie.geometry.performance.float3} object
+   * @param argCol2 a {@link com.github.rccookie.geometry.performance.float3} object
+   * @param argCol3 a {@link com.github.rccookie.geometry.performance.float3} object
+   */
   public Mat33(float3 argCol1, float3 argCol2, float3 argCol3) {
     ex = argCol1.clone();
     ey = argCol2.clone();
     ez = argCol3.clone();
   }
 
+  /**
+   * <p>setZero.</p>
+   */
   public void setZero() {
     ex.setZero();
     ey.setZero();
     ez.setZero();
   }
 
+  /**
+   * <p>set.</p>
+   *
+   * @param exx a float
+   * @param exy a float
+   * @param exz a float
+   * @param eyx a float
+   * @param eyy a float
+   * @param eyz a float
+   * @param ezx a float
+   * @param ezy a float
+   * @param ezz a float
+   */
   public void set(float exx, float exy, float exz, float eyx, float eyy, float eyz, float ezx,
       float ezy, float ezz) {
     ex.x = exx;
@@ -79,6 +120,11 @@ public class Mat33 implements Serializable {
     ez.z = eyz;
   }
 
+  /**
+   * <p>set.</p>
+   *
+   * @param mat a {@link org.jbox2d.common.Mat33} object
+   */
   public void set(Mat33 mat) {
     float3 vec = mat.ex;
     ex.x = vec.x;
@@ -94,6 +140,9 @@ public class Mat33 implements Serializable {
     ez.z = vec2.z;
   }
 
+  /**
+   * <p>setIdentity.</p>
+   */
   public void setIdentity() {
     ex.x = (float) 1;
     ex.y = (float) 0;
@@ -107,27 +156,62 @@ public class Mat33 implements Serializable {
   }
 
   // / Multiply a matrix times a vector.
+  /**
+   * <p>mul.</p>
+   *
+   * @param A a {@link org.jbox2d.common.Mat33} object
+   * @param v a {@link com.github.rccookie.geometry.performance.float3} object
+   * @return a {@link com.github.rccookie.geometry.performance.float3} object
+   */
   public static final float3 mul(Mat33 A, float3 v) {
     return new float3(v.x * A.ex.x + v.y * A.ey.x + v.z + A.ez.x, v.x * A.ex.y + v.y * A.ey.y + v.z
         * A.ez.y, v.x * A.ex.z + v.y * A.ey.z + v.z * A.ez.z);
   }
 
+  /**
+   * <p>mul22.</p>
+   *
+   * @param A a {@link org.jbox2d.common.Mat33} object
+   * @param v a {@link com.github.rccookie.geometry.performance.float2} object
+   * @return a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public static final float2 mul22(Mat33 A, float2 v) {
     return new float2(A.ex.x * v.x + A.ey.x * v.y, A.ex.y * v.x + A.ey.y * v.y);
   }
 
+  /**
+   * <p>mul22ToOut.</p>
+   *
+   * @param A a {@link org.jbox2d.common.Mat33} object
+   * @param v a {@link com.github.rccookie.geometry.performance.float2} object
+   * @param out a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public static final void mul22ToOut(Mat33 A, float2 v, float2 out) {
     final float tempx = A.ex.x * v.x + A.ey.x * v.y;
     out.y = A.ex.y * v.x + A.ey.y * v.y;
     out.x = tempx;
   }
 
+  /**
+   * <p>mul22ToOutUnsafe.</p>
+   *
+   * @param A a {@link org.jbox2d.common.Mat33} object
+   * @param v a {@link com.github.rccookie.geometry.performance.float2} object
+   * @param out a {@link com.github.rccookie.geometry.performance.float2} object
+   */
   public static final void mul22ToOutUnsafe(Mat33 A, float2 v, float2 out) {
     assert (v != out);
     out.y = A.ex.y * v.x + A.ey.y * v.y;
     out.x = A.ex.x * v.x + A.ey.x * v.y;
   }
 
+  /**
+   * <p>mulToOut.</p>
+   *
+   * @param A a {@link org.jbox2d.common.Mat33} object
+   * @param v a {@link com.github.rccookie.geometry.performance.float3} object
+   * @param out a {@link com.github.rccookie.geometry.performance.float3} object
+   */
   public static final void mulToOut(Mat33 A, float3 v, float3 out) {
     final float tempy = v.x * A.ex.y + v.y * A.ey.y + v.z * A.ez.y;
     final float tempz = v.x * A.ex.z + v.y * A.ey.z + v.z * A.ez.z;
@@ -136,6 +220,13 @@ public class Mat33 implements Serializable {
     out.z = tempz;
   }
 
+  /**
+   * <p>mulToOutUnsafe.</p>
+   *
+   * @param A a {@link org.jbox2d.common.Mat33} object
+   * @param v a {@link com.github.rccookie.geometry.performance.float3} object
+   * @param out a {@link com.github.rccookie.geometry.performance.float3} object
+   */
   public static final void mulToOutUnsafe(Mat33 A, float3 v, float3 out) {
     assert (out != v);
     out.x = v.x * A.ex.x + v.y * A.ey.x + v.z * A.ez.x;
@@ -146,9 +237,9 @@ public class Mat33 implements Serializable {
   /**
    * Solve A * x = b, where b is a column vector. This is more efficient than computing the inverse
    * in one-shot cases.
-   * 
-   * @param b
-   * @return
+   *
+   * @param b a {@link com.github.rccookie.geometry.performance.float2} object
+   * @return a {@link com.github.rccookie.geometry.performance.float2} object
    */
   public final float2 solve22(float2 b) {
     float2 x = new float2();
@@ -159,9 +250,9 @@ public class Mat33 implements Serializable {
   /**
    * Solve A * x = b, where b is a column vector. This is more efficient than computing the inverse
    * in one-shot cases.
-   * 
-   * @param b
-   * @return
+   *
+   * @param b a {@link com.github.rccookie.geometry.performance.float2} object
+   * @param out a {@link com.github.rccookie.geometry.performance.float2} object
    */
   public final void solve22ToOut(float2 b, float2 out) {
     final float a11 = ex.x, a12 = ey.x, a21 = ex.y, a22 = ey.y;
@@ -177,9 +268,9 @@ public class Mat33 implements Serializable {
   /**
    * Solve A * x = b, where b is a column vector. This is more efficient than computing the inverse
    * in one-shot cases.
-   * 
-   * @param b
-   * @return
+   *
+   * @param b a {@link com.github.rccookie.geometry.performance.float3} object
+   * @return a {@link com.github.rccookie.geometry.performance.float3} object
    */
   public final float3 solve33(float3 b) {
     float3 x = new float3();
@@ -190,8 +281,8 @@ public class Mat33 implements Serializable {
   /**
    * Solve A * x = b, where b is a column vector. This is more efficient than computing the inverse
    * in one-shot cases.
-   * 
-   * @param b
+   *
+   * @param b a {@link com.github.rccookie.geometry.performance.float3} object
    * @param out the result
    */
   public final void solve33ToOut(float3 b, float3 out) {
@@ -212,6 +303,11 @@ public class Mat33 implements Serializable {
     out.z = z;
   }
 
+  /**
+   * <p>getInverse22.</p>
+   *
+   * @param M a {@link org.jbox2d.common.Mat33} object
+   */
   public void getInverse22(Mat33 M) {
     float a = ex.x, b = ey.x, c = ex.y, d = ey.y;
     float det = a * d - b * c;
@@ -231,6 +327,11 @@ public class Mat33 implements Serializable {
   }
 
   // / Returns the zero matrix if singular.
+  /**
+   * <p>getSymInverse33.</p>
+   *
+   * @param M a {@link org.jbox2d.common.Mat33} object
+   */
   public void getSymInverse33(Mat33 M) {
     float bx = ey.y * ez.z - ey.z * ez.y;
     float by = ey.z * ez.x - ey.x * ez.z;
@@ -258,11 +359,18 @@ public class Mat33 implements Serializable {
   }
 
 
+  /**
+   * <p>setScaleTransform.</p>
+   *
+   * @param scale a float
+   * @param out a {@link org.jbox2d.common.Mat33} object
+   */
   public final static void setScaleTransform(float scale, Mat33 out) {
     out.ex.x = scale;
     out.ey.y = scale;
   }
 
+  /** {@inheritDoc} */
   @Override
   public int hashCode() {
     final int prime = 31;
@@ -273,6 +381,7 @@ public class Mat33 implements Serializable {
     return result;
   }
 
+  /** {@inheritDoc} */
   @Override
   public boolean equals(Object obj) {
     if (this == obj) return true;

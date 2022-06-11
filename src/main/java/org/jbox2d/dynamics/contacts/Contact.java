@@ -40,23 +40,30 @@ import org.jbox2d.pooling.IWorldPool;
  * The class manages contact between two shapes. A contact exists for each overlapping AABB in the
  * broad-phase (except if filtered). Therefore a contact object may exist that has no contact
  * points.
- * 
+ *
  * @author daniel
+ * @version $Id: $Id
  */
 public abstract class Contact {
 
   // Flags stored in m_flags
   // Used when crawling contact graph when forming islands.
+  /** Constant <code>ISLAND_FLAG=0x0001</code> */
   public static final int ISLAND_FLAG = 0x0001;
   // Set when the shapes are touching.
+  /** Constant <code>TOUCHING_FLAG=0x0002</code> */
   public static final int TOUCHING_FLAG = 0x0002;
   // This contact can be disabled (by user)
+  /** Constant <code>ENABLED_FLAG=0x0004</code> */
   public static final int ENABLED_FLAG = 0x0004;
   // This contact needs filtering because a fixture filter was changed.
+  /** Constant <code>FILTER_FLAG=0x0008</code> */
   public static final int FILTER_FLAG = 0x0008;
   // This bullet contact had a TOI event
+  /** Constant <code>BULLET_HIT_FLAG=0x0010</code> */
   public static final int BULLET_HIT_FLAG = 0x0010;
 
+  /** Constant <code>TOI_FLAG=0x0020</code> */
   public static final int TOI_FLAG = 0x0020;
 
   public int m_flags;
@@ -87,6 +94,11 @@ public abstract class Contact {
 
   protected final IWorldPool pool;
 
+  /**
+   * <p>Constructor for Contact.</p>
+   *
+   * @param argPool a {@link org.jbox2d.pooling.IWorldPool} object
+   */
   protected Contact(IWorldPool argPool) {
     m_fixtureA = null;
     m_fixtureB = null;
@@ -96,7 +108,14 @@ public abstract class Contact {
     pool = argPool;
   }
 
-  /** initialization for pooling */
+  /**
+   * initialization for pooling
+   *
+   * @param fA a {@link org.jbox2d.dynamics.Fixture} object
+   * @param indexA a int
+   * @param fB a {@link org.jbox2d.dynamics.Fixture} object
+   * @param indexB a int
+   */
   public void init(Fixture fA, int indexA, Fixture fB, int indexB) {
     m_flags = ENABLED_FLAG;
 
@@ -130,6 +149,8 @@ public abstract class Contact {
 
   /**
    * Get the contact manifold. Do not set the point count to zero. Instead call Disable.
+   *
+   * @return a {@link org.jbox2d.collision.Manifold} object
    */
   public Manifold getManifold() {
     return m_manifold;
@@ -137,6 +158,8 @@ public abstract class Contact {
 
   /**
    * Get the world manifold.
+   *
+   * @param worldManifold a {@link org.jbox2d.collision.WorldManifold} object
    */
   public void getWorldManifold(WorldManifold worldManifold) {
     final Body bodyA = m_fixtureA.getBody();
@@ -150,8 +173,8 @@ public abstract class Contact {
 
   /**
    * Is this contact touching
-   * 
-   * @return
+   *
+   * @return a boolean
    */
   public boolean isTouching() {
     return (m_flags & TOUCHING_FLAG) == TOUCHING_FLAG;
@@ -160,8 +183,8 @@ public abstract class Contact {
   /**
    * Enable/disable this contact. This can be used inside the pre-solve contact listener. The
    * contact is only disabled for the current time step (or sub-step in continuous collisions).
-   * 
-   * @param flag
+   *
+   * @param flag a boolean
    */
   public void setEnabled(boolean flag) {
     if (flag) {
@@ -173,8 +196,8 @@ public abstract class Contact {
 
   /**
    * Has this contact been disabled?
-   * 
-   * @return
+   *
+   * @return a boolean
    */
   public boolean isEnabled() {
     return (m_flags & ENABLED_FLAG) == ENABLED_FLAG;
@@ -182,8 +205,8 @@ public abstract class Contact {
 
   /**
    * Get the next contact in the world's contact list.
-   * 
-   * @return
+   *
+   * @return a {@link org.jbox2d.dynamics.contacts.Contact} object
    */
   public Contact getNext() {
     return m_next;
@@ -191,62 +214,115 @@ public abstract class Contact {
 
   /**
    * Get the first fixture in this contact.
-   * 
-   * @return
+   *
+   * @return a {@link org.jbox2d.dynamics.Fixture} object
    */
   public Fixture getFixtureA() {
     return m_fixtureA;
   }
 
+  /**
+   * <p>getChildIndexA.</p>
+   *
+   * @return a int
+   */
   public int getChildIndexA() {
     return m_indexA;
   }
 
   /**
    * Get the second fixture in this contact.
-   * 
-   * @return
+   *
+   * @return a {@link org.jbox2d.dynamics.Fixture} object
    */
   public Fixture getFixtureB() {
     return m_fixtureB;
   }
 
+  /**
+   * <p>getChildIndexB.</p>
+   *
+   * @return a int
+   */
   public int getChildIndexB() {
     return m_indexB;
   }
 
+  /**
+   * <p>setFriction.</p>
+   *
+   * @param friction a float
+   */
   public void setFriction(float friction) {
     m_friction = friction;
   }
 
+  /**
+   * <p>getFriction.</p>
+   *
+   * @return a float
+   */
   public float getFriction() {
     return m_friction;
   }
 
+  /**
+   * <p>resetFriction.</p>
+   */
   public void resetFriction() {
     m_friction = Contact.mixFriction(m_fixtureA.m_friction, m_fixtureB.m_friction);
   }
 
+  /**
+   * <p>setRestitution.</p>
+   *
+   * @param restitution a float
+   */
   public void setRestitution(float restitution) {
     m_restitution = restitution;
   }
 
+  /**
+   * <p>getRestitution.</p>
+   *
+   * @return a float
+   */
   public float getRestitution() {
     return m_restitution;
   }
 
+  /**
+   * <p>resetRestitution.</p>
+   */
   public void resetRestitution() {
     m_restitution = Contact.mixRestitution(m_fixtureA.m_restitution, m_fixtureB.m_restitution);
   }
 
+  /**
+   * <p>setTangentSpeed.</p>
+   *
+   * @param speed a float
+   */
   public void setTangentSpeed(float speed) {
     m_tangentSpeed = speed;
   }
 
+  /**
+   * <p>getTangentSpeed.</p>
+   *
+   * @return a float
+   */
   public float getTangentSpeed() {
     return m_tangentSpeed;
   }
 
+  /**
+   * <p>evaluate.</p>
+   *
+   * @param manifold a {@link org.jbox2d.collision.Manifold} object
+   * @param xfA a {@link org.jbox2d.common.Transform} object
+   * @param xfB a {@link org.jbox2d.common.Transform} object
+   */
   public abstract void evaluate(Manifold manifold, Transform xfA, Transform xfB);
 
   /**
@@ -259,6 +335,11 @@ public abstract class Contact {
   // djm pooling
   private final Manifold oldManifold = new Manifold();
 
+  /**
+   * <p>update.</p>
+   *
+   * @param listener a {@link org.jbox2d.callbacks.ContactListener} object
+   */
   public void update(ContactListener listener) {
 
     oldManifold.set(m_manifold);
@@ -342,10 +423,10 @@ public abstract class Contact {
   /**
    * Friction mixing law. The idea is to allow either fixture to drive the restitution to zero. For
    * example, anything slides on ice.
-   * 
-   * @param friction1
-   * @param friction2
-   * @return
+   *
+   * @param friction1 a float
+   * @param friction2 a float
+   * @return a float
    */
   public static final float mixFriction(float friction1, float friction2) {
     return MathUtils.sqrt(friction1 * friction2);
@@ -354,10 +435,10 @@ public abstract class Contact {
   /**
    * Restitution mixing law. The idea is allow for anything to bounce off an inelastic surface. For
    * example, a superball bounces on anything.
-   * 
-   * @param restitution1
-   * @param restitution2
-   * @return
+   *
+   * @param restitution1 a float
+   * @param restitution2 a float
+   * @return a float
    */
   public static final float mixRestitution(float restitution1, float restitution2) {
     return restitution1 > restitution2 ? restitution1 : restitution2;

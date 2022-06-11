@@ -35,17 +35,26 @@ import com.github.rccookie.geometry.performance.float2;
 
 /**
  * A circle shape.
+ *
  */
 public class CircleShape extends Shape {
 
   public final float2 m_p;
 
+  /**
+   * <p>Constructor for CircleShape.</p>
+   */
   public CircleShape() {
     super(ShapeType.CIRCLE);
     m_p = new float2();
     m_radius = 0;
   }
 
+  /**
+   * <p>clone.</p>
+   *
+   * @return a {@link org.jbox2d.collision.shapes.Shape} object
+   */
   public final Shape clone() {
     CircleShape shape = new CircleShape();
     shape.m_p.x = m_p.x;
@@ -54,15 +63,20 @@ public class CircleShape extends Shape {
     return shape;
   }
 
+  /**
+   * <p>getChildCount.</p>
+   *
+   * @return a int
+   */
   public final int getChildCount() {
     return 1;
   }
 
   /**
    * Get the supporting vertex index in the given direction.
-   * 
-   * @param d
-   * @return
+   *
+   * @param d a {@link com.github.rccookie.geometry.performance.float2} object
+   * @return a int
    */
   public final int getSupport(final float2 d) {
     return 0;
@@ -70,9 +84,9 @@ public class CircleShape extends Shape {
 
   /**
    * Get the supporting vertex in the given direction.
-   * 
-   * @param d
-   * @return
+   *
+   * @param d a {@link com.github.rccookie.geometry.performance.float2} object
+   * @return a {@link com.github.rccookie.geometry.performance.float2} object
    */
   public final float2 getSupportVertex(final float2 d) {
     return m_p;
@@ -80,8 +94,8 @@ public class CircleShape extends Shape {
 
   /**
    * Get the vertex count.
-   * 
-   * @return
+   *
+   * @return a int
    */
   public final int getVertexCount() {
     return 1;
@@ -89,15 +103,16 @@ public class CircleShape extends Shape {
 
   /**
    * Get a vertex by index.
-   * 
-   * @param index
-   * @return
+   *
+   * @param index a int
+   * @return a {@link com.github.rccookie.geometry.performance.float2} object
    */
   public final float2 getVertex(final int index) {
     assert (index == 0);
     return m_p;
   }
 
+  /** {@inheritDoc} */
   @Override
   public final boolean testPoint(final Transform transform, final float2 p) {
     // Rot.mulToOutUnsafe(transform.q, m_p, center);
@@ -113,6 +128,7 @@ public class CircleShape extends Shape {
     return centerx * centerx + centery * centery <= m_radius * m_radius;
   }
 
+  /** {@inheritDoc} */
   @Override
   public float computeDistanceToOut(Transform xf, float2 p, int childIndex, float2 normalOut) {
     final Rot xfq = xf.q;
@@ -130,6 +146,7 @@ public class CircleShape extends Shape {
   // From Section 3.1.2
   // x = s + a * r
   // norm(x) = radius
+  /** {@inheritDoc} */
   @Override
   public final boolean raycast(RayCastOutput output, RayCastInput input, Transform transform,
       int childIndex) {
@@ -179,6 +196,7 @@ public class CircleShape extends Shape {
     return false;
   }
 
+  /** {@inheritDoc} */
   @Override
   public final void computeAABB(final AABB aabb, final Transform transform, int childIndex) {
     final Rot tq = transform.q;
@@ -192,6 +210,7 @@ public class CircleShape extends Shape {
     aabb.upperBound.y = py + m_radius;
   }
 
+  /** {@inheritDoc} */
   @Override
   public final void computeMass(final MassData massData, final float density) {
     massData.mass = density * Settings.PI * m_radius * m_radius;

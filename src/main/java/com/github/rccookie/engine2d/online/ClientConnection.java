@@ -16,12 +16,14 @@ import java.util.function.Consumer;
 
 import com.github.rccookie.engine2d.Application;
 import com.github.rccookie.engine2d.Execute;
+import com.github.rccookie.engine2d.online.server.Message;
 import com.github.rccookie.json.Json;
 import com.github.rccookie.json.JsonElement;
 import com.github.rccookie.json.JsonObject;
 import com.github.rccookie.json.JsonParser;
 import com.github.rccookie.util.Arguments;
 import com.github.rccookie.util.Console;
+
 import org.jetbrains.annotations.Blocking;
 
 public class ClientConnection implements Closeable {
@@ -30,16 +32,26 @@ public class ClientConnection implements Closeable {
     private final InputStream in;
     private final PrintStream out;
     private final Map<MessageType, Set<Consumer<OnlineData>>> generalProcessors = new HashMap<>();
-    private final Map<String, Consumer<OnlineData>> processors = new HashMap<>();
+    private final Map<String, Consumer<OnlineData>> shareProcessors = new HashMap<>();
     {
         Set<Consumer<OnlineData>> set = new HashSet<>();
         set.add(data -> Execute.later(() -> data.json.asObject().forEach((k, d) -> {
-            if(processors.containsKey(k))
-                processors.get(k).accept(new OnlineData(data.json.get(k), data.delay, data.type));
+            if(shareProcessors.containsKey(k))
+                shareProcessors.get(k).accept(new OnlineData(data.json.get(k), data.delay, data.type));
         })));
         generalProcessors.put(MessageType.CLIENT_TO_CLIENT, set);
     }
-    private final JsonObject queuedData = new JsonObject();
+    private final Map<String, Consumer<OnlineData>> sendProcessors = new HashMap<>();
+    {
+        Set<Consumer<OnlineData>> set = new HashSet<>();
+        set.add(data -> Execute.later(() -> data.json.asObject().forEach((k, d) -> {
+            if(sendProcessors.containsKey(k))
+                sendProcessors.get(k).accept(new OnlineData(data.json.get(k), data.delay, data.type));
+        })));
+        generalProcessors.put(MessageType.SERVER_TO_CLIENT, set);
+    }
+    private final JsonObject queuedShareData = new JsonObject();
+    private final JsonObject queuedSendData = new JsonObject();
     private final Thread outputThread = new Thread("Online Output Thread") {
         {
             setDaemon(true);
@@ -49,13 +61,23 @@ public class ClientConnection implements Closeable {
             //noinspection InfiniteLoopStatement
             while(true) {
                 try { join(); } catch(InterruptedException ignored) { }
-                String dataString;
-                synchronized (queuedData) {
-                    if(queuedData.isEmpty()) continue;
-                    dataString = Online.createMessage(queuedData, MessageType.CLIENT_TO_CLIENT).asObject().toString(false);
-                    queuedData.clear();
+                String messageString;
+                synchronized (queuedShareData) {
+                    if(queuedShareData.isEmpty()) messageString = null;
+                    else {
+                        messageString = Json.toString(new Message(JsonElement.wrap(queuedShareData), MessageType.CLIENT_TO_CLIENT), false);
+                        queuedShareData.clear();
+                    }
                 }
-                out.println(dataString);
+                if(messageString != null) out.println(messageString);
+                synchronized (queuedSendData) {
+                    if(queuedSendData.isEmpty()) messageString = null;
+                    else {
+                        messageString = Json.toString(new Message(JsonElement.wrap(queuedSendData), MessageType.CLIENT_TO_SERVER), false);
+                        queuedSendData.clear();
+                    }
+                }
+                if(messageString != null) out.println(messageString);
             }
         }
     };
@@ -102,14 +124,19 @@ public class ClientConnection implements Closeable {
             if(Online.clientConnection == this)
                 Online.disconnect();
         }
-        Console.info("Disconnected from server");
+        Console.log("Disconnected from server");
     }
 
     private void checkForData() {
-        synchronized (queuedData) {
-            if(queuedData.isEmpty()) return;
+        boolean queued = false;
+        synchronized (queuedShareData) {
+            if(!queuedShareData.isEmpty()) queued = true;
         }
-        outputThread.interrupt();
+        if(!queued) synchronized (queuedSendData) {
+            if(!queuedSendData.isEmpty()) queued = true;
+        }
+        if(queued)
+            outputThread.interrupt();
     }
 
     private void processData(JsonElement data) {
@@ -133,25 +160,47 @@ public class ClientConnection implements Closeable {
                 .add(Arguments.checkNull(processor, "processor"));
     }
 
-    public void registerProcessor(String key, Consumer<OnlineData> processor) {
+    public void registerShareProcessor(String key, Consumer<OnlineData> processor) {
         checkClosed();
-        processors.put(Arguments.checkNull(key, "key"),
+        shareProcessors.put(Arguments.checkNull(key, "key"),
                 Arguments.checkNull(processor, "processor"));
     }
 
-    public void submit(String key, Object jsonData) {
+    public void registerSendProcessor(String key, Consumer<OnlineData> processor) {
         checkClosed();
-        synchronized (queuedData) {
-            queuedData.put(key, jsonData);
+        sendProcessors.put(Arguments.checkNull(key, "key"),
+                Arguments.checkNull(processor, "processor"));
+    }
+
+    public void share(String key, Object jsonData) {
+        checkClosed();
+        synchronized (queuedShareData) {
+            queuedShareData.put(key, jsonData);
         }
     }
 
-    public <T> void submit(String key, T jsonData, BinaryOperator<T> combiner) {
+    public <T> void share(String key, T jsonData, BinaryOperator<T> combiner) {
         checkClosed();
-        synchronized (queuedData) {
-            if(combiner != null && queuedData.containsKey(key))
-                queuedData.put(key, combiner.apply(jsonData, queuedData.getElement(key).get()));
-            else queuedData.put(key, jsonData);
+        synchronized (queuedShareData) {
+            if(combiner != null && queuedShareData.containsKey(key))
+                queuedShareData.put(key, combiner.apply(jsonData, queuedShareData.getElement(key).get()));
+            else queuedShareData.put(key, jsonData);
+        }
+    }
+
+    public void send(String key, Object jsonData) {
+        checkClosed();
+        synchronized (queuedSendData) {
+            queuedSendData.put(key, jsonData);
+        }
+    }
+
+    public <T> void send(String key, T jsonData, BinaryOperator<T> combiner) {
+        checkClosed();
+        synchronized (queuedSendData) {
+            if(combiner != null && queuedSendData.containsKey(key))
+                queuedSendData.put(key, combiner.apply(jsonData, queuedSendData.getElement(key).get()));
+            else queuedSendData.put(key, jsonData);
         }
     }
 
