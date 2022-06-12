@@ -97,7 +97,7 @@ public class Camera {
      * Rendering background color.
      */
     @NotNull
-    private Color backgroundColor = Color.WHITE;
+    private Color backgroundColor = Color.DARK_GRAY;
 
 
     /**
