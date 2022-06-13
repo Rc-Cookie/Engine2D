@@ -12,10 +12,12 @@ import javax.imageio.ImageIO;
 import com.github.rccookie.engine2d.image.Color;
 import com.github.rccookie.engine2d.image.Image;
 import com.github.rccookie.engine2d.impl.ImageImpl;
+import com.github.rccookie.engine2d.util.Num;
 import com.github.rccookie.engine2d.util.RuntimeIOException;
 import com.github.rccookie.geometry.performance.int2;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Range;
 
 /**
  * AWT implementation of {@link ImageImpl} using {@link BufferedImage}.
@@ -30,6 +32,10 @@ public class AWTImageImpl implements ImageImpl {
      * The image size, cached.
      */
     final int2 size;
+    /**
+     * Transparency of the image.
+     */
+    int transparency = 255;
 
 
     /**
@@ -81,6 +87,16 @@ public class AWTImageImpl implements ImageImpl {
         return new AWTImageImpl(imageClone);
     }
 
+
+    @Override
+    public @Range(from = 0, to = 255) int getAlpha() {
+        return transparency;
+    }
+
+    @Override
+    public void setAlpha(@Range(from = 0, to = 255) int a) {
+        transparency = a;
+    }
 
     @Override
     public void fillRect(int2 topLeft, int2 size, Color color) {
@@ -142,7 +158,10 @@ public class AWTImageImpl implements ImageImpl {
     @Override
     public void drawImage(ImageImpl image, int2 topLeft) {
         Graphics2D g = this.image.createGraphics();
-        g.drawImage(((AWTImageImpl) image).image, topLeft.x, topLeft.y, null);
+        AWTImageImpl impl = (AWTImageImpl) image;
+        if(impl.transparency != 255)
+            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, Num.clamp(impl.transparency / 255f, 0, 1)));
+        g.drawImage(impl.image, topLeft.x, topLeft.y, null);
         g.dispose();
     }
 

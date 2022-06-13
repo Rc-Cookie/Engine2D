@@ -9,11 +9,27 @@ import com.github.rccookie.util.Arguments;
 import com.github.rccookie.util.Cloneable;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Range;
 
 /**
  * Generic implementation of an image.
  */
 public interface ImageImpl extends Cloneable<ImageImpl> {
+
+    /**
+     * Returns the transparency of this image.
+     *
+     * @return The current transparency
+     */
+    @Range(from = 0, to = 255)
+    int getAlpha();
+
+    /**
+     * Sets the transparency of this image.
+     *
+     * @param a The transparency to set
+     */
+    void setAlpha(@Range(from = 0, to = 255) int a);
 
     /**
      * Fills the given rectangle.
@@ -109,6 +125,7 @@ public interface ImageImpl extends Cloneable<ImageImpl> {
     final class ZeroSizeImageImpl implements ImageImpl {
 
         private final int2 size;
+        private int alpha = 255;
 
         public ZeroSizeImageImpl(int2 size) {
             Arguments.checkRange(size.x, 0, null);
@@ -116,6 +133,16 @@ public interface ImageImpl extends Cloneable<ImageImpl> {
             if(size.x * size.y != 0)
                 throw new IllegalArgumentException("Image not zero-sized");
             this.size = size;
+        }
+
+        @Override
+        public @Range(from = 0, to = 255) int getAlpha() {
+            return alpha;
+        }
+
+        @Override
+        public void setAlpha(@Range(from = 0, to = 255) int a) {
+            alpha = a;
         }
 
         @Override

@@ -1,12 +1,13 @@
 package com.github.rccookie.engine2d.impl.awt;
 
+import java.awt.AlphaComposite;
+import java.awt.Composite;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.geom.AffineTransform;
-import java.awt.image.BufferedImage;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -18,6 +19,7 @@ import com.github.rccookie.engine2d.core.DrawObject;
 import com.github.rccookie.engine2d.image.Color;
 import com.github.rccookie.engine2d.impl.Display;
 import com.github.rccookie.engine2d.impl.DisplayController;
+import com.github.rccookie.engine2d.util.Num;
 import com.github.rccookie.geometry.performance.int2;
 
 /**
@@ -42,7 +44,7 @@ public class AWTDisplay extends JPanel implements Display {
     final JFrame window;
 
     /**
-     * Currently set resulution.
+     * Currently set resolution.
      */
     private int2 resolution;
 
@@ -130,21 +132,33 @@ public class AWTDisplay extends JPanel implements Display {
         g.setColor(background.getAwtColor());
         g.fillRect(0, 0, resolution.x, resolution.y);
 
+        boolean wasTransparent = false;
+        Composite plain = g.getComposite();
+
         for(DrawObject o : objects) {
 
             AffineTransform oldTransform = null;
 
-            BufferedImage oImage = ((AWTImageImpl) o.image).image;
-            int2 drawPos = o.screenLocation.subed(new int2(oImage.getWidth() / 2, oImage.getHeight() / 2));
+            AWTImageImpl impl = (AWTImageImpl) o.image;
+
+            int2 drawPos = o.screenLocation.subed(new int2(impl.image.getWidth() / 2, impl.image.getHeight() / 2));
             if(o.rotation != 0) {
                 oldTransform = g.getTransform();
                 g.rotate(Math.toRadians(o.rotation), o.screenLocation.x, o.screenLocation.y);
             }
+            if(impl.transparency != 255) {
+                wasTransparent = true;
+                g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, Num.clamp(impl.transparency / 255f, 0, 1)));
+            }
+            else if(wasTransparent) {
+                g.setComposite(plain);
+            }
 
-            g.drawImage(oImage, drawPos.x, drawPos.y, null);
+            g.drawImage(impl.image, drawPos.x, drawPos.y, null);
 
             if(oldTransform != null) g.setTransform(oldTransform);
         }
+        g.setComposite(plain);
     }
 
     /**

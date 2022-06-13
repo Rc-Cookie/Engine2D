@@ -3,6 +3,7 @@ package com.github.rccookie.engine2d;
 import java.io.IOException;
 import java.net.Inet4Address;
 
+import com.github.rccookie.engine2d.components.Follower;
 import com.github.rccookie.engine2d.image.Color;
 import com.github.rccookie.engine2d.image.Font;
 import com.github.rccookie.engine2d.image.Image;
@@ -105,7 +106,7 @@ class TestLoader implements ILoader {
         fade.onComplete.add(s -> {
             if(s) fade.fadeOut();
         });
-        fade.input.addKeyPressListener(fade::fadeIn, "f");
+//        fade.input.addKeyPressListener(fade::fadeIn, "f");
 
         StackView stack = new StackView(new Dimension(uiObject, 160, 0), StackView.Orientation.TOP_TO_BOTTOM);//new SimpleList(uiObject, true);
         stack.setStartGapSize(10);
@@ -142,6 +143,7 @@ class TestLoader implements ILoader {
 
         GameObject cameraManager = new GameObject();
         cameraManager.setImage(new Image(int2.one.scaled(30), Color.BLACK));
+        cameraManager.getImage().setAlpha(127);
         cameraManager.getComponent(Collider.class).setRestitution(0);
 //        cameraManager.getComponent(Collider.class).setDensity(1);
         cameraManager.setBackgroundFriction(1);
@@ -161,6 +163,12 @@ class TestLoader implements ILoader {
         cameraManager.input.addKeyListener(() -> cameraManager.angle += 90 * Time.delta(), "e");
         cameraManager.input.addKeyListener(() -> cameraManager.angle -= 90 * Time.delta(), "q");
 
+        cameraManager.input.addKeyPressListener(() -> cameraManager.setFixedRotation(!cameraManager.isFixedRotation()), "f");
+
+        GameObject cameraHolder = new GameObject();
+        Follower follower = new Follower(cameraHolder, cameraManager);
+        follower.setFollowAngle(false);
+
         camera.update.add(() -> {
             Mouse m = camera.input.getMouse();
             if(!m.pressed) return;
@@ -170,7 +178,7 @@ class TestLoader implements ILoader {
             o.setMap(map);
         });
 
-        camera.setGameObject(cameraManager);
+        camera.setGameObject(cameraHolder);
         camera.setUI(ui);
 
         Execute.when(() -> uiObject1.update.add(() -> uiObject1.relativeLoc.x = Math.min(1, uiObject1.relativeLoc.x + Time.delta())), () -> Input.getKeyState(" "));

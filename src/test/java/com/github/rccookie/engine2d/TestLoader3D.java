@@ -2,7 +2,7 @@ package com.github.rccookie.engine2d;
 
 import com.github.rccookie.engine2d.image.Color;
 import com.github.rccookie.engine2d.image.Image;
-import com.github.rccookie.engine2d.physics.SimplePlayerController;
+import com.github.rccookie.engine2d.components.SimplePlayerController;
 import com.github.rccookie.engine2d.ui.IconPanel;
 import com.github.rccookie.geometry.performance.Coll3;
 import com.github.rccookie.geometry.performance.Ray3;

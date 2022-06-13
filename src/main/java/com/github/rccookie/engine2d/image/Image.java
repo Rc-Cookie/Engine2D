@@ -128,6 +128,55 @@ public class Image implements Cloneable<Image> {
         return new Image(impl.clone());
     }
 
+
+    /**
+     * Returns the current transparency of this image. 0 means transparent, 255 means
+     * opaque.
+     *
+     * @return The current transparency
+     */
+    @Range(from = 0, to = 255)
+    public int getAlpha() {
+        return impl.getAlpha();
+    }
+
+    /**
+     * Returns the current transparency of this image in float space. 0 means transparent,
+     * 1 means opaque.
+     *
+     * @return The current transparency
+     */
+    @Range(from = 0, to = 1)
+    public float getAlphaF() {
+        return Num.clamp((getAlpha() + 0.5f) / 255, 0, 1);
+    }
+
+    /**
+     * Sets the transparency of this image. The transparency defines the transparency
+     * when drawing this image onto another image, and when displaying it. It does function
+     * as a "post-processing" instruction and is independent of previous and subsequent
+     * drawing operations onto this image.
+     *
+     * @param a The alpha value to set. 0 means transparent, 255 means opaque
+     */
+    public void setAlpha(@Range(from = 0, to = 255) int a) {
+        Arguments.checkRange(a, 0, 256);
+        impl.setAlpha(a);
+    }
+
+    /**
+     * Sets the transparency of this image. The transparency defines the transparency
+     * when drawing this image onto another image, and when displaying it. It does function
+     * as a "post-processing" instruction and is independent of previous and subsequent
+     * drawing operations onto this image.
+     *
+     * @param fa The alpha value to set. 0 means transparent, 1 means opaque
+     */
+    public void setAlpha(@Range(from = 0, to = 1) float fa) {
+        Arguments.checkInclusive(fa, 0f, 1f);
+        setAlpha(Num.clamp(Num.round(fa), 0, 255));
+    }
+
     /**
      * Fills the specified rectangle with the given color.
      *
