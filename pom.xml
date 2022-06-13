@@ -6,7 +6,7 @@
 
   <groupId>com.github.rccookie</groupId>
   <artifactId>engine2d</artifactId>
-  <version>0.10.24</version>
+  <version>0.10.25</version>
 
   <properties>
     <maven.compiler.source>11</maven.compiler.source>
@@ -29,7 +29,7 @@
     <dependency>
       <groupId>com.github.rccookie</groupId>
       <artifactId>util</artifactId>
-      <version>1.11.1.0</version>
+      <version>1.11.1.2</version>
     </dependency>
     <dependency>
       <groupId>com.github.rccookie</groupId>
