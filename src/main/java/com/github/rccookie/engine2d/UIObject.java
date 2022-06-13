@@ -4,14 +4,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import com.github.rccookie.engine2d.core.LocalExecutionManager;
 import com.github.rccookie.engine2d.core.LocalInputManager;
 import com.github.rccookie.engine2d.image.Image;
-import com.github.rccookie.engine2d.ui.Structure;
 import com.github.rccookie.engine2d.image.Theme;
+import com.github.rccookie.engine2d.ui.Structure;
 import com.github.rccookie.engine2d.ui.util.Alignment;
 import com.github.rccookie.engine2d.util.Bounds;
 import com.github.rccookie.engine2d.util.NamedCaughtEvent;
@@ -31,6 +29,7 @@ import com.github.rccookie.geometry.performance.int2;
 import com.github.rccookie.util.Arguments;
 import com.github.rccookie.util.Console;
 import com.github.rccookie.util.IterableIterator;
+import com.github.rccookie.util.ListStream;
 import com.github.rccookie.util.ModIterableArrayList;
 
 import com.diogonunes.jcolor.Attribute;
@@ -974,8 +973,8 @@ public abstract class UIObject implements Iterable<UIObject> {
      * @return A stream over this and all its children
      */
     @NotNull
-    public Stream<UIObject> stream() {
-        return StreamSupport.stream(spliterator(), false);
+    public ListStream<UIObject> stream() {
+        return ListStream.of(this);
     }
 
     /**

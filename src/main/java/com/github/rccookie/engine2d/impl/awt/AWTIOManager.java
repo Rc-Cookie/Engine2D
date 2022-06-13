@@ -16,7 +16,6 @@ import com.github.rccookie.engine2d.impl.IOManager;
 import com.github.rccookie.engine2d.util.RuntimeIOException;
 import com.github.rccookie.util.Console;
 import com.github.rccookie.util.Future;
-import com.github.rccookie.util.PrecomputedFutureImpl;
 import com.github.rccookie.util.UncheckedException;
 
 import org.jetbrains.annotations.NotNull;
@@ -46,12 +45,12 @@ public class AWTIOManager implements IOManager {
     @Override
     public Future<String> getClipboard() {
         try {
-            return new PrecomputedFutureImpl<>((String) Toolkit.getDefaultToolkit()
+            return Future.of((String) Toolkit.getDefaultToolkit()
                     .getSystemClipboard().getContents(this)
                     .getTransferData(DataFlavor.stringFlavor));
         } catch (Exception e) {
             Console.error(e);
-            return new PrecomputedFutureImpl<>("");
+            return Future.of("");
         }
     }
 

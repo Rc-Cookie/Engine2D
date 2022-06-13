@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import com.github.rccookie.engine2d.core.LocalExecutionManager;
 import com.github.rccookie.engine2d.core.LocalInputManager;
@@ -19,8 +18,8 @@ import com.github.rccookie.event.LazyEvent;
 import com.github.rccookie.event.action.Action;
 import com.github.rccookie.event.action.IAction;
 import com.github.rccookie.geometry.performance.float2;
+import com.github.rccookie.util.ListStream;
 import com.github.rccookie.util.ModIterableArrayList;
-import com.github.rccookie.util.Utils;
 
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
@@ -453,6 +452,14 @@ public class GameObject {
         }
     }
 
+    public boolean isFixedRotation() {
+        return bodyData.fixedRotation;
+    }
+
+    public void setFixedRotation(boolean fixedRotation) {
+        bodyData.fixedRotation = fixedRotation;
+    }
+
     /**
      * Prepares the physics update by updating the physics body's parameters to
      * the currently set ones.
@@ -469,6 +476,8 @@ public class GameObject {
 
         if(bodyData.angle != body.m_sweep.a || !bodyData.position.equals(body.m_xf.p))
             body.setTransform(bodyData.position, bodyData.angle);
+        if(bodyData.fixedRotation != body.isFixedRotation())
+            body.setFixedRotation(bodyData.fixedRotation);
         body.setLinearVelocity(bodyData.linearVelocity);
         body.setAngularVelocity(bodyData.angularVelocity);
     }
@@ -511,7 +520,7 @@ public class GameObject {
      * @param type The type to search for
      * @return A stream of objects on this position
      */
-    public <T> Stream<T> findOnLoc(Class<T> type) {
+    public <T> ListStream<T> findOnLoc(Class<T> type) {
         return getMap().objects(location, type).filter(o -> o != this);
     }
 
@@ -523,7 +532,7 @@ public class GameObject {
      * @param type Type of objects to find
      * @return A stream of objects found
      */
-    public <T> Stream<T> findInRange(float maxDist, Class<T> type) {
+    public <T> ListStream<T> findInRange(float maxDist, Class<T> type) {
         return getMap().objects(location, maxDist, type).filter(o -> o != this);
     }
 
@@ -537,10 +546,10 @@ public class GameObject {
      * @param type The type of objects to find
      * @return A stream of objects found
      */
-    public <T> Stream<T> findAdjacent(float maxDist, boolean diagonal, Class<T> type) {
-        return Utils.filterType(getMap().objects().filter(diagonal ?
+    public <T> ListStream<T> findAdjacent(float maxDist, boolean diagonal, Class<T> type) {
+        return getMap().objects().filter(diagonal ?
                 o -> o != this && float2.maxDist(location, o.location) <= maxDist :
-                o -> o != this && float2.manhattanDist(location, o.location) <= maxDist), type);
+                o -> o != this && float2.manhattanDist(location, o.location) <= maxDist).filterType(type);
     }
 
 

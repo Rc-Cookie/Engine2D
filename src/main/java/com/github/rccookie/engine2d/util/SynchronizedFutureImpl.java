@@ -7,14 +7,12 @@ import com.github.rccookie.engine2d.Execute;
 import com.github.rccookie.util.Arguments;
 import com.github.rccookie.util.Future;
 
-public class SynchronizedMappedFutureImpl<V,W> implements Future<V> {
+public class SynchronizedFutureImpl<V> implements Future<V> {
 
-    private final Future<W> future;
-    private final Function<W,V> mapper;
+    private final Future<? extends V> future;
 
-    public SynchronizedMappedFutureImpl(Future<W> future, Function<W, V> mapper) {
+    public SynchronizedFutureImpl(Future<? extends V> future) {
         this.future = Arguments.checkNull(future, "future");
-        this.mapper = Arguments.checkNull(mapper, "mapper");
     }
 
     @Override
@@ -34,23 +32,33 @@ public class SynchronizedMappedFutureImpl<V,W> implements Future<V> {
 
     @Override
     public V get() throws IllegalStateException {
-        return mapper.apply(future.get());
+        return future.get();
     }
 
     @Override
     public V waitFor() throws IllegalStateException, UnsupportedOperationException {
-        return mapper.apply(future.waitFor()); // Called from the main thread anyway
+        return future.waitFor(); // Called from the main thread anyway
     }
 
     @Override
     public Future<V> then(Consumer<? super V> action) {
-        future.then(w -> Execute.synced(() -> action.accept(mapper.apply(w))));
+        future.then(w -> Execute.synced(() -> action.accept(w)));
         return this;
     }
 
     @Override
-    public Future<V> onCancel(Consumer<Exception> handler) {
-        future.onCancel(e -> Execute.synced(() -> handler.accept(e)));
+    public Future<V> except(Consumer<? super Exception> handler) {
+        future.except(e -> Execute.synced(() -> handler.accept(e)));
         return this;
+    }
+
+    @Override
+    public <T> Future<T> map(Function<? super V, ? extends T> mapper) {
+        return new SynchronizedFutureImpl<>(future.map(mapper));
+    }
+
+    @Override
+    public <T> Future<T> flatMap(Function<? super V, ? extends Future<T>> mapper) {
+        return new SynchronizedFutureImpl<>(future.flatMap(mapper));
     }
 }

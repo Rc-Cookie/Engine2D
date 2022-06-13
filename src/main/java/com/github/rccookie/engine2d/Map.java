@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Stream;
 
 import com.github.rccookie.engine2d.physics.Raycast;
 import com.github.rccookie.engine2d.physics.RaycastFilter;
@@ -15,8 +14,8 @@ import com.github.rccookie.event.Event;
 import com.github.rccookie.event.SimpleEvent;
 import com.github.rccookie.geometry.performance.float2;
 import com.github.rccookie.util.Arguments;
+import com.github.rccookie.util.ListStream;
 import com.github.rccookie.util.ModIterableArrayList;
-import com.github.rccookie.util.Utils;
 
 import org.jbox2d.callbacks.ContactImpulse;
 import org.jbox2d.callbacks.ContactListener;
@@ -213,8 +212,8 @@ public class Map {
      *
      * @return The objects on this map
      */
-    public Stream<GameObject> objects() {
-        return objects.stream();
+    public ListStream<GameObject> objects() {
+        return ListStream.of(objects);
     }
 
     /**
@@ -223,8 +222,8 @@ public class Map {
      * @param type The type of objects to find
      * @return A stream over those objects
      */
-    public <T> Stream<T> objects(Class<T> type) {
-        return Utils.filterType(objects(), type);
+    public <T> ListStream<T> objects(Class<T> type) {
+        return objects().filterType(type);
     }
 
     /**
@@ -234,8 +233,8 @@ public class Map {
      * @param type The type of objects to find
      * @return A stream over those objects
      */
-    public <T> Stream<T> objects(float2 pos, Class<T> type) {
-        return Utils.filterType(objects().filter(o -> o.location.equals(pos)), type);
+    public <T> ListStream<T> objects(float2 pos, Class<T> type) {
+        return objects().filter(o -> o.location.equals(pos)).filterType(type);
     }
 
     /**
@@ -246,9 +245,9 @@ public class Map {
      * @param type The type of objects to find
      * @return A stream over those objects
      */
-    public <T> Stream<T> objects(float2 pos, float maxDist, Class<T> type) {
+    public <T> ListStream<T> objects(float2 pos, float maxDist, Class<T> type) {
         float maxSqrDist = maxDist * maxDist;
-        return Utils.filterType(objects().filter(o -> float2.sqrDist(o.location, pos) <= maxSqrDist), type);
+        return objects().filter(o -> float2.sqrDist(o.location, pos) <= maxSqrDist).filterType(type);
     }
 
 

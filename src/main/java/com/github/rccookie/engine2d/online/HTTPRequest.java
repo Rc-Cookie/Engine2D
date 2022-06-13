@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.github.rccookie.engine2d.Application;
-import com.github.rccookie.engine2d.util.SynchronizedMappedFutureImpl;
+import com.github.rccookie.engine2d.util.SynchronizedFutureImpl;
 import com.github.rccookie.json.Json;
 import com.github.rccookie.util.Arguments;
 import com.github.rccookie.util.Future;
@@ -126,10 +126,7 @@ public class HTTPRequest {
      * @return A future to the HTTP response
      */
     public Future<HTTPResponse> send(@Nullable String data) {
-        return new SynchronizedMappedFutureImpl<>(
-                Application.getImplementation().getOnlineManager().sendHTTPRequest(url, method, headerView, data),
-                HTTPResponse::new
-        );
+        return new SynchronizedFutureImpl<>(Application.getImplementation().getOnlineManager().sendHTTPRequest(url, method, headerView, data).map(HTTPResponse::new));
     }
 
     /**
@@ -161,10 +158,7 @@ public class HTTPRequest {
      */
     public Future<HTTPResponse> sendParams(Map<?,?> params) {
         String paramsString = "?" + params.entrySet().stream().map(e -> e.getKey() + "=" + e.getValue()).collect(Collectors.joining("&"));
-        return new SynchronizedMappedFutureImpl<>(
-                Application.getImplementation().getOnlineManager().sendHTTPRequest(url + paramsString, method, headerView, null),
-                HTTPResponse::new
-        );
+        return new SynchronizedFutureImpl<>(Application.getImplementation().getOnlineManager().sendHTTPRequest(url + paramsString, method, headerView, null).map(HTTPResponse::new));
     }
 
     /**
