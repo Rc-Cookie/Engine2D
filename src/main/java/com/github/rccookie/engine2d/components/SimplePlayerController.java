@@ -1,4 +1,4 @@
-package com.github.rccookie.engine2d.physics;
+package com.github.rccookie.engine2d.components;
 
 import com.github.rccookie.engine2d.Component;
 import com.github.rccookie.engine2d.GameObject;

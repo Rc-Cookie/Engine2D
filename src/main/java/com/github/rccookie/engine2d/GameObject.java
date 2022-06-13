@@ -125,7 +125,8 @@ public class GameObject {
     private final Action updateAction = update::invoke, lateUpdateAction = lateUpdate::invoke;
 
     /**
-     * Executed when the gameobject changes map, with the old and new map as parameters.
+     * Executed when the gameobject changes map, with the new and old map as parameters.
+     * The new map gets passed as first parameter.
      */
     public final BiParamEvent<Map,Map> onMapChange = new CaughtBiParamEvent<>(false);
 
@@ -271,7 +272,7 @@ public class GameObject {
             if(lateUpdateUses != 0)
                 this.map.gameobjectLateUpdate.add(lateUpdateAction);
         }
-        onMapChange.invoke(old, map);
+        onMapChange.invoke(map, old);
     }
 
     /**
