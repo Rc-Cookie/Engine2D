@@ -9,14 +9,13 @@ import com.github.rccookie.engine2d.core.LoopExecutor;
 import com.github.rccookie.engine2d.core.ParallelLoopExecutor;
 import com.github.rccookie.engine2d.core.SequentialLoopExecutor;
 import com.github.rccookie.engine2d.core.stats.PerformanceStats;
+import com.github.rccookie.engine2d.coroutine.Execute;
 import com.github.rccookie.engine2d.impl.DisplayController;
 import com.github.rccookie.engine2d.impl.Implementation;
-import com.github.rccookie.engine2d.util.Coroutine;
 import com.github.rccookie.engine2d.util.NamedCaughtEvent;
-import com.github.rccookie.engine2d.util.VoidCoroutine;
 import com.github.rccookie.event.Event;
 import com.github.rccookie.geometry.performance.int2;
-import com.github.rccookie.util.Future;
+import com.github.rccookie.util.Console;
 
 import org.jetbrains.annotations.Blocking;
 
@@ -151,7 +150,7 @@ public enum Application {
         }
         else executor.setFps(60);
 
-        Execute.init();
+        Execute.repeating(() -> Console.write("FPS", Time.fps()), 1, 1, true);
     }
 
     /**
@@ -197,35 +196,7 @@ public enum Application {
         executor.runIteration();
     }
 
-    /**
-     * Starts the given coroutine.
-     *
-     * @param coroutine The coroutine to start
-     * @param <T> The type of result
-     * @return A future for the result of the coroutine
-     */
-    @Deprecated
-    public static <T> Future<T> startCoroutine(Coroutine<T> coroutine) {
-        checkSetup();
-        return implementation.startCoroutine(coroutine);
-    }
 
-    /**
-     * Starts the given coroutine which has no result.
-     *
-     * @param coroutine The coroutine to start
-     */
-    @Deprecated
-    public static void startCoroutine(VoidCoroutine coroutine) {
-        startCoroutine((Coroutine<Object>) coroutine);
-    }
-
-
-
-//    public static void yield() {
-//        checkSetup();
-//        implementation.yield();
-//    }
 
     /**
      * Determines whether this application has been set up using

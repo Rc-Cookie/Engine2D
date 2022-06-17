@@ -3,7 +3,7 @@ package com.github.rccookie.engine2d.util;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import com.github.rccookie.engine2d.Execute;
+import com.github.rccookie.engine2d.coroutine.Execute;
 import com.github.rccookie.util.Arguments;
 import com.github.rccookie.util.Future;
 

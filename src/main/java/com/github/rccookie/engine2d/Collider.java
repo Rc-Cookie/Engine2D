@@ -1,9 +1,13 @@
 package com.github.rccookie.engine2d;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import com.github.rccookie.engine2d.physics.Raycast;
 import com.github.rccookie.event.CaughtParamEvent;
 import com.github.rccookie.event.ParamEvent;
 import com.github.rccookie.geometry.performance.float2;
+import com.github.rccookie.util.Utils;
 
 import org.jbox2d.dynamics.Body;
 
@@ -21,6 +25,8 @@ public abstract class Collider extends Component {
      * Called when a collision ends with a certain object.
      */
     public final ParamEvent<Collider> onCollisionExit = new CaughtParamEvent<>();
+
+    private Set<Collider> colliding;
 
 
     /**
@@ -146,6 +152,27 @@ public abstract class Collider extends Component {
     }
 
     /**
+     * Returns <b>a view</b> of all colliders that the collider intersects with.
+     * The set will be updated automatically.
+     * <p>There updates will only happen in the physics update. Thus, the returned
+     * set will <b>always be empty</b> at first. Also, moving an object around will
+     * not immediately be represented in the set but only after the next physics
+     * update.</p>
+     * <p>Subsequent calls to this method will always return the same instance and
+     * will not cause a recalculation. They will also <b>not</b> update the set to
+     * the exact state that is currently present.</p>
+     *
+     * @return A view of the colliders that this collider intersects
+     */
+    public Set<Collider> getColliding() {
+        if(colliding != null) return colliding;
+        Set<Collider> mutColliding = new HashSet<>();
+        onCollisionEnter.add(mutColliding::add);
+        onCollisionExit.add(mutColliding::remove);
+        return colliding = Utils.view(mutColliding);
+    }
+
+    /**
      * Clears the used fixture. Internal method.
      */
     protected abstract void clearFixture();
@@ -156,6 +183,4 @@ public abstract class Collider extends Component {
      * @param body The body to attach to
      */
     protected abstract void generateFixture(Body body);
-
-    // TODO: Filter?
 }

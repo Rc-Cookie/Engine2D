@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.github.rccookie.engine2d.Execute;
+import com.github.rccookie.engine2d.coroutine.Execute;
 import com.github.rccookie.engine2d.ui.Toggle;
 import com.github.rccookie.event.CaughtParamEvent;
 import com.github.rccookie.event.ParamEvent;

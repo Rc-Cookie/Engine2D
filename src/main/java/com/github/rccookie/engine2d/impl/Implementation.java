@@ -1,8 +1,6 @@
 package com.github.rccookie.engine2d.impl;
 
 import com.github.rccookie.engine2d.Properties;
-import com.github.rccookie.engine2d.util.Coroutine;
-import com.github.rccookie.util.Future;
 
 /**
  * Generic interface for an implementation of an Engine-2D application.
@@ -106,28 +104,6 @@ public interface Implementation {
      *                                       or use an external update loop
      */
     void runExternalUpdateLoop() throws UnsupportedOperationException;
-
-    /**
-     * Yields this thread, if supported.
-     */
-    @Deprecated
-    void yield();
-
-    /**
-     * Starts the given coroutine.
-     *
-     * @param coroutine The coroutine to start
-     * @param <T> The return type
-     * @return A future referring to the result of the coroutine
-     */
-    @Deprecated
-    <T> Future<T> startCoroutine(Coroutine<T> coroutine);
-
-    /**
-     * Sleeps until the next frame, if supported.
-     */
-    @Deprecated
-    void sleepUntilNextFrame();
 
     /**
      * Sets the executing thread as the main thread.

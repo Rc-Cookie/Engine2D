@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
-import com.github.rccookie.engine2d.Execute;
+import com.github.rccookie.engine2d.coroutine.Execute;
 import com.github.rccookie.engine2d.UIObject;
 import com.github.rccookie.engine2d.image.Font;
 import com.github.rccookie.engine2d.image.Image;

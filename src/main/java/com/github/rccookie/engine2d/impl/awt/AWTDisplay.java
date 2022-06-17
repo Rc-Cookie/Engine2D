@@ -14,7 +14,7 @@ import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
 import com.github.rccookie.engine2d.Application;
-import com.github.rccookie.engine2d.Execute;
+import com.github.rccookie.engine2d.coroutine.Execute;
 import com.github.rccookie.engine2d.core.DrawObject;
 import com.github.rccookie.engine2d.image.Color;
 import com.github.rccookie.engine2d.impl.Display;

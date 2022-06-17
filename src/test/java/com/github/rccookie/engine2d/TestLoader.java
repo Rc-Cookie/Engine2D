@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.Inet4Address;
 
 import com.github.rccookie.engine2d.components.Follower;
+import com.github.rccookie.engine2d.coroutine.Execute;
 import com.github.rccookie.engine2d.image.Color;
 import com.github.rccookie.engine2d.image.Font;
 import com.github.rccookie.engine2d.image.Image;

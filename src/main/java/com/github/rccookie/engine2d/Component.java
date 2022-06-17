@@ -1,6 +1,6 @@
 package com.github.rccookie.engine2d;
 
-import com.github.rccookie.engine2d.core.LocalExecutionManager;
+import com.github.rccookie.engine2d.coroutine.LocalExecutionManager;
 import com.github.rccookie.engine2d.core.LocalInputManager;
 import com.github.rccookie.engine2d.util.NamedLazyEvent;
 import com.github.rccookie.event.Event;

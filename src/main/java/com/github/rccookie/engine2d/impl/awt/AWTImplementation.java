@@ -1,6 +1,5 @@
 package com.github.rccookie.engine2d.impl.awt;
 
-import com.github.rccookie.engine2d.Execute;
 import com.github.rccookie.engine2d.Properties;
 import com.github.rccookie.engine2d.impl.Display;
 import com.github.rccookie.engine2d.impl.DisplayController;
@@ -9,11 +8,7 @@ import com.github.rccookie.engine2d.impl.ImageManager;
 import com.github.rccookie.engine2d.impl.Implementation;
 import com.github.rccookie.engine2d.impl.InputAdapter;
 import com.github.rccookie.engine2d.impl.OnlineManager;
-import com.github.rccookie.engine2d.util.Coroutine;
 import com.github.rccookie.engine2d.util.awt.AWTStartupPrefs;
-import com.github.rccookie.util.Future;
-import com.github.rccookie.util.FutureImpl;
-import com.github.rccookie.util.ThreadedFutureImpl;
 
 /**
  * AWT based pure java Engine2D implementation.
@@ -127,37 +122,6 @@ public class AWTImplementation implements Implementation {
     @Override
     public void runExternalUpdateLoop() throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
-    }
-
-    @Override
-    @Deprecated
-    public void yield() {
-        Thread.yield();
-    }
-
-    @Override
-    @Deprecated
-    public <T> Future<T> startCoroutine(Coroutine<T> coroutine) {
-        FutureImpl<T> future = new ThreadedFutureImpl<>();
-        new Thread(() -> {
-            try {
-                T result = coroutine.run();
-                future.complete(result);
-            } catch(RuntimeException e) {
-                future.fail(e);
-                throw e;
-            }
-        }).start();
-        return future;
-    }
-
-    @Override
-    @Deprecated
-    public void sleepUntilNextFrame() {
-        Thread thread = Thread.currentThread();
-        Execute.nextFrame(thread::interrupt);
-        try { thread.join(); }
-        catch (InterruptedException ignored) { }
     }
 
     @Override
